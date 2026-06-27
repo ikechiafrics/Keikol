@@ -15,13 +15,13 @@ const NAV_LINKS = [
 
 function Logo() {
   return (
-    <Link to="/" className="group inline-flex items-center gap-2">
+    <Link to="/" className="group inline-flex items-center gap-2.5">
       <img
         src={keikolMark.url}
         alt="Keikol"
-        className="h-9 w-9 rounded-lg shadow-gold"
+        className="h-12 w-12 rounded-xl shadow-gold"
       />
-      <span className="font-display text-xl font-extrabold tracking-tight">Keikol</span>
+      <span className="font-display text-2xl font-extrabold tracking-tight">Keikol</span>
     </Link>
   );
 }
