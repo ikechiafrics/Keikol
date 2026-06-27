@@ -129,7 +129,7 @@ function BillboardDetailPage() {
             <div className="rounded-2xl bg-card-premium p-6 shadow-elegant ring-hairline">
               <h3 className="font-display text-base font-bold">Recommended Industries</h3>
               <div className="mt-4 flex flex-wrap gap-2">
-                {b.recommendedIndustries.map((i) => (
+                {b.recommendedIndustries.map((i: string) => (
                   <span key={i} className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-xs font-semibold border border-border">
                     <Tag className="h-3 w-3 text-gold" /> {i}
                   </span>
@@ -139,7 +139,7 @@ function BillboardDetailPage() {
             <div className="rounded-2xl bg-card-premium p-6 shadow-elegant ring-hairline">
               <h3 className="font-display text-base font-bold">Nearby Businesses</h3>
               <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-                {b.nearbyBusinesses.map((n) => (
+                {b.nearbyBusinesses.map((n: string) => (
                   <li key={n} className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-accent" /> {n}
                   </li>
