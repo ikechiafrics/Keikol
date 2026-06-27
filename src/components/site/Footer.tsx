@@ -1,12 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+import keikolMark from "@/assets/keikol-mark.png.asset.json";
 
 function Logo() {
   return (
     <Link to="/" className="inline-flex items-center gap-2">
-      <span className="relative inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gold shadow-gold ring-hairline">
-        <span className="font-display text-base font-extrabold text-primary-foreground">K</span>
-      </span>
+      <img src={keikolMark.url} alt="Keikol" className="h-8 w-8 rounded-lg shadow-gold" />
       <span className="font-display text-xl font-extrabold tracking-tight">Keikol</span>
     </Link>
   );

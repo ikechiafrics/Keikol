@@ -2,6 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowRight, Menu, X } from "lucide-react";
 
+import keikolMark from "@/assets/keikol-mark.png.asset.json";
+
 const NAV_LINKS = [
   { label: "Home", to: "/" },
   { label: "Locations", to: "/locations" },
@@ -14,10 +16,11 @@ const NAV_LINKS = [
 function Logo() {
   return (
     <Link to="/" className="group inline-flex items-center gap-2">
-      <span className="relative inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gold shadow-gold ring-hairline">
-        <span className="font-display text-base font-extrabold text-primary-foreground">K</span>
-        <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-electric shadow-glow" />
-      </span>
+      <img
+        src={keikolMark.url}
+        alt="Keikol"
+        className="h-9 w-9 rounded-lg shadow-gold"
+      />
       <span className="font-display text-xl font-extrabold tracking-tight">Keikol</span>
     </Link>
   );
