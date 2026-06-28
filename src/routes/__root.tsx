@@ -131,7 +131,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-background text-foreground">
-        <Navbar />
+        <Header />
         <main>
           <Outlet />
         </main>
