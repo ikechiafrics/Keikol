@@ -317,13 +317,8 @@ function TagPanel({
         </span>
         <h3 className="font-display text-base font-bold">{title}</h3>
       </div>
-      <div className="mt-5 flex flex-wrap gap-2">
-        {items.map((i) => (
-          <span key={i} className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-xs font-semibold border border-border">
-            {i}
-          </span>
-        ))}
-      </div>
+      <TagList items={items} className="mt-5" />
+
     </div>
   );
 }
