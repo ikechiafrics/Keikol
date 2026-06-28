@@ -116,7 +116,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
   );
 }
 
-function QuoteForm() {
+function QuoteForm({ interestedBillboard = "Not sure yet", billboardId }: { interestedBillboard?: string; billboardId?: string }) {
   const [submitted, setSubmitted] = useState(false);
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
