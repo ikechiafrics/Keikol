@@ -1,13 +1,31 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowRight, CheckCircle2, Eye, Lightbulb, MapPin, Phone, Ruler, Sparkles, Tag, Target, TrendingUp } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Building2,
+  CheckCircle2,
+  Eye,
+  Landmark,
+  Lightbulb,
+  MapPin,
+  Megaphone,
+  Phone,
+  Ruler,
+  Sparkles,
+  Sun,
+  Tag,
+  Target,
+  TrendingUp,
+  Wallet,
+} from "lucide-react";
 
 import { Section, SectionHeader, CTASection } from "@/components/site/Section";
 import { BillboardCard } from "@/components/site/BillboardCard";
-import { BILLBOARDS } from "@/lib/site-data";
+import { BILLBOARDS, getBillboardById, type Billboard } from "@/lib/site-data";
 
 export const Route = createFileRoute("/locations/$id")({
   head: ({ params }) => {
-    const b = BILLBOARDS.find((x) => x.id === params.id);
+    const b = getBillboardById(params.id);
     const title = b ? `${b.area}, ${b.city} — Keikol` : "Billboard — Keikol";
     const desc = b
       ? `${b.billboardType} · ${b.estimatedDailyImpressions} daily impressions · ${b.landmark}.`
@@ -22,26 +40,17 @@ export const Route = createFileRoute("/locations/$id")({
       ],
     };
   },
-  loader: ({ params }) => {
-    const b = BILLBOARDS.find((x) => x.id === params.id);
-    if (!b) throw notFound();
-    return { billboard: b };
-  },
   component: BillboardDetailPage,
-  notFoundComponent: () => (
-    <div className="pt-40 pb-24 text-center">
-      <h1 className="font-display text-3xl font-bold">Billboard not found</h1>
-      <p className="mt-3 text-muted-foreground">This location may have moved or been removed.</p>
-      <Link to="/locations" className="mt-6 inline-flex items-center gap-2 rounded-full bg-gold px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-gold">
-        Back to Locations <ArrowRight className="h-4 w-4" />
-      </Link>
-    </div>
-  ),
 });
 
 function BillboardDetailPage() {
-  const { billboard: b } = Route.useLoaderData();
+  const { id } = Route.useParams();
+  const b = getBillboardById(id);
+
+  if (!b) return <NotFoundState id={id} />;
+
   const related = BILLBOARDS.filter((x) => x.id !== b.id).slice(0, 3);
+  const quoteHref = `/contact?billboard=${b.id}`;
 
   return (
     <>
@@ -52,9 +61,15 @@ function BillboardDetailPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
         </div>
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
-          <Link to="/locations" className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground hover:text-gold">
-            ← All Locations
-          </Link>
+          {/* Breadcrumb */}
+          <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            <Link to="/" className="hover:text-gold">Home</Link>
+            <span>/</span>
+            <Link to="/locations" className="hover:text-gold">Locations</Link>
+            <span>/</span>
+            <span className="text-foreground">{b.city} — {b.area}</span>
+          </nav>
+
           <div className="mt-6 grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-center">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">{b.city}</p>
@@ -74,11 +89,18 @@ function BillboardDetailPage() {
                 </span>
               </div>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link to="/contact" className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-primary-foreground shadow-gold transition-transform hover:-translate-y-0.5">
-                  Request Quote for This Billboard <ArrowRight className="h-4 w-4" />
+                <Link
+                  to="/contact"
+                  search={{ billboard: b.id }}
+                  className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-primary-foreground shadow-gold transition-transform hover:-translate-y-0.5"
+                >
+                  Request Quote <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link to="/contact" className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-6 py-3 text-sm font-semibold hover:border-accent hover:text-accent">
-                  <Phone className="h-4 w-4" /> Contact Sales
+                <Link
+                  to="/locations"
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-6 py-3 text-sm font-semibold hover:border-accent hover:text-accent"
+                >
+                  <ArrowLeft className="h-4 w-4" /> Back to Locations
                 </Link>
               </div>
             </div>
@@ -91,68 +113,74 @@ function BillboardDetailPage() {
         </div>
       </section>
 
-      {/* Details grid */}
+      {/* Key details grid */}
       <Section>
-        <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-          <div className="rounded-3xl bg-card-premium p-8 shadow-elegant ring-hairline">
-            <h2 className="font-display text-2xl font-bold">Location Details</h2>
-            <dl className="mt-6 grid gap-x-8 gap-y-4 sm:grid-cols-2">
-              {[
-                ["Location", `${b.area}, ${b.city}`],
-                ["Landmark", b.landmark],
-                ["Billboard Type", b.billboardType],
-                ["Size", b.size],
-                ["Daily Impressions", b.estimatedDailyImpressions],
-                ["Availability", b.availability],
-                ["Lighting", b.lighting],
-                ["Price Range", b.priceRange],
-              ].map(([k, v]) => (
-                <div key={k}>
-                  <dt className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{k}</dt>
-                  <dd className="mt-1 text-sm font-semibold">{v}</dd>
-                </div>
-              ))}
-            </dl>
-
-            <div className="mt-8 border-t border-border pt-6">
-              <h3 className="font-display text-lg font-bold">About this placement</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{b.description}</p>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                This billboard location is designed for brands that want strong visibility in a high-traffic
-                commercial environment. It is suitable for awareness campaigns, product launches, retail
-                promotions, and premium brand positioning.
-              </p>
-            </div>
-          </div>
-
-          <aside className="space-y-4">
-            <div className="rounded-2xl bg-card-premium p-6 shadow-elegant ring-hairline">
-              <h3 className="font-display text-base font-bold">Recommended Industries</h3>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {b.recommendedIndustries.map((i: string) => (
-                  <span key={i} className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-xs font-semibold border border-border">
-                    <Tag className="h-3 w-3 text-gold" /> {i}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div className="rounded-2xl bg-card-premium p-6 shadow-elegant ring-hairline">
-              <h3 className="font-display text-base font-bold">Nearby Businesses</h3>
-              <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-                {b.nearbyBusinesses.map((n: string) => (
-                  <li key={n} className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-accent" /> {n}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </aside>
+        <SectionHeader
+          align="left"
+          eyebrow="Key Details"
+          title={<>Everything you need to know about <span className="text-gradient-gold">this placement.</span></>}
+        />
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <DetailInfoCard icon={MapPin} label="City" value={b.city} />
+          <DetailInfoCard icon={Building2} label="Area" value={b.area} />
+          <DetailInfoCard icon={Landmark} label="Landmark" value={b.landmark} />
+          <DetailInfoCard icon={Megaphone} label="Billboard Type" value={b.billboardType} />
+          <DetailInfoCard icon={Ruler} label="Size" value={b.size} />
+          <DetailInfoCard icon={Eye} label="Daily Impressions" value={b.estimatedDailyImpressions} />
+          <DetailInfoCard icon={CheckCircle2} label="Availability" value={b.availability} />
+          <DetailInfoCard icon={Wallet} label="Price Range" value={b.priceRange} />
+          <DetailInfoCard icon={Sun} label="Lighting" value={b.lighting} />
         </div>
       </Section>
 
-      {/* Why it works */}
+      {/* Description */}
       <Section tone="surface">
-        <SectionHeader eyebrow="Why this works" title={<>Why this location <span className="text-gradient-gold">delivers.</span></>} />
+        <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr]">
+          <SectionHeader
+            align="left"
+            eyebrow="About this placement"
+            title={<>Why brands choose <span className="text-gradient-gold">{b.area}.</span></>}
+          />
+          <div className="rounded-3xl bg-card-premium p-8 shadow-elegant ring-hairline">
+            <p className="text-base leading-relaxed text-muted-foreground">{b.description}</p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {b.tags.map((t) => (
+                <span key={t} className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-xs font-semibold border border-border">
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      {/* Industries + bestFor + nearby */}
+      <Section>
+        <div className="grid gap-6 lg:grid-cols-3">
+          <TagPanel
+            title="Recommended Industries"
+            icon={Tag}
+            items={b.recommendedIndustries}
+            accent="gold"
+          />
+          <TagPanel
+            title="Best For"
+            icon={Target}
+            items={b.bestFor}
+            accent="electric"
+          />
+          <TagPanel
+            title="Nearby Environment"
+            icon={Landmark}
+            items={b.nearbyLandmarks}
+            accent="gold"
+          />
+        </div>
+      </Section>
+
+      {/* Why this works */}
+      <Section tone="surface">
+        <SectionHeader eyebrow="Why it works" title={<>Why this location <span className="text-gradient-gold">delivers.</span></>} />
         <div className="mt-14 grid gap-5 lg:grid-cols-3">
           {[
             { icon: Eye, title: "High Daily Visibility", body: "This placement is designed to reach commuters, shoppers, professionals, and local traffic." },
@@ -211,10 +239,116 @@ function BillboardDetailPage() {
         </div>
       </Section>
 
-      <CTASection
-        headline={<>Interested in this <span className="text-gradient-gold">billboard location?</span></>}
-        subheadline="Send us your campaign details and the Keikol team will help you confirm availability, pricing, and next steps."
-      />
+      {/* Final CTA */}
+      <Section>
+        <div className="relative overflow-hidden rounded-3xl bg-card-premium p-10 shadow-elegant ring-hairline sm:p-14">
+          <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-gold/20 blur-3xl" />
+          <div className="absolute -bottom-24 -right-10 h-72 w-72 rounded-full bg-accent/25 blur-3xl" />
+          <div className="relative mx-auto max-w-3xl text-center">
+            <Phone className="mx-auto h-10 w-10 text-gold" />
+            <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
+              Interested in <span className="text-gradient-gold">this billboard location?</span>
+            </h2>
+            <p className="mt-5 text-base text-muted-foreground sm:text-lg">
+              Send us your campaign details and the Keikol team will help you confirm availability, pricing, and next steps.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Link
+                to="/contact"
+                search={{ billboard: b.id }}
+                className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-primary-foreground shadow-gold transition-transform hover:-translate-y-0.5"
+              >
+                Request Quote <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                to="/locations"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-6 py-3 text-sm font-semibold transition-colors hover:border-accent hover:text-accent"
+              >
+                <ArrowLeft className="h-4 w-4" /> Back to Locations
+              </Link>
+            </div>
+          </div>
+        </div>
+      </Section>
     </>
   );
 }
+
+function DetailInfoCard({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-start gap-4 rounded-2xl bg-card-premium p-5 shadow-elegant ring-hairline">
+      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-surface text-gold">
+        <Icon className="h-5 w-5" />
+      </span>
+      <div className="min-w-0">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{label}</p>
+        <p className="mt-1 text-sm font-semibold">{value}</p>
+      </div>
+    </div>
+  );
+}
+
+function TagPanel({
+  title,
+  icon: Icon,
+  items,
+  accent,
+}: {
+  title: string;
+  icon: React.ComponentType<{ className?: string }>;
+  items: string[];
+  accent: "gold" | "electric";
+}) {
+  const accentClass = accent === "gold" ? "bg-gold text-primary-foreground" : "bg-electric text-accent-foreground";
+  return (
+    <div className="rounded-2xl bg-card-premium p-6 shadow-elegant ring-hairline">
+      <div className="flex items-center gap-3">
+        <span className={`grid h-10 w-10 place-items-center rounded-xl ${accentClass}`}>
+          <Icon className="h-5 w-5" />
+        </span>
+        <h3 className="font-display text-base font-bold">{title}</h3>
+      </div>
+      <div className="mt-5 flex flex-wrap gap-2">
+        {items.map((i) => (
+          <span key={i} className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-xs font-semibold border border-border">
+            {i}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function NotFoundState({ id }: { id: string }) {
+  return (
+    <div className="mx-auto max-w-3xl px-5 pt-40 pb-24 text-center">
+      <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+        Not Found
+      </span>
+      <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
+        Billboard Location <span className="text-gradient-gold">Not Found</span>
+      </h1>
+      <p className="mt-4 text-base text-muted-foreground">
+        The billboard location you are looking for {id ? <>(<code className="text-foreground">{id}</code>)</> : null} may have been moved, renamed, or is no longer available.
+      </p>
+      <div className="mt-8 flex flex-wrap justify-center gap-3">
+        <Link to="/locations" className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-6 py-3 text-sm font-semibold hover:border-accent hover:text-accent">
+          <ArrowLeft className="h-4 w-4" /> Back to Locations
+        </Link>
+        <Link to="/contact" className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-primary-foreground shadow-gold">
+          Request a Quote <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+export type { Billboard };
