@@ -15,7 +15,7 @@ export function Footer() {
   return (
     <footer className="border-t border-border bg-background">
       <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
-        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
           <div>
             <Logo />
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted-foreground">
@@ -53,6 +53,14 @@ export function Footer() {
               { label: "Contact", to: "/contact" },
             ]}
           />
+          <FooterCol
+            title="Legal"
+            links={[
+              { label: "Privacy Policy", to: "/privacy-policy" },
+              { label: "Terms of Use", to: "/terms-of-use" },
+            ]}
+          />
+
           <FooterCol
             title="Services"
             links={[
