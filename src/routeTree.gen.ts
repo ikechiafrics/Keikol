@@ -10,21 +10,16 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
-import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as IndustriesRouteImport } from './routes/industries'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LocationsIndexRouteImport } from './routes/locations.index'
 import { Route as LocationsIdRouteImport } from './routes/locations.$id'
 
 const PortfolioRoute = PortfolioRouteImport.update({
   id: '/portfolio',
   path: '/portfolio',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LocationsRoute = LocationsRouteImport.update({
-  id: '/locations',
-  path: '/locations',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndustriesRoute = IndustriesRouteImport.update({
@@ -47,10 +42,15 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LocationsIndexRoute = LocationsIndexRouteImport.update({
+  id: '/locations/',
+  path: '/locations/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LocationsIdRoute = LocationsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => LocationsRoute,
+  id: '/locations/$id',
+  path: '/locations/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -58,18 +58,18 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/industries': typeof IndustriesRoute
-  '/locations': typeof LocationsRouteWithChildren
   '/portfolio': typeof PortfolioRoute
   '/locations/$id': typeof LocationsIdRoute
+  '/locations/': typeof LocationsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/industries': typeof IndustriesRoute
-  '/locations': typeof LocationsRouteWithChildren
   '/portfolio': typeof PortfolioRoute
   '/locations/$id': typeof LocationsIdRoute
+  '/locations': typeof LocationsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,9 +77,9 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/industries': typeof IndustriesRoute
-  '/locations': typeof LocationsRouteWithChildren
   '/portfolio': typeof PortfolioRoute
   '/locations/$id': typeof LocationsIdRoute
+  '/locations/': typeof LocationsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -88,27 +88,27 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/industries'
-    | '/locations'
     | '/portfolio'
     | '/locations/$id'
+    | '/locations/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/contact'
     | '/industries'
-    | '/locations'
     | '/portfolio'
     | '/locations/$id'
+    | '/locations'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/contact'
     | '/industries'
-    | '/locations'
     | '/portfolio'
     | '/locations/$id'
+    | '/locations/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -116,8 +116,9 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
   IndustriesRoute: typeof IndustriesRoute
-  LocationsRoute: typeof LocationsRouteWithChildren
   PortfolioRoute: typeof PortfolioRoute
+  LocationsIdRoute: typeof LocationsIdRoute
+  LocationsIndexRoute: typeof LocationsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -127,13 +128,6 @@ declare module '@tanstack/react-router' {
       path: '/portfolio'
       fullPath: '/portfolio'
       preLoaderRoute: typeof PortfolioRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/locations': {
-      id: '/locations'
-      path: '/locations'
-      fullPath: '/locations'
-      preLoaderRoute: typeof LocationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/industries': {
@@ -164,46 +158,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/locations/': {
+      id: '/locations/'
+      path: '/locations'
+      fullPath: '/locations/'
+      preLoaderRoute: typeof LocationsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/locations/$id': {
       id: '/locations/$id'
-      path: '/$id'
+      path: '/locations/$id'
       fullPath: '/locations/$id'
       preLoaderRoute: typeof LocationsIdRouteImport
-      parentRoute: typeof LocationsRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
-
-interface LocationsRouteChildren {
-  LocationsIdRoute: typeof LocationsIdRoute
-}
-
-const LocationsRouteChildren: LocationsRouteChildren = {
-  LocationsIdRoute: LocationsIdRoute,
-}
-
-const LocationsRouteWithChildren = LocationsRoute._addFileChildren(
-  LocationsRouteChildren,
-)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
   IndustriesRoute: IndustriesRoute,
-  LocationsRoute: LocationsRouteWithChildren,
   PortfolioRoute: PortfolioRoute,
+  LocationsIdRoute: LocationsIdRoute,
+  LocationsIndexRoute: LocationsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

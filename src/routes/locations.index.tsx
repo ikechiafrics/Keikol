@@ -13,7 +13,7 @@ import {
   heroImg,
 } from "@/lib/site-data";
 
-export const Route = createFileRoute("/locations")({
+export const Route = createFileRoute("/locations/")({
   head: () => ({
     meta: [
       { title: "Billboard Locations — Keikol" },
