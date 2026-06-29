@@ -36,14 +36,39 @@ export const Route = createFileRoute("/locations/$id")({
     const desc = b
       ? `${b.billboardType} · ${b.estimatedDailyImpressions} daily impressions · ${b.landmark}.`
       : "Billboard details.";
+    const url = `/locations/${params.id}`;
     return {
       meta: [
         { title },
         { name: "description", content: desc },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
+        { property: "og:url", content: url },
         ...(b ? [{ property: "og:image", content: b.image }] : []),
       ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: b
+        ? [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Service",
+                serviceType: "Billboard Advertising",
+                name: `${b.area} Billboard — ${b.city}`,
+                description: b.description,
+                provider: {
+                  "@type": "Organization",
+                  name: "Keikol",
+                  legalName: "Keikol Media Group Ltd",
+                },
+                areaServed: { "@type": "Place", name: `${b.area}, ${b.city}, Nigeria` },
+                category: b.billboardType,
+                image: b.image,
+              }),
+            },
+          ]
+        : undefined,
     };
   },
   component: BillboardDetailPage,

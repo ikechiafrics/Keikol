@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ChevronRight, Eye, MapPin, Palette, Sparkles, Target } from "lucide-react";
 
 import { PageHero, Section, SectionHeader, CTASection } from "@/components";
-import { PORTFOLIO_SAMPLES } from "@/data/billboards";
+import { PORTFOLIO_SAMPLES, heroImg } from "@/data/billboards";
 
 export const Route = createFileRoute("/portfolio")({
   head: () => ({
@@ -15,7 +15,10 @@ export const Route = createFileRoute("/portfolio")({
       },
       { property: "og:title", content: "Portfolio — Keikol" },
       { property: "og:description", content: "Sample outdoor advertising campaign concepts by Keikol." },
+      { property: "og:url", content: "/portfolio" },
+      { property: "og:image", content: heroImg },
     ],
+    links: [{ rel: "canonical", href: "/portfolio" }],
   }),
   component: PortfolioPage,
 });

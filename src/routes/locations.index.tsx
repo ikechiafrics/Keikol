@@ -27,8 +27,10 @@ export const Route = createFileRoute("/locations/")({
         property: "og:description",
         content: "High-visibility billboard advertising spaces across major Nigerian cities.",
       },
+      { property: "og:url", content: "/locations" },
       { property: "og:image", content: heroImg },
     ],
+    links: [{ rel: "canonical", href: "/locations" }],
   }),
   component: LocationsPage,
 });

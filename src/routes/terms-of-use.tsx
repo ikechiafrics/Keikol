@@ -16,7 +16,9 @@ export const Route = createFileRoute("/terms-of-use")({
         content:
           "The terms that apply to using the Keikol website and submitting quote requests.",
       },
+      { property: "og:url", content: "/terms-of-use" },
     ],
+    links: [{ rel: "canonical", href: "/terms-of-use" }],
   }),
   component: TermsOfUsePage,
 });

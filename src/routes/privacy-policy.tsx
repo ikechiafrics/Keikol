@@ -16,7 +16,9 @@ export const Route = createFileRoute("/privacy-policy")({
         content:
           "How Keikol handles your information when you request a quote or browse our website.",
       },
+      { property: "og:url", content: "/privacy-policy" },
     ],
+    links: [{ rel: "canonical", href: "/privacy-policy" }],
   }),
   component: PrivacyPolicyPage,
 });

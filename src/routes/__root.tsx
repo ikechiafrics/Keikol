@@ -79,20 +79,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Keikol — Modern Billboard Advertising in Nigeria" },
-      {
-        name: "description",
-        content:
-          "Keikol helps brands grow through premium billboard advertising, strategic outdoor media placements, and technology-driven campaigns across Nigeria.",
-      },
       { name: "author", content: "Keikol Media Group Ltd" },
-      { property: "og:title", content: "Keikol — Modern Billboard Advertising in Nigeria" },
-      {
-        property: "og:description",
-        content:
-          "Premium outdoor advertising and technology-driven media solutions across Nigeria.",
-      },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "Keikol" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
@@ -102,6 +91,30 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap",
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "Keikol",
+          legalName: "Keikol Media Group Ltd",
+          url: "/",
+          description:
+            "Modern advertising and media company offering premium billboard placements and technology-driven outdoor campaigns across Nigeria.",
+          areaServed: "Nigeria",
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Keikol",
+          url: "/",
+        }),
       },
     ],
   }),

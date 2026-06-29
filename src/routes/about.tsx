@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, CheckCircle2, Eye, Heart, Lightbulb, Sparkles, TrendingUp, Users } from "lucide-react";
 
 import { PageHero, Section, SectionHeader, CTASection } from "@/components";
+import { heroImg } from "@/data/billboards";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -14,7 +15,10 @@ export const Route = createFileRoute("/about")({
       },
       { property: "og:title", content: "About Keikol" },
       { property: "og:description", content: "Building the future of outdoor advertising in Nigeria." },
+      { property: "og:url", content: "/about" },
+      { property: "og:image", content: heroImg },
     ],
+    links: [{ rel: "canonical", href: "/about" }],
   }),
   component: AboutPage,
 });

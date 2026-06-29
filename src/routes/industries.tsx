@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { PageHero, Section, CTASection } from "@/components";
+import { heroImg } from "@/data/billboards";
 
 export const Route = createFileRoute("/industries")({
   head: () => ({
@@ -27,7 +28,10 @@ export const Route = createFileRoute("/industries")({
       },
       { property: "og:title", content: "Industries — Keikol" },
       { property: "og:description", content: "Outdoor advertising solutions tailored to every industry in Nigeria." },
+      { property: "og:url", content: "/industries" },
+      { property: "og:image", content: heroImg },
     ],
+    links: [{ rel: "canonical", href: "/industries" }],
   }),
   component: IndustriesPage,
 });

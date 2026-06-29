@@ -43,8 +43,10 @@ export const Route = createFileRoute("/")({
         content:
           "Premium billboard placements, outdoor media, and technology-driven advertising campaigns across Nigeria.",
       },
+      { property: "og:url", content: "/" },
       { property: "og:image", content: heroImg },
     ],
+    links: [{ rel: "canonical", href: "/" }],
   }),
   component: HomePage,
 });
