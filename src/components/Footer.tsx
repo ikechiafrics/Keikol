@@ -5,7 +5,7 @@ import keikolMark from "@/assets/keikol-mark.png.asset.json";
 function Logo() {
   return (
     <Link to="/" className="inline-flex items-center gap-2">
-      <img src={keikolMark.url} alt="Keikol" className="h-8 w-8 rounded-lg shadow-gold" />
+      <img src={keikolMark.url} alt="Keikol Media Group logo" className="h-8 w-8 rounded-lg shadow-gold" />
       <span className="font-display text-xl font-extrabold tracking-tight">Keikol</span>
     </Link>
   );
