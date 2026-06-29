@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsOfUseRouteImport } from './routes/terms-of-use'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as IndustriesRouteImport } from './routes/industries'
@@ -22,6 +23,11 @@ import { Route as LocationsIdRouteImport } from './routes/locations.$id'
 const TermsOfUseRoute = TermsOfUseRouteImport.update({
   id: '/terms-of-use',
   path: '/terms-of-use',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/industries': typeof IndustriesRoute
   '/portfolio': typeof PortfolioRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms-of-use': typeof TermsOfUseRoute
   '/locations/$id': typeof LocationsIdRoute
   '/locations/': typeof LocationsIndexRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/industries': typeof IndustriesRoute
   '/portfolio': typeof PortfolioRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms-of-use': typeof TermsOfUseRoute
   '/locations/$id': typeof LocationsIdRoute
   '/locations': typeof LocationsIndexRoute
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/industries': typeof IndustriesRoute
   '/portfolio': typeof PortfolioRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms-of-use': typeof TermsOfUseRoute
   '/locations/$id': typeof LocationsIdRoute
   '/locations/': typeof LocationsIndexRoute
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/industries'
     | '/portfolio'
     | '/privacy-policy'
+    | '/sitemap.xml'
     | '/terms-of-use'
     | '/locations/$id'
     | '/locations/'
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/industries'
     | '/portfolio'
     | '/privacy-policy'
+    | '/sitemap.xml'
     | '/terms-of-use'
     | '/locations/$id'
     | '/locations'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/industries'
     | '/portfolio'
     | '/privacy-policy'
+    | '/sitemap.xml'
     | '/terms-of-use'
     | '/locations/$id'
     | '/locations/'
@@ -142,6 +154,7 @@ export interface RootRouteChildren {
   IndustriesRoute: typeof IndustriesRoute
   PortfolioRoute: typeof PortfolioRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsOfUseRoute: typeof TermsOfUseRoute
   LocationsIdRoute: typeof LocationsIdRoute
   LocationsIndexRoute: typeof LocationsIndexRoute
@@ -154,6 +167,13 @@ declare module '@tanstack/react-router' {
       path: '/terms-of-use'
       fullPath: '/terms-of-use'
       preLoaderRoute: typeof TermsOfUseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy-policy': {
@@ -222,6 +242,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndustriesRoute: IndustriesRoute,
   PortfolioRoute: PortfolioRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsOfUseRoute: TermsOfUseRoute,
   LocationsIdRoute: LocationsIdRoute,
   LocationsIndexRoute: LocationsIndexRoute,
@@ -229,13 +250,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
