@@ -3,28 +3,9 @@ import { useState } from "react";
 import { ChevronDown, Tag } from "lucide-react";
 
 import { ContactForm, ContactSidebar, PageHero, Section, SectionHeader } from "@/components";
-import { getBillboardById } from "@/data/billboards";
+import { getBillboardById, heroImg } from "@/data/billboards";
 
 type ContactSearch = { billboard?: string };
-
-export const Route = createFileRoute("/contact")({
-  validateSearch: (search: Record<string, unknown>): ContactSearch => ({
-    billboard: typeof search.billboard === "string" ? search.billboard : undefined,
-  }),
-  head: () => ({
-    meta: [
-      { title: "Request a Quote — Keikol Billboard Advertising" },
-      {
-        name: "description",
-        content:
-          "Tell Keikol about your campaign goals, preferred city, budget, and timeline. We'll recommend the right billboard placements.",
-      },
-      { property: "og:title", content: "Contact Keikol" },
-      { property: "og:description", content: "Request a billboard advertising quote in Nigeria." },
-    ],
-  }),
-  component: ContactPage,
-});
 
 const FAQS = [
   {
@@ -48,6 +29,42 @@ const FAQS = [
     a: "Online payments are planned for a later phase. For now, the website should focus on quote requests and customer inquiries.",
   },
 ];
+
+export const Route = createFileRoute("/contact")({
+  validateSearch: (search: Record<string, unknown>): ContactSearch => ({
+    billboard: typeof search.billboard === "string" ? search.billboard : undefined,
+  }),
+  head: () => ({
+    meta: [
+      { title: "Request a Quote — Keikol Billboard Advertising" },
+      {
+        name: "description",
+        content:
+          "Tell Keikol about your campaign goals, preferred city, budget, and timeline. We'll recommend the right billboard placements.",
+      },
+      { property: "og:title", content: "Contact Keikol" },
+      { property: "og:description", content: "Request a billboard advertising quote in Nigeria." },
+      { property: "og:url", content: "/contact" },
+      { property: "og:image", content: heroImg },
+    ],
+    links: [{ rel: "canonical", href: "/contact" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: FAQS.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+          })),
+        }),
+      },
+    ],
+  }),
+  component: ContactPage,
+});
 
 function ContactPage() {
   const { billboard: billboardId } = Route.useSearch();
