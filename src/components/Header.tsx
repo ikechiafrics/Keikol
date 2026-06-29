@@ -18,7 +18,7 @@ function Logo() {
     <Link to="/" className="group inline-flex items-center gap-2.5">
       <img
         src={keikolMark.url}
-        alt="Keikol"
+        alt="Keikol — Billboard Advertising"
         className="h-12 w-12 rounded-xl shadow-gold"
       />
       <span className="font-display text-2xl font-extrabold tracking-tight">Keikol</span>

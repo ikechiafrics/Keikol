@@ -199,7 +199,7 @@ function MissionVision() {
               <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 {tag}
               </p>
-              <h3 className="mt-2 font-display text-2xl font-bold sm:text-3xl">{title}</h3>
+              <h2 className="mt-2 font-display text-2xl font-bold sm:text-3xl">{title}</h2>
               <p className="mt-4 text-base leading-relaxed text-muted-foreground">{body}</p>
             </div>
           </article>

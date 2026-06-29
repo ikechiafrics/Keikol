@@ -1,0 +1,17 @@
+# Keikol
+
+> Keikol is a modern advertising and media brand (Keikol Media Group Ltd) offering premium billboard placements, outdoor media, and technology-driven advertising campaigns across Nigeria.
+
+## Pages
+
+- [Home](/): Overview of Keikol's billboard advertising services in Nigeria.
+- [Billboard Locations](/locations): Browse premium billboard locations across Lagos, Abuja, Port Harcourt, and Kano.
+- [Industries](/industries): Industries Keikol serves — real estate, telecom, FMCG, banking, fashion, and more.
+- [Portfolio](/portfolio): Sample outdoor advertising campaigns and creative work.
+- [About](/about): Company story, mission, vision, and long-term technology roadmap.
+- [Contact](/contact): Request a billboard advertising quote.
+
+## Optional
+
+- [Privacy Policy](/privacy-policy): How Keikol handles quote and contact data.
+- [Terms of Use](/terms-of-use): Terms governing use of the Keikol website.
