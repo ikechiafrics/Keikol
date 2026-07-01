@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowRight, Menu, X } from "lucide-react";
 
-import keikolMark from "@/assets/keikol-mark.png.asset.json";
+import keikolMark from "@/assets/Logo.png";
 
 const NAV_LINKS = [
   { label: "Home", to: "/" },
@@ -17,7 +17,7 @@ function Logo() {
   return (
     <Link to="/" className="group inline-flex items-center gap-2.5">
       <img
-        src={keikolMark.url}
+        src={keikolMark}
         alt="Keikol — Billboard Advertising"
         className="h-12 w-12 rounded-xl shadow-gold"
       />
