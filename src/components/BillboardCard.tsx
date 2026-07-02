@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ChevronRight, Eye, MapPin, Ruler } from "lucide-react";
 import type { Billboard } from "@/data/billboards";
 import type { StatusBadgeClasses } from "@/lib/status-badge";
+import { useConfirmedWindows, getEffectiveAvailability } from "@/lib/billboard-availability";
 
 const AVAILABILITY_CLASSES: Record<Billboard["availability"], StatusBadgeClasses> = {
   Available: { dot: "bg-accent", text: "text-accent", bg: "bg-accent/20" },
@@ -20,7 +21,9 @@ export function BillboardCard({
   selected?: boolean;
   onSelect?: () => void;
 }) {
-  const s = AVAILABILITY_CLASSES[b.availability];
+  const { data: windows } = useConfirmedWindows();
+  const availability = getEffectiveAvailability(b, windows ?? []);
+  const s = AVAILABILITY_CLASSES[availability];
   return (
     <article
       onClick={onSelect}
@@ -40,7 +43,7 @@ export function BillboardCard({
           className={`absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider backdrop-blur ${s.bg} ${s.text}`}
         >
           <span className={`h-1.5 w-1.5 rounded-full ${s.dot}`} />
-          {b.availability}
+          {availability}
         </span>
       </div>
       <div className="flex flex-1 flex-col p-5">

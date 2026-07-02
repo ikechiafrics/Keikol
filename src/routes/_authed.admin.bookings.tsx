@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { collection, doc, getDocs, orderBy, query, serverTimestamp, updateDoc } from "firebase/firestore";
+import { collection, doc, getDocs, orderBy, query, serverTimestamp, writeBatch } from "firebase/firestore";
 import { Paperclip } from "lucide-react";
 import { toast } from "sonner";
 
@@ -24,8 +24,25 @@ async function fetchAllBookings(): Promise<Booking[]> {
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Booking);
 }
 
-async function updateBookingStatus(bookingId: string, status: BookingStatus) {
-  await updateDoc(doc(db, "bookings", bookingId), { status, updatedAt: serverTimestamp() });
+async function updateBookingStatus(booking: Booking, status: BookingStatus) {
+  const batch = writeBatch(db);
+  batch.update(doc(db, "bookings", booking.id), { status, updatedAt: serverTimestamp() });
+
+  // Keep the public availability mirror in sync with the real status in the
+  // same atomic commit, so they can never drift apart from a partial write.
+  const windowRef = doc(db, "publicBookingWindows", booking.id);
+  if (status === "confirmed") {
+    batch.set(windowRef, {
+      billboardId: booking.billboardId,
+      startDate: booking.startDate,
+      endDate: booking.endDate,
+      status: "confirmed",
+    });
+  } else {
+    batch.delete(windowRef);
+  }
+
+  await batch.commit();
 }
 
 function AdminBookingsPage() {
@@ -37,10 +54,11 @@ function AdminBookingsPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: ({ bookingId, status }: { bookingId: string; status: BookingStatus }) =>
-      updateBookingStatus(bookingId, status),
+    mutationFn: ({ booking, status }: { booking: Booking; status: BookingStatus }) =>
+      updateBookingStatus(booking, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["public-booking-windows"] });
     },
     onError: () => {
       toast.error("Couldn't update booking status. Please try again.");
@@ -77,7 +95,7 @@ function AdminBookingsPage() {
             <tbody>
               {bookings.map((b) => {
                 const s = BOOKING_STATUS_CLASSES[b.status];
-                const isSaving = mutation.isPending && mutation.variables?.bookingId === b.id;
+                const isSaving = mutation.isPending && mutation.variables?.booking.id === b.id;
                 return (
                   <tr key={b.id} className="border-b border-border last:border-0">
                     <td className="px-5 py-4">
@@ -103,7 +121,7 @@ function AdminBookingsPage() {
                       <select
                         value={b.status}
                         disabled={isSaving}
-                        onChange={(e) => mutation.mutate({ bookingId: b.id, status: e.target.value as BookingStatus })}
+                        onChange={(e) => mutation.mutate({ booking: b, status: e.target.value as BookingStatus })}
                         className="block w-full appearance-none rounded-lg border border-border bg-background/60 px-3 py-2 text-xs focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30 disabled:opacity-60"
                       >
                         {STATUS_OPTIONS.map((opt) => (

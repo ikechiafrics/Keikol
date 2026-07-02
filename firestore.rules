@@ -38,6 +38,17 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
+    // Public-safe mirror of confirmed booking date ranges — only the fields
+    // needed to compute billboard availability for anonymous visitors.
+    // Never write contact/campaign/user data here.
+    match /publicBookingWindows/{windowId} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+                            && request.resource.data.keys().hasOnly(["billboardId", "startDate", "endDate", "status"])
+                            && request.resource.data.status == "confirmed";
+      allow delete: if isAdmin();
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

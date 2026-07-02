@@ -28,6 +28,7 @@ import {
   TagList,
 } from "@/components";
 import { BILLBOARDS, getBillboardById, type Billboard } from "@/data/billboards";
+import { useConfirmedWindows, getEffectiveAvailability } from "@/lib/billboard-availability";
 
 export const Route = createFileRoute("/locations/$id")({
   head: ({ params }) => {
@@ -77,6 +78,8 @@ export const Route = createFileRoute("/locations/$id")({
 function BillboardDetailPage() {
   const { id } = Route.useParams();
   const b = getBillboardById(id);
+  const { data: windows } = useConfirmedWindows();
+  const availability = b ? getEffectiveAvailability(b, windows ?? []) : null;
 
   if (!b) return <NotFoundState id={id} />;
 
@@ -110,7 +113,7 @@ function BillboardDetailPage() {
               </p>
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-xs font-semibold border border-border">
-                  <span className="h-1.5 w-1.5 rounded-full bg-gold" /> {b.availability}
+                  <span className="h-1.5 w-1.5 rounded-full bg-gold" /> {availability}
                 </span>
                 <span className="text-sm text-muted-foreground">{b.billboardType}</span>
                 <span className="inline-flex items-center gap-1.5 text-sm">
@@ -165,7 +168,7 @@ function BillboardDetailPage() {
           <DetailInfoCard icon={Megaphone} label="Billboard Type" value={b.billboardType} />
           <DetailInfoCard icon={Ruler} label="Size" value={b.size} />
           <DetailInfoCard icon={Eye} label="Daily Impressions" value={b.estimatedDailyImpressions} />
-          <DetailInfoCard icon={CheckCircle2} label="Availability" value={b.availability} />
+          <DetailInfoCard icon={CheckCircle2} label="Availability" value={availability ?? b.availability} />
           <DetailInfoCard icon={Wallet} label="Price Range" value={b.priceRange} />
           <DetailInfoCard icon={Sun} label="Lighting" value={b.lighting} />
         </div>

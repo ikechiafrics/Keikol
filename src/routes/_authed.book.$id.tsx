@@ -17,6 +17,11 @@ import { db, storage, artworkStoragePath } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
 import { getBillboardById } from "@/data/billboards";
 import type { BookingStatus } from "@/lib/booking-status";
+import {
+  useConfirmedWindows,
+  getConfirmedRangesForBillboard,
+  isDateInAnyConfirmedRange,
+} from "@/lib/billboard-availability";
 
 export const Route = createFileRoute("/_authed/book/$id")({
   head: ({ params }) => {
@@ -57,6 +62,11 @@ function BookBillboardPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const bookedSet = useMemo(() => new Set(billboard?.bookedDates ?? []), [billboard]);
+  const { data: windows } = useConfirmedWindows();
+  const confirmedRanges = useMemo(
+    () => (billboard ? getConfirmedRangesForBillboard(billboard.id, windows ?? []) : []),
+    [billboard, windows],
+  );
 
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
@@ -176,7 +186,11 @@ function BookBillboardPage() {
               mode="range"
               selected={range}
               onSelect={setRange}
-              disabled={(date) => date < new Date(new Date().toDateString()) || bookedSet.has(toISODate(date))}
+              disabled={(date) =>
+                date < new Date(new Date().toDateString()) ||
+                bookedSet.has(toISODate(date)) ||
+                isDateInAnyConfirmedRange(date, confirmedRanges)
+              }
             />
           </div>
           {range?.from && range?.to && (

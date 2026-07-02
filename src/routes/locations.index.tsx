@@ -17,6 +17,7 @@ import {
   heroImg,
   type Billboard,
 } from "@/data/billboards";
+import { useConfirmedWindows, getEffectiveAvailability } from "@/lib/billboard-availability";
 
 export const Route = createFileRoute("/locations/")({
   head: () => ({
@@ -57,11 +58,13 @@ function LocationsPage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
+  const { data: windows } = useConfirmedWindows();
+
   const filtered = useMemo(() => {
     return BILLBOARDS.filter((b) => {
       if (city !== "All" && b.city !== city) return false;
       if (type !== "All" && b.billboardType !== type) return false;
-      if (avail !== "All" && b.availability !== avail) return false;
+      if (avail !== "All" && getEffectiveAvailability(b, windows ?? []) !== avail) return false;
       if (
         industry !== "All" &&
         !b.recommendedIndustries.some((i) => i.toLowerCase().includes(industry.toLowerCase()))
@@ -78,7 +81,7 @@ function LocationsPage() {
       }
       return true;
     });
-  }, [q, city, type, avail, industry]);
+  }, [q, city, type, avail, industry, windows]);
 
   const selected = selectedId ? BILLBOARDS.find((b) => b.id === selectedId) ?? null : null;
   const hasFilters = q || city !== "All" || type !== "All" || avail !== "All" || industry !== "All";
@@ -361,6 +364,8 @@ function DetailsSidebar({
   }, [open, onClose]);
 
   const b = displayed;
+  const { data: windows } = useConfirmedWindows();
+  const availability = b ? getEffectiveAvailability(b, windows ?? []) : null;
 
   return (
     <>
@@ -431,7 +436,7 @@ function DetailsSidebar({
                   </>
                 )}
                 <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-background/85 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-gold backdrop-blur">
-                  {b.availability}
+                  {availability}
                 </span>
               </div>
 

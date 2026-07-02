@@ -4,6 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { RotateCcw } from "lucide-react";
 import type { Billboard } from "@/data/billboards";
+import { useConfirmedWindows, getEffectiveAvailability } from "@/lib/billboard-availability";
 
 function makeIcon(color: string) {
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='34' height='46' viewBox='0 0 34 46'>
@@ -92,6 +93,8 @@ export function BillboardMap({
   selectedId: string | null;
   onSelect: (id: string | null) => void;
 }) {
+  const { data: windows } = useConfirmedWindows();
+
   return (
     <MapContainer
       center={[9.082, 8.6753]}
@@ -108,7 +111,9 @@ export function BillboardMap({
         <Marker
           key={b.id}
           position={[b.lat, b.lng]}
-          icon={makeIcon(selectedId === b.id ? SELECTED_COLOR : STATUS_COLORS[b.availability])}
+          icon={makeIcon(
+            selectedId === b.id ? SELECTED_COLOR : STATUS_COLORS[getEffectiveAvailability(b, windows ?? [])],
+          )}
           alt={`${b.area}, ${b.city}`}
           title={`${b.area}, ${b.city}`}
           eventHandlers={{ click: () => onSelect(b.id) }}
