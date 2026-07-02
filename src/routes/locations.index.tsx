@@ -9,7 +9,6 @@ import {
 import { PageHero, Section, SectionHeader, CTASection } from "@/components";
 import { BillboardCard } from "@/components/BillboardCard";
 import {
-  BILLBOARDS,
   CITIES,
   BILLBOARD_TYPES,
   AVAILABILITIES,
@@ -18,6 +17,7 @@ import {
   type Billboard,
 } from "@/data/billboards";
 import { useConfirmedWindows, getEffectiveAvailability } from "@/lib/billboard-availability";
+import { useBillboards } from "@/lib/billboards-data";
 
 export const Route = createFileRoute("/locations/")({
   head: () => ({
@@ -59,9 +59,10 @@ function LocationsPage() {
   useEffect(() => setMounted(true), []);
 
   const { data: windows } = useConfirmedWindows();
+  const { data: billboards } = useBillboards();
 
   const filtered = useMemo(() => {
-    return BILLBOARDS.filter((b) => {
+    return (billboards ?? []).filter((b) => {
       if (city !== "All" && b.city !== city) return false;
       if (type !== "All" && b.billboardType !== type) return false;
       if (avail !== "All" && getEffectiveAvailability(b, windows ?? []) !== avail) return false;
@@ -81,9 +82,9 @@ function LocationsPage() {
       }
       return true;
     });
-  }, [q, city, type, avail, industry, windows]);
+  }, [q, city, type, avail, industry, windows, billboards]);
 
-  const selected = selectedId ? BILLBOARDS.find((b) => b.id === selectedId) ?? null : null;
+  const selected = selectedId ? (billboards ?? []).find((b) => b.id === selectedId) ?? null : null;
   const hasFilters = q || city !== "All" || type !== "All" || avail !== "All" || industry !== "All";
 
   function clearFilters() {

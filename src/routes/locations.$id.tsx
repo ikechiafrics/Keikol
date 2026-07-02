@@ -27,12 +27,14 @@ import {
   SectionHeader,
   TagList,
 } from "@/components";
-import { BILLBOARDS, getBillboardById, type Billboard } from "@/data/billboards";
+import type { Billboard } from "@/data/billboards";
 import { useConfirmedWindows, getEffectiveAvailability } from "@/lib/billboard-availability";
+import { fetchBillboardById, useBillboards } from "@/lib/billboards-data";
 
 export const Route = createFileRoute("/locations/$id")({
-  head: ({ params }) => {
-    const b = getBillboardById(params.id);
+  loader: async ({ params }) => ({ billboard: await fetchBillboardById(params.id) }),
+  head: ({ params, loaderData }) => {
+    const b = loaderData?.billboard ?? null;
     const title = b ? `${b.area}, ${b.city} — Keikol` : "Billboard — Keikol";
     const desc = b
       ? `${b.billboardType} · ${b.estimatedDailyImpressions} daily impressions · ${b.landmark}.`
@@ -77,13 +79,14 @@ export const Route = createFileRoute("/locations/$id")({
 
 function BillboardDetailPage() {
   const { id } = Route.useParams();
-  const b = getBillboardById(id);
+  const { billboard: b } = Route.useLoaderData();
   const { data: windows } = useConfirmedWindows();
   const availability = b ? getEffectiveAvailability(b, windows ?? []) : null;
+  const { data: allBillboards } = useBillboards();
 
   if (!b) return <NotFoundState id={id} />;
 
-  const related = BILLBOARDS.filter((x) => x.id !== b.id).slice(0, 3);
+  const related = (allBillboards ?? []).filter((x) => x.id !== b.id).slice(0, 3);
   const quoteHref = `/contact?billboard=${b.id}`;
 
   return (

@@ -3,7 +3,8 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
 import { ContactForm, ContactSidebar, PageHero, Section, SectionHeader, SelectedBillboardSummary } from "@/components";
-import { getBillboardById, heroImg } from "@/data/billboards";
+import { heroImg } from "@/data/billboards";
+import { useBillboard } from "@/lib/billboards-data";
 
 type ContactSearch = { billboard?: string };
 
@@ -68,7 +69,7 @@ export const Route = createFileRoute("/contact")({
 
 function ContactPage() {
   const { billboard: billboardId } = Route.useSearch();
-  const billboard = billboardId ? getBillboardById(billboardId) : undefined;
+  const { data: billboard } = useBillboard(billboardId);
   const interestedLabel = billboard ? `${billboard.city} — ${billboard.area}` : "Not sure yet";
 
   return (

@@ -15,17 +15,18 @@ import { Progress } from "@/components/ui/progress";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { db, storage, artworkStoragePath } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
-import { getBillboardById } from "@/data/billboards";
 import type { BookingStatus } from "@/lib/booking-status";
 import {
   useConfirmedWindows,
   getConfirmedRangesForBillboard,
   isDateInAnyConfirmedRange,
 } from "@/lib/billboard-availability";
+import { fetchBillboardById } from "@/lib/billboards-data";
 
 export const Route = createFileRoute("/_authed/book/$id")({
-  head: ({ params }) => {
-    const b = getBillboardById(params.id);
+  loader: async ({ params }) => ({ billboard: await fetchBillboardById(params.id) }),
+  head: ({ loaderData }) => {
+    const b = loaderData?.billboard ?? null;
     return { meta: [{ title: b ? `Book ${b.area} — Keikol` : "Book a Billboard — Keikol" }] };
   },
   component: BookBillboardPage,
@@ -50,8 +51,7 @@ function toISODate(d: Date) {
 }
 
 function BookBillboardPage() {
-  const { id } = Route.useParams();
-  const billboard = getBillboardById(id);
+  const { billboard } = Route.useLoaderData();
   const { user } = useAuth();
   const navigate = useNavigate();
 

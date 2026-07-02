@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
-import { BILLBOARDS } from "@/data/billboards";
+import { fetchAllBillboards } from "@/lib/billboards-data";
 
 // TODO: replace with your project URL once a project name or custom domain is set.
 const BASE_URL = "";
@@ -15,6 +15,7 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
+        const billboards = await fetchAllBillboards();
         const entries: SitemapEntry[] = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
           { path: "/locations", changefreq: "weekly", priority: "0.9" },
@@ -24,7 +25,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/contact", changefreq: "monthly", priority: "0.8" },
           { path: "/privacy-policy", changefreq: "yearly", priority: "0.3" },
           { path: "/terms-of-use", changefreq: "yearly", priority: "0.3" },
-          ...BILLBOARDS.map((b) => ({
+          ...billboards.map((b) => ({
             path: `/locations/${b.id}`,
             changefreq: "monthly" as const,
             priority: "0.7",

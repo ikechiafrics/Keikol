@@ -25,6 +25,10 @@ import { Route as AuthedDashboardRouteImport } from './routes/_authed.dashboard'
 import { Route as AuthedAdminRouteImport } from './routes/_authed.admin'
 import { Route as AuthedBookIdRouteImport } from './routes/_authed.book.$id'
 import { Route as AuthedAdminBookingsRouteImport } from './routes/_authed.admin.bookings'
+import { Route as AuthedAdminBillboardsRouteImport } from './routes/_authed.admin.billboards'
+import { Route as AuthedAdminBillboardsIndexRouteImport } from './routes/_authed.admin.billboards.index'
+import { Route as AuthedAdminBillboardsNewRouteImport } from './routes/_authed.admin.billboards.new'
+import { Route as AuthedAdminBillboardsIdRouteImport } from './routes/_authed.admin.billboards.$id'
 
 const TermsOfUseRoute = TermsOfUseRouteImport.update({
   id: '/terms-of-use',
@@ -105,6 +109,28 @@ const AuthedAdminBookingsRoute = AuthedAdminBookingsRouteImport.update({
   path: '/bookings',
   getParentRoute: () => AuthedAdminRoute,
 } as any)
+const AuthedAdminBillboardsRoute = AuthedAdminBillboardsRouteImport.update({
+  id: '/billboards',
+  path: '/billboards',
+  getParentRoute: () => AuthedAdminRoute,
+} as any)
+const AuthedAdminBillboardsIndexRoute =
+  AuthedAdminBillboardsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthedAdminBillboardsRoute,
+  } as any)
+const AuthedAdminBillboardsNewRoute =
+  AuthedAdminBillboardsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthedAdminBillboardsRoute,
+  } as any)
+const AuthedAdminBillboardsIdRoute = AuthedAdminBillboardsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthedAdminBillboardsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -120,8 +146,12 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthedDashboardRoute
   '/locations/$id': typeof LocationsIdRoute
   '/locations/': typeof LocationsIndexRoute
+  '/admin/billboards': typeof AuthedAdminBillboardsRouteWithChildren
   '/admin/bookings': typeof AuthedAdminBookingsRoute
   '/book/$id': typeof AuthedBookIdRoute
+  '/admin/billboards/$id': typeof AuthedAdminBillboardsIdRoute
+  '/admin/billboards/new': typeof AuthedAdminBillboardsNewRoute
+  '/admin/billboards/': typeof AuthedAdminBillboardsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -139,6 +169,9 @@ export interface FileRoutesByTo {
   '/locations': typeof LocationsIndexRoute
   '/admin/bookings': typeof AuthedAdminBookingsRoute
   '/book/$id': typeof AuthedBookIdRoute
+  '/admin/billboards/$id': typeof AuthedAdminBillboardsIdRoute
+  '/admin/billboards/new': typeof AuthedAdminBillboardsNewRoute
+  '/admin/billboards': typeof AuthedAdminBillboardsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -156,8 +189,12 @@ export interface FileRoutesById {
   '/_authed/dashboard': typeof AuthedDashboardRoute
   '/locations/$id': typeof LocationsIdRoute
   '/locations/': typeof LocationsIndexRoute
+  '/_authed/admin/billboards': typeof AuthedAdminBillboardsRouteWithChildren
   '/_authed/admin/bookings': typeof AuthedAdminBookingsRoute
   '/_authed/book/$id': typeof AuthedBookIdRoute
+  '/_authed/admin/billboards/$id': typeof AuthedAdminBillboardsIdRoute
+  '/_authed/admin/billboards/new': typeof AuthedAdminBillboardsNewRoute
+  '/_authed/admin/billboards/': typeof AuthedAdminBillboardsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -175,8 +212,12 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/locations/$id'
     | '/locations/'
+    | '/admin/billboards'
     | '/admin/bookings'
     | '/book/$id'
+    | '/admin/billboards/$id'
+    | '/admin/billboards/new'
+    | '/admin/billboards/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -194,6 +235,9 @@ export interface FileRouteTypes {
     | '/locations'
     | '/admin/bookings'
     | '/book/$id'
+    | '/admin/billboards/$id'
+    | '/admin/billboards/new'
+    | '/admin/billboards'
   id:
     | '__root__'
     | '/'
@@ -210,8 +254,12 @@ export interface FileRouteTypes {
     | '/_authed/dashboard'
     | '/locations/$id'
     | '/locations/'
+    | '/_authed/admin/billboards'
     | '/_authed/admin/bookings'
     | '/_authed/book/$id'
+    | '/_authed/admin/billboards/$id'
+    | '/_authed/admin/billboards/new'
+    | '/_authed/admin/billboards/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -343,14 +391,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedAdminBookingsRouteImport
       parentRoute: typeof AuthedAdminRoute
     }
+    '/_authed/admin/billboards': {
+      id: '/_authed/admin/billboards'
+      path: '/billboards'
+      fullPath: '/admin/billboards'
+      preLoaderRoute: typeof AuthedAdminBillboardsRouteImport
+      parentRoute: typeof AuthedAdminRoute
+    }
+    '/_authed/admin/billboards/': {
+      id: '/_authed/admin/billboards/'
+      path: '/'
+      fullPath: '/admin/billboards/'
+      preLoaderRoute: typeof AuthedAdminBillboardsIndexRouteImport
+      parentRoute: typeof AuthedAdminBillboardsRoute
+    }
+    '/_authed/admin/billboards/new': {
+      id: '/_authed/admin/billboards/new'
+      path: '/new'
+      fullPath: '/admin/billboards/new'
+      preLoaderRoute: typeof AuthedAdminBillboardsNewRouteImport
+      parentRoute: typeof AuthedAdminBillboardsRoute
+    }
+    '/_authed/admin/billboards/$id': {
+      id: '/_authed/admin/billboards/$id'
+      path: '/$id'
+      fullPath: '/admin/billboards/$id'
+      preLoaderRoute: typeof AuthedAdminBillboardsIdRouteImport
+      parentRoute: typeof AuthedAdminBillboardsRoute
+    }
   }
 }
 
+interface AuthedAdminBillboardsRouteChildren {
+  AuthedAdminBillboardsIdRoute: typeof AuthedAdminBillboardsIdRoute
+  AuthedAdminBillboardsNewRoute: typeof AuthedAdminBillboardsNewRoute
+  AuthedAdminBillboardsIndexRoute: typeof AuthedAdminBillboardsIndexRoute
+}
+
+const AuthedAdminBillboardsRouteChildren: AuthedAdminBillboardsRouteChildren = {
+  AuthedAdminBillboardsIdRoute: AuthedAdminBillboardsIdRoute,
+  AuthedAdminBillboardsNewRoute: AuthedAdminBillboardsNewRoute,
+  AuthedAdminBillboardsIndexRoute: AuthedAdminBillboardsIndexRoute,
+}
+
+const AuthedAdminBillboardsRouteWithChildren =
+  AuthedAdminBillboardsRoute._addFileChildren(
+    AuthedAdminBillboardsRouteChildren,
+  )
+
 interface AuthedAdminRouteChildren {
+  AuthedAdminBillboardsRoute: typeof AuthedAdminBillboardsRouteWithChildren
   AuthedAdminBookingsRoute: typeof AuthedAdminBookingsRoute
 }
 
 const AuthedAdminRouteChildren: AuthedAdminRouteChildren = {
+  AuthedAdminBillboardsRoute: AuthedAdminBillboardsRouteWithChildren,
   AuthedAdminBookingsRoute: AuthedAdminBookingsRoute,
 }
 

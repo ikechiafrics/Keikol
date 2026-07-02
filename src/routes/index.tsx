@@ -26,7 +26,8 @@ import {
 
 import { Section, SectionHeader, CTASection } from "@/components";
 import { BillboardCard } from "@/components/BillboardCard";
-import { BILLBOARDS, PORTFOLIO_SAMPLES, heroImg } from "@/data/billboards";
+import { PORTFOLIO_SAMPLES, heroImg } from "@/data/billboards";
+import { useBillboards } from "@/lib/billboards-data";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -212,7 +213,8 @@ function MissionVision() {
 }
 
 function FeaturedLocations() {
-  const featured = BILLBOARDS.slice(0, 4);
+  const { data: billboards } = useBillboards();
+  const featured = (billboards ?? []).slice(0, 4);
   return (
     <Section tone="surface">
       <SectionHeader

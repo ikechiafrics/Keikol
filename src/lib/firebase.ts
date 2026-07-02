@@ -3,13 +3,19 @@ import { getAuth, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 import { getStorage, type FirebaseStorage } from "firebase/storage";
 
-// This app renders `AuthProvider` (which imports this module) as part of the
-// root route tree, which TanStack Start also renders during SSR. The
-// Firebase JS SDK expects a browser environment, so every export here is
-// left `undefined` on the server and only real once running client-side —
-// consumers of `auth`/`db`/`storage` must only ever touch them from
-// useEffect/event handlers (never during render), same as this module must
-// never be imported from a route `loader` or `head` function.
+// `AuthProvider` (which imports this module) renders as part of the root
+// route tree, which TanStack Start also renders during SSR. `auth`/`storage`
+// are left `undefined` on the server and only real once running
+// client-side — this app's usage of them (auth-state listeners, popups,
+// resumable uploads) is inherently browser-only, so consumers must only ever
+// touch them from useEffect/event handlers, never during render.
+//
+// `db` (Firestore) is different: `getFirestore()` doesn't touch any browser
+// API at construction — it only opens a network/IndexedDB connection lazily
+// when a query actually runs, and this app doesn't enable IndexedDB
+// persistence. So `db` is initialized unconditionally and is safe to use in
+// server loaders/route handlers (plain `getDoc`/`getDocs` reads) as well as
+// client code.
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -20,24 +26,29 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-let app: FirebaseApp | undefined;
+const app: FirebaseApp = getApps().length ? getApps()[0]! : initializeApp(firebaseConfig);
+
+export const db: Firestore = getFirestore(app);
+
 let authInstance: Auth | undefined;
-let dbInstance: Firestore | undefined;
 let storageInstance: FirebaseStorage | undefined;
 
 if (typeof window !== "undefined") {
-  app = getApps().length ? getApps()[0]! : initializeApp(firebaseConfig);
   authInstance = getAuth(app);
-  dbInstance = getFirestore(app);
   storageInstance = getStorage(app);
 }
 
 export const auth = authInstance as Auth;
-export const db = dbInstance as Firestore;
 export const storage = storageInstance as FirebaseStorage;
 
 // Storage path convention for uploaded campaign artwork. Must stay in sync
 // with the `artwork/{userId}/{allPaths=**}` match in storage.rules.
 export function artworkStoragePath(uid: string, bookingId: string, filename: string): string {
   return `artwork/${uid}/${bookingId}/${filename}`;
+}
+
+// Storage path convention for billboard images/gallery. Must stay in sync
+// with the `billboards/{billboardId}/{allPaths=**}` match in storage.rules.
+export function billboardStoragePath(billboardId: string, filename: string): string {
+  return `billboards/${billboardId}/${filename}`;
 }
