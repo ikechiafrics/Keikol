@@ -131,7 +131,7 @@ function IndustriesPage() {
                   <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.2em] text-gold">
                     Best campaign types
                   </p>
-                  <ul className="mt-3 grid grid-cols-2 gap-2">
+                  <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                     {campaigns.map((c) => (
                       <li key={c} className="flex items-center gap-2 text-sm">
                         <CheckCircle2 className="h-3.5 w-3.5 text-accent" /> {c}

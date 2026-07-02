@@ -107,7 +107,7 @@ function Hero() {
               Request a Quote
             </Link>
           </div>
-          <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <ul className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-4">
             {[
               { icon: MapPin, label: "Premium Locations" },
               { icon: CheckCircle2, label: "Transparent Booking" },

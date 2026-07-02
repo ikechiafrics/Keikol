@@ -140,7 +140,7 @@ function LocationsPage() {
         {/* Map view */}
         {view === "map" && (
           <div className="mt-8 grid gap-4 lg:grid-cols-[1fr_360px]">
-            <div className="relative isolate h-[560px] overflow-hidden rounded-2xl bg-card-premium shadow-elegant ring-hairline">
+            <div className="relative isolate h-[360px] overflow-hidden rounded-2xl bg-card-premium shadow-elegant ring-hairline sm:h-[560px]">
               {mounted ? (
                 <Suspense fallback={<MapPlaceholder />}>
                   <BillboardMap billboards={filtered} selectedId={selectedId} onSelect={setSelectedId} />
@@ -153,7 +153,7 @@ function LocationsPage() {
                 <Legend color="#60A5FA" label="Available Soon" />
                 <Legend color="#9CA3AF" label="Coming Soon" />
               </div>
-              <div className="pointer-events-none absolute bottom-3 left-1/2 z-[500] -translate-x-1/2 rounded-full bg-background/85 px-3 py-1.5 text-[11px] font-semibold text-muted-foreground shadow-elegant backdrop-blur">
+              <div className="pointer-events-none absolute bottom-3 left-1/2 z-[500] hidden -translate-x-1/2 rounded-full bg-background/85 px-3 py-1.5 text-[11px] font-semibold text-muted-foreground shadow-elegant backdrop-blur sm:block">
                 Tap a pin to see details
               </div>
             </div>
@@ -301,7 +301,7 @@ function ResultCard({ b, active, onClick }: { b: Billboard; active: boolean; onC
       <div className="flex flex-1 flex-col justify-between py-0.5 pr-1">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-wider text-gold">{b.city}</p>
-          <p className="font-display text-sm font-bold leading-tight">{b.area}</p>
+          <p className="line-clamp-1 font-display text-sm font-bold leading-tight">{b.area}</p>
           <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">{b.billboardType}</p>
         </div>
         <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
@@ -450,7 +450,7 @@ function DetailsSidebar({
                 </header>
 
                 <div className="grid grid-cols-3 gap-2 rounded-xl bg-card-premium p-3 ring-hairline">
-                  <Stat icon={Eye} label="Daily traffic" value={b.estimatedDailyImpressions} />
+                  <Stat icon={Eye} label="Traffic" value={b.estimatedDailyImpressions} />
                   <Stat icon={Ruler} label="Size" value={b.size} />
                   <Stat label="Price tier" value={b.priceTier} valueClass="text-gold" />
                 </div>

@@ -174,3 +174,11 @@
 @utility animate-float-slow {
   animation: float-slow 6s ease-in-out infinite;
 }
+
+/* Leaflet's default zoom control buttons are ~26px, below the ~44px
+   recommended touch target — enlarge them for comfortable use on mobile. */
+.leaflet-control-zoom a {
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+}
