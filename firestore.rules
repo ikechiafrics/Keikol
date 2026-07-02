@@ -55,6 +55,52 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Quote requests are submitted anonymously from /contact — there is no
+    // signed-in identity to lean on, so this create rule is the entire
+    // security boundary: it fully validates shape/types/sizes and forces
+    // status/timestamps itself, unlike every other write path above.
+    match /quoteRequests/{quoteId} {
+      allow read: if isAdmin();
+
+      allow create: if request.resource.data.keys().hasOnly([
+                        "name", "company", "email", "phone", "city",
+                        "billboardType", "budget", "duration", "goal", "message",
+                        "billboardId", "interestedBillboard", "status", "createdAt", "updatedAt"
+                      ])
+                    && request.resource.data.keys().hasAll([
+                        "name", "company", "email", "phone", "city",
+                        "billboardType", "budget", "duration", "goal", "message",
+                        "billboardId", "interestedBillboard", "status", "createdAt", "updatedAt"
+                      ])
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 200
+                    && request.resource.data.company is string && request.resource.data.company.size() <= 200
+                    && request.resource.data.email is string
+                    && request.resource.data.email.size() > 0 && request.resource.data.email.size() <= 320
+                    && request.resource.data.phone is string && request.resource.data.phone.size() <= 40
+                    && request.resource.data.city is string && request.resource.data.city.size() <= 100
+                    && request.resource.data.billboardType is string && request.resource.data.billboardType.size() <= 100
+                    && request.resource.data.budget is string && request.resource.data.budget.size() <= 100
+                    && request.resource.data.duration is string && request.resource.data.duration.size() <= 100
+                    && request.resource.data.goal is string && request.resource.data.goal.size() <= 200
+                    && request.resource.data.message is string
+                    && request.resource.data.message.size() > 0 && request.resource.data.message.size() <= 5000
+                    && request.resource.data.billboardId is string && request.resource.data.billboardId.size() <= 200
+                    && request.resource.data.interestedBillboard is string
+                    && request.resource.data.interestedBillboard.size() > 0
+                    && request.resource.data.interestedBillboard.size() <= 200
+                    && request.resource.data.status == "new"
+                    && request.resource.data.createdAt == request.time
+                    && request.resource.data.updatedAt == request.time;
+
+      allow update: if isAdmin()
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "updatedAt"])
+                    && request.resource.data.status in ["new", "contacted", "closed"]
+                    && request.resource.data.updatedAt == request.time;
+
+      allow delete: if isAdmin();
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

@@ -24,6 +24,7 @@ import { Route as LocationsIdRouteImport } from './routes/locations.$id'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed.dashboard'
 import { Route as AuthedAdminRouteImport } from './routes/_authed.admin'
 import { Route as AuthedBookIdRouteImport } from './routes/_authed.book.$id'
+import { Route as AuthedAdminQuotesRouteImport } from './routes/_authed.admin.quotes'
 import { Route as AuthedAdminBookingsRouteImport } from './routes/_authed.admin.bookings'
 import { Route as AuthedAdminBillboardsRouteImport } from './routes/_authed.admin.billboards'
 import { Route as AuthedAdminBillboardsIndexRouteImport } from './routes/_authed.admin.billboards.index'
@@ -104,6 +105,11 @@ const AuthedBookIdRoute = AuthedBookIdRouteImport.update({
   path: '/book/$id',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedAdminQuotesRoute = AuthedAdminQuotesRouteImport.update({
+  id: '/quotes',
+  path: '/quotes',
+  getParentRoute: () => AuthedAdminRoute,
+} as any)
 const AuthedAdminBookingsRoute = AuthedAdminBookingsRouteImport.update({
   id: '/bookings',
   path: '/bookings',
@@ -148,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/locations/': typeof LocationsIndexRoute
   '/admin/billboards': typeof AuthedAdminBillboardsRouteWithChildren
   '/admin/bookings': typeof AuthedAdminBookingsRoute
+  '/admin/quotes': typeof AuthedAdminQuotesRoute
   '/book/$id': typeof AuthedBookIdRoute
   '/admin/billboards/$id': typeof AuthedAdminBillboardsIdRoute
   '/admin/billboards/new': typeof AuthedAdminBillboardsNewRoute
@@ -168,6 +175,7 @@ export interface FileRoutesByTo {
   '/locations/$id': typeof LocationsIdRoute
   '/locations': typeof LocationsIndexRoute
   '/admin/bookings': typeof AuthedAdminBookingsRoute
+  '/admin/quotes': typeof AuthedAdminQuotesRoute
   '/book/$id': typeof AuthedBookIdRoute
   '/admin/billboards/$id': typeof AuthedAdminBillboardsIdRoute
   '/admin/billboards/new': typeof AuthedAdminBillboardsNewRoute
@@ -191,6 +199,7 @@ export interface FileRoutesById {
   '/locations/': typeof LocationsIndexRoute
   '/_authed/admin/billboards': typeof AuthedAdminBillboardsRouteWithChildren
   '/_authed/admin/bookings': typeof AuthedAdminBookingsRoute
+  '/_authed/admin/quotes': typeof AuthedAdminQuotesRoute
   '/_authed/book/$id': typeof AuthedBookIdRoute
   '/_authed/admin/billboards/$id': typeof AuthedAdminBillboardsIdRoute
   '/_authed/admin/billboards/new': typeof AuthedAdminBillboardsNewRoute
@@ -214,6 +223,7 @@ export interface FileRouteTypes {
     | '/locations/'
     | '/admin/billboards'
     | '/admin/bookings'
+    | '/admin/quotes'
     | '/book/$id'
     | '/admin/billboards/$id'
     | '/admin/billboards/new'
@@ -234,6 +244,7 @@ export interface FileRouteTypes {
     | '/locations/$id'
     | '/locations'
     | '/admin/bookings'
+    | '/admin/quotes'
     | '/book/$id'
     | '/admin/billboards/$id'
     | '/admin/billboards/new'
@@ -256,6 +267,7 @@ export interface FileRouteTypes {
     | '/locations/'
     | '/_authed/admin/billboards'
     | '/_authed/admin/bookings'
+    | '/_authed/admin/quotes'
     | '/_authed/book/$id'
     | '/_authed/admin/billboards/$id'
     | '/_authed/admin/billboards/new'
@@ -384,6 +396,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedBookIdRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/admin/quotes': {
+      id: '/_authed/admin/quotes'
+      path: '/quotes'
+      fullPath: '/admin/quotes'
+      preLoaderRoute: typeof AuthedAdminQuotesRouteImport
+      parentRoute: typeof AuthedAdminRoute
+    }
     '/_authed/admin/bookings': {
       id: '/_authed/admin/bookings'
       path: '/bookings'
@@ -442,11 +461,13 @@ const AuthedAdminBillboardsRouteWithChildren =
 interface AuthedAdminRouteChildren {
   AuthedAdminBillboardsRoute: typeof AuthedAdminBillboardsRouteWithChildren
   AuthedAdminBookingsRoute: typeof AuthedAdminBookingsRoute
+  AuthedAdminQuotesRoute: typeof AuthedAdminQuotesRoute
 }
 
 const AuthedAdminRouteChildren: AuthedAdminRouteChildren = {
   AuthedAdminBillboardsRoute: AuthedAdminBillboardsRouteWithChildren,
   AuthedAdminBookingsRoute: AuthedAdminBookingsRoute,
+  AuthedAdminQuotesRoute: AuthedAdminQuotesRoute,
 }
 
 const AuthedAdminRouteWithChildren = AuthedAdminRoute._addFileChildren(

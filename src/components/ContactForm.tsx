@@ -1,7 +1,10 @@
 import { useState, type FormEvent } from "react";
 import { ArrowRight, CheckCircle2, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { collection, doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { toast } from "sonner";
 
 import { Field } from "./FormField";
+import { db } from "@/lib/firebase";
 
 export function ContactForm({
   interestedBillboard = "Not sure yet",
@@ -11,19 +14,46 @@ export function ContactForm({
   billboardId?: string;
 }) {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const data = Object.fromEntries(fd.entries());
-    try {
-      const existing = JSON.parse(localStorage.getItem("keikol_quote_submissions") || "[]");
-      existing.push({ ...data, submittedAt: new Date().toISOString() });
-      localStorage.setItem("keikol_quote_submissions", JSON.stringify(existing));
-    } catch {
-      // ignore storage errors
+    const data = Object.fromEntries(fd.entries()) as Record<string, string>;
+
+    // Honeypot: real visitors never see/fill this field. If it's filled,
+    // silently show success without writing anything.
+    if (data.website) {
+      setSubmitted(true);
+      return;
     }
-    setSubmitted(true);
+
+    setSubmitting(true);
+    try {
+      await setDoc(doc(collection(db, "quoteRequests")), {
+        name: data.name ?? "",
+        company: data.company ?? "",
+        email: data.email ?? "",
+        phone: data.phone ?? "",
+        city: data.city ?? "",
+        billboardType: data.billboardType ?? "",
+        budget: data.budget ?? "",
+        duration: data.duration ?? "",
+        goal: data.goal ?? "",
+        message: data.message ?? "",
+        billboardId: billboardId ?? "",
+        interestedBillboard,
+        status: "new",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      setSubmitted(true);
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong sending your request. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -48,7 +78,7 @@ export function ContactForm({
 
   return (
     <form onSubmit={onSubmit} className="rounded-3xl bg-card-premium p-7 shadow-elegant ring-hairline sm:p-9">
-      <input type="hidden" name="billboardId" value={billboardId ?? ""} />
+      <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
       <div className="mb-4 rounded-xl border border-border bg-surface/60 p-4">
         <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Interested Billboard</p>
         <p className="mt-1 text-sm font-semibold">{interestedBillboard}</p>
@@ -96,13 +126,11 @@ export function ContactForm({
         </div>
         <button
           type="submit"
-          className="sm:col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-gold px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-gold transition-transform hover:-translate-y-0.5"
+          disabled={submitting}
+          className="sm:col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-gold px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-gold transition-transform hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0"
         >
-          Send Quote Request <ArrowRight className="h-4 w-4" />
+          {submitting ? "Sending…" : "Send Quote Request"} <ArrowRight className="h-4 w-4" />
         </button>
-        <p className="sm:col-span-2 text-center text-[11px] text-muted-foreground">
-          This form is currently set up for demo submission. Email and backend integration can be connected later.
-        </p>
       </div>
     </form>
   );
