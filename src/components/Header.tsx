@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
+import { ArrowRight, LayoutDashboard, LogOut, Menu, Shield, X } from "lucide-react";
 
 import keikolMark from "@/assets/Logo.png";
 import { useAuth } from "@/lib/auth-context";
@@ -29,7 +29,7 @@ function Logo() {
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const { user, signOutUser } = useAuth();
+  const { user, isAdmin, signOutUser } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -71,6 +71,14 @@ export function Header() {
         <div className="hidden items-center gap-3 lg:flex">
           {user ? (
             <>
+              {isAdmin && (
+                <Link
+                  to="/admin/bookings"
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-5 py-2.5 text-sm font-semibold hover:border-gold hover:text-gold"
+                >
+                  <Shield className="h-4 w-4" /> Admin
+                </Link>
+              )}
               <Link
                 to="/dashboard"
                 className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-5 py-2.5 text-sm font-semibold hover:border-gold hover:text-gold"
@@ -126,6 +134,15 @@ export function Header() {
             ))}
             {user ? (
               <>
+                {isAdmin && (
+                  <Link
+                    to="/admin/bookings"
+                    onClick={() => setOpen(false)}
+                    className="mt-2 inline-flex items-center justify-center gap-2 rounded-full border border-border px-5 py-3 text-sm font-semibold hover:border-gold hover:text-gold"
+                  >
+                    <Shield className="h-4 w-4" /> Admin
+                  </Link>
+                )}
                 <Link
                   to="/dashboard"
                   onClick={() => setOpen(false)}
