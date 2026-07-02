@@ -121,11 +121,18 @@ function BillboardDetailPage() {
               </div>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
-                  to="/contact"
-                  search={{ billboard: b.id }}
+                  to="/book/$id"
+                  params={{ id: b.id }}
                   className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-primary-foreground shadow-gold transition-transform hover:-translate-y-0.5"
                 >
-                  Request Quote <ArrowRight className="h-4 w-4" />
+                  Book This Billboard <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  to="/contact"
+                  search={{ billboard: b.id }}
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-6 py-3 text-sm font-semibold hover:border-gold hover:text-gold"
+                >
+                  Request Quote
                 </Link>
                 <Link
                   to="/locations"
@@ -280,11 +287,18 @@ function BillboardDetailPage() {
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link
-                to="/contact"
-                search={{ billboard: b.id }}
+                to="/book/$id"
+                params={{ id: b.id }}
                 className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-primary-foreground shadow-gold transition-transform hover:-translate-y-0.5"
               >
-                Request Quote <ArrowRight className="h-4 w-4" />
+                Book This Billboard <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                to="/contact"
+                search={{ billboard: b.id }}
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-6 py-3 text-sm font-semibold transition-colors hover:border-gold hover:text-gold"
+              >
+                Request Quote
               </Link>
               <Link
                 to="/locations"

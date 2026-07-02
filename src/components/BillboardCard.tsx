@@ -1,17 +1,33 @@
 import { Link } from "@tanstack/react-router";
 import { ChevronRight, Eye, MapPin, Ruler } from "lucide-react";
 import type { Billboard } from "@/data/billboards";
+import type { StatusBadgeClasses } from "@/lib/status-badge";
 
-function statusClasses(s: Billboard["availability"]) {
-  if (s === "Available") return { dot: "bg-accent", text: "text-accent", bg: "bg-accent/20" };
-  if (s === "Available Soon") return { dot: "bg-electric-soft", text: "text-electric-soft", bg: "bg-electric/15" };
-  return { dot: "bg-gold", text: "text-gold", bg: "bg-gold/20" };
-}
+const AVAILABILITY_CLASSES: Record<Billboard["availability"], StatusBadgeClasses> = {
+  Available: { dot: "bg-accent", text: "text-accent", bg: "bg-accent/20" },
+  "Available Soon": { dot: "bg-electric-soft", text: "text-electric-soft", bg: "bg-electric/15" },
+  "Coming Soon": { dot: "bg-gold", text: "text-gold", bg: "bg-gold/20" },
+};
 
-export function BillboardCard({ b, compact = false }: { b: Billboard; compact?: boolean }) {
-  const s = statusClasses(b.availability);
+export function BillboardCard({
+  b,
+  compact = false,
+  selected = false,
+  onSelect,
+}: {
+  b: Billboard;
+  compact?: boolean;
+  selected?: boolean;
+  onSelect?: () => void;
+}) {
+  const s = AVAILABILITY_CLASSES[b.availability];
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl bg-card-premium shadow-elegant ring-hairline transition-all hover:-translate-y-1 hover:shadow-glow">
+    <article
+      onClick={onSelect}
+      className={`group flex flex-col overflow-hidden rounded-2xl bg-card-premium shadow-elegant ring-hairline transition-all hover:-translate-y-1 hover:shadow-glow ${
+        selected ? "outline outline-2 outline-offset-2 outline-gold" : ""
+      }`}
+    >
       <div className="relative aspect-[4/3] overflow-hidden">
         <img
           src={b.image}
@@ -65,11 +81,11 @@ export function BillboardCard({ b, compact = false }: { b: Billboard; compact?: 
             View Details
           </Link>
           <Link
-            to="/contact"
-            search={{ billboard: b.id }}
+            to="/book/$id"
+            params={{ id: b.id }}
             className="inline-flex items-center justify-center gap-1 rounded-xl bg-gold px-3 py-2.5 text-sm font-semibold text-primary-foreground shadow-gold transition-transform hover:-translate-y-0.5"
           >
-            Request Quote <ChevronRight className="h-4 w-4" />
+            Book Now <ChevronRight className="h-4 w-4" />
           </Link>
         </div>
       </div>

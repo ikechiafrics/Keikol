@@ -1,0 +1,123 @@
+import { useEffect } from "react";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { RotateCcw } from "lucide-react";
+import type { Billboard } from "@/data/billboards";
+
+function makeIcon(color: string) {
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='34' height='46' viewBox='0 0 34 46'>
+    <defs><filter id='s' x='-50%' y='-50%' width='200%' height='200%'><feDropShadow dx='0' dy='2' stdDeviation='1.5' flood-opacity='0.4'/></filter></defs>
+    <path filter='url(#s)' d='M17 1C8.7 1 2 7.7 2 16c0 11 15 29 15 29s15-18 15-29C32 7.7 25.3 1 17 1z' fill='${color}' stroke='#0b0b12' stroke-width='1.5'/>
+    <circle cx='17' cy='16' r='6' fill='#0b0b12'/>
+  </svg>`;
+  return L.icon({
+    iconUrl: `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`,
+    iconSize: [34, 46],
+    iconAnchor: [17, 44],
+    popupAnchor: [0, -40],
+  });
+}
+
+const STATUS_COLORS: Record<Billboard["availability"], string> = {
+  Available: "#F4C430",
+  "Available Soon": "#60A5FA",
+  "Coming Soon": "#9CA3AF",
+};
+const SELECTED_COLOR = "#22D3EE";
+
+// Fly the map to fit all given billboards: a single billboard gets a close
+// zoom, several get a bounds fit, and an empty list is a no-op.
+function flyToFit(map: L.Map, billboards: Billboard[]) {
+  if (billboards.length === 0) return;
+  if (billboards.length === 1) {
+    const b = billboards[0];
+    map.flyTo([b.lat, b.lng], 10, { duration: 0.6 });
+    return;
+  }
+  const bounds = L.latLngBounds(billboards.map((b) => [b.lat, b.lng] as [number, number]));
+  map.flyToBounds(bounds, { padding: [40, 40], duration: 0.6 });
+}
+
+function FitBounds({ billboards, selectedId }: { billboards: Billboard[]; selectedId: string | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (selectedId) {
+      const b = billboards.find((x) => x.id === selectedId);
+      if (b) {
+        map.flyTo([b.lat, b.lng], 12, { duration: 0.8 });
+        return;
+      }
+      // Selected billboard was filtered out — fall through and fit the
+      // remaining results instead of leaving the map stuck on the old view.
+    }
+    flyToFit(map, billboards);
+  }, [map, billboards, selectedId]);
+  return null;
+}
+
+function ResetViewControl({
+  billboards,
+  onReset,
+}: {
+  billboards: Billboard[];
+  onReset: () => void;
+}) {
+  const map = useMap();
+
+  function handleReset(e: React.MouseEvent) {
+    e.stopPropagation();
+    onReset();
+    flyToFit(map, billboards);
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleReset}
+      onDoubleClick={(e) => e.stopPropagation()}
+      className="absolute bottom-3 left-3 z-[500] inline-flex items-center gap-1.5 rounded-full border border-border bg-background/85 px-3 py-1.5 text-[11px] font-semibold text-muted-foreground shadow-elegant backdrop-blur transition-colors hover:text-gold"
+    >
+      <RotateCcw className="h-3.5 w-3.5" /> Reset view
+    </button>
+  );
+}
+
+export function BillboardMap({
+  billboards,
+  selectedId,
+  onSelect,
+}: {
+  billboards: Billboard[];
+  selectedId: string | null;
+  onSelect: (id: string | null) => void;
+}) {
+  return (
+    <MapContainer
+      center={[9.082, 8.6753]}
+      zoom={6}
+      scrollWheelZoom
+      className="h-full w-full"
+      style={{ background: "#e5e7eb" }}
+    >
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      {billboards.map((b) => (
+        <Marker
+          key={b.id}
+          position={[b.lat, b.lng]}
+          icon={makeIcon(selectedId === b.id ? SELECTED_COLOR : STATUS_COLORS[b.availability])}
+          alt={`${b.area}, ${b.city}`}
+          title={`${b.area}, ${b.city}`}
+          eventHandlers={{ click: () => onSelect(b.id) }}
+        />
+      ))}
+      <FitBounds billboards={billboards} selectedId={selectedId} />
+      <ResetViewControl billboards={billboards} onReset={() => onSelect(null)} />
+    </MapContainer>
+  );
+}
+
+export default BillboardMap;

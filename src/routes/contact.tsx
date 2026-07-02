@@ -1,8 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { ChevronDown, Tag } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
-import { ContactForm, ContactSidebar, PageHero, Section, SectionHeader } from "@/components";
+import { ContactForm, ContactSidebar, PageHero, Section, SectionHeader, SelectedBillboardSummary } from "@/components";
 import { getBillboardById, heroImg } from "@/data/billboards";
 
 type ContactSearch = { billboard?: string };
@@ -80,27 +80,7 @@ function ContactPage() {
       />
 
       <Section>
-        {billboard && (
-          <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gold/40 bg-gold/10 p-5 shadow-elegant">
-            <div className="flex items-start gap-3">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gold text-primary-foreground">
-                <Tag className="h-5 w-5" />
-              </span>
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-gold">Selected Billboard</p>
-                <p className="mt-1 font-display text-base font-bold">{billboard.city} — {billboard.area}</p>
-                <p className="text-xs text-muted-foreground">{billboard.billboardType} · {billboard.estimatedDailyImpressions} daily impressions</p>
-              </div>
-            </div>
-            <Link
-              to="/locations/$id"
-              params={{ id: billboard.id }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/60 px-4 py-2 text-xs font-semibold hover:border-gold hover:text-gold"
-            >
-              View billboard details
-            </Link>
-          </div>
-        )}
+        {billboard && <SelectedBillboardSummary billboard={billboard} className="mb-8" />}
         <div className="grid gap-8 lg:grid-cols-[1.3fr_1fr]">
           <ContactForm interestedBillboard={interestedLabel} billboardId={billboard?.id} />
           <ContactSidebar />

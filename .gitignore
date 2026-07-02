@@ -15,6 +15,7 @@ dist
 skills-lock.json
 dist-ssr
 .output
+.apphosting/
 .vinxi
 .tanstack/**
 .nitro
