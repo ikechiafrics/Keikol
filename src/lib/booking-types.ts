@@ -1,0 +1,38 @@
+import type { Timestamp } from "firebase/firestore";
+import type { BookingStatus } from "@/lib/booking-status";
+import type { StatusBadgeClasses } from "@/lib/status-badge";
+
+export interface BillboardSnapshot {
+  city: string;
+  area: string;
+  billboardType: string;
+  size: string;
+  priceRange: string;
+  image?: string;
+}
+
+export interface Booking {
+  id: string;
+  userId: string;
+  billboardId: string;
+  billboardSnapshot: BillboardSnapshot;
+  startDate: string;
+  endDate: string;
+  budget: string;
+  goal: string;
+  duration: string;
+  companyName: string;
+  contactEmail: string;
+  contactPhone: string;
+  campaignDetails: string;
+  status: BookingStatus;
+  artworkPaths: string[];
+  createdAt: Timestamp | null;
+}
+
+export const BOOKING_STATUS_CLASSES: Record<BookingStatus, StatusBadgeClasses> = {
+  pending_payment: { dot: "bg-gold", text: "text-gold", bg: "bg-gold/20", label: "Pending Payment" },
+  under_review: { dot: "bg-electric-soft", text: "text-electric-soft", bg: "bg-electric/15", label: "Under Review" },
+  confirmed: { dot: "bg-accent", text: "text-accent", bg: "bg-accent/20", label: "Confirmed" },
+  cancelled: { dot: "bg-muted-foreground", text: "text-muted-foreground", bg: "bg-muted/20", label: "Cancelled" },
+};

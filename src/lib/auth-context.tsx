@@ -14,13 +14,20 @@ import {
   signOut,
   type User,
 } from "firebase/auth";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
 import { auth, db } from "@/lib/firebase";
 
+interface UserProfile {
+  role?: "admin";
+}
+
 interface AuthContextValue {
   user: User | null;
+  profile: UserProfile | null;
+  isAdmin: boolean;
   loading: boolean;
+  profileLoading: boolean;
   signUpWithEmail: (email: string, password: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
@@ -44,6 +51,8 @@ async function createUserProfile(user: User) {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
@@ -52,6 +61,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     return unsubscribe;
   }, []);
+
+  // Kept separate from `loading` so routes that never need admin status
+  // (the customer dashboard, the booking form) aren't slowed down waiting on
+  // this extra fetch — only the admin guard route waits on it.
+  useEffect(() => {
+    // Wait until auth-state resolution itself is done — otherwise `user` is
+    // `null` on the very first render (before Firebase has even checked for
+    // a persisted session), and this effect would wrongly declare "resolved,
+    // no profile" before the real session/profile fetch ever starts.
+    if (loading) return;
+    if (!user) {
+      setProfile(null);
+      setProfileLoading(false);
+      return;
+    }
+    setProfileLoading(true);
+    getDoc(doc(db, "users", user.uid))
+      .then((snap) => setProfile(snap.exists() ? (snap.data() as UserProfile) : null))
+      .catch(() => setProfile(null)) // fail closed — never fail open to admin on error
+      .finally(() => setProfileLoading(false));
+  }, [user, loading]);
 
   async function signUpWithEmail(email: string, password: string) {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
@@ -73,7 +103,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, signUpWithEmail, signInWithEmail, signInWithGoogle, signOutUser }}
+      value={{
+        user,
+        profile,
+        isAdmin: profile?.role === "admin",
+        loading,
+        profileLoading,
+        signUpWithEmail,
+        signInWithEmail,
+        signInWithGoogle,
+        signOutUser,
+      }}
     >
       {children}
     </AuthContext.Provider>

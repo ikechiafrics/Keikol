@@ -22,7 +22,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LocationsIndexRouteImport } from './routes/locations.index'
 import { Route as LocationsIdRouteImport } from './routes/locations.$id'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed.dashboard'
+import { Route as AuthedAdminRouteImport } from './routes/_authed.admin'
 import { Route as AuthedBookIdRouteImport } from './routes/_authed.book.$id'
+import { Route as AuthedAdminBookingsRouteImport } from './routes/_authed.admin.bookings'
 
 const TermsOfUseRoute = TermsOfUseRouteImport.update({
   id: '/terms-of-use',
@@ -88,10 +90,20 @@ const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedAdminRoute = AuthedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedBookIdRoute = AuthedBookIdRouteImport.update({
   id: '/book/$id',
   path: '/book/$id',
   getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedAdminBookingsRoute = AuthedAdminBookingsRouteImport.update({
+  id: '/bookings',
+  path: '/bookings',
+  getParentRoute: () => AuthedAdminRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -104,9 +116,11 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms-of-use': typeof TermsOfUseRoute
+  '/admin': typeof AuthedAdminRouteWithChildren
   '/dashboard': typeof AuthedDashboardRoute
   '/locations/$id': typeof LocationsIdRoute
   '/locations/': typeof LocationsIndexRoute
+  '/admin/bookings': typeof AuthedAdminBookingsRoute
   '/book/$id': typeof AuthedBookIdRoute
 }
 export interface FileRoutesByTo {
@@ -119,9 +133,11 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms-of-use': typeof TermsOfUseRoute
+  '/admin': typeof AuthedAdminRouteWithChildren
   '/dashboard': typeof AuthedDashboardRoute
   '/locations/$id': typeof LocationsIdRoute
   '/locations': typeof LocationsIndexRoute
+  '/admin/bookings': typeof AuthedAdminBookingsRoute
   '/book/$id': typeof AuthedBookIdRoute
 }
 export interface FileRoutesById {
@@ -136,9 +152,11 @@ export interface FileRoutesById {
   '/sign-in': typeof SignInRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms-of-use': typeof TermsOfUseRoute
+  '/_authed/admin': typeof AuthedAdminRouteWithChildren
   '/_authed/dashboard': typeof AuthedDashboardRoute
   '/locations/$id': typeof LocationsIdRoute
   '/locations/': typeof LocationsIndexRoute
+  '/_authed/admin/bookings': typeof AuthedAdminBookingsRoute
   '/_authed/book/$id': typeof AuthedBookIdRoute
 }
 export interface FileRouteTypes {
@@ -153,9 +171,11 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sitemap.xml'
     | '/terms-of-use'
+    | '/admin'
     | '/dashboard'
     | '/locations/$id'
     | '/locations/'
+    | '/admin/bookings'
     | '/book/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -168,9 +188,11 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sitemap.xml'
     | '/terms-of-use'
+    | '/admin'
     | '/dashboard'
     | '/locations/$id'
     | '/locations'
+    | '/admin/bookings'
     | '/book/$id'
   id:
     | '__root__'
@@ -184,9 +206,11 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sitemap.xml'
     | '/terms-of-use'
+    | '/_authed/admin'
     | '/_authed/dashboard'
     | '/locations/$id'
     | '/locations/'
+    | '/_authed/admin/bookings'
     | '/_authed/book/$id'
   fileRoutesById: FileRoutesById
 }
@@ -298,6 +322,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedDashboardRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/admin': {
+      id: '/_authed/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthedAdminRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/book/$id': {
       id: '/_authed/book/$id'
       path: '/book/$id'
@@ -305,15 +336,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedBookIdRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/admin/bookings': {
+      id: '/_authed/admin/bookings'
+      path: '/bookings'
+      fullPath: '/admin/bookings'
+      preLoaderRoute: typeof AuthedAdminBookingsRouteImport
+      parentRoute: typeof AuthedAdminRoute
+    }
   }
 }
 
+interface AuthedAdminRouteChildren {
+  AuthedAdminBookingsRoute: typeof AuthedAdminBookingsRoute
+}
+
+const AuthedAdminRouteChildren: AuthedAdminRouteChildren = {
+  AuthedAdminBookingsRoute: AuthedAdminBookingsRoute,
+}
+
+const AuthedAdminRouteWithChildren = AuthedAdminRoute._addFileChildren(
+  AuthedAdminRouteChildren,
+)
+
 interface AuthedRouteChildren {
+  AuthedAdminRoute: typeof AuthedAdminRouteWithChildren
   AuthedDashboardRoute: typeof AuthedDashboardRoute
   AuthedBookIdRoute: typeof AuthedBookIdRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedAdminRoute: AuthedAdminRouteWithChildren,
   AuthedDashboardRoute: AuthedDashboardRoute,
   AuthedBookIdRoute: AuthedBookIdRoute,
 }

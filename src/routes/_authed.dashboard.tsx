@@ -1,13 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { collection, query, where, orderBy, getDocs, Timestamp } from "firebase/firestore";
+import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
 import { ArrowRight, Calendar, ImageOff, MapPin, Paperclip, Wallet } from "lucide-react";
 
 import { Section, SectionHeader } from "@/components";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
-import type { StatusBadgeClasses } from "@/lib/status-badge";
-import type { BookingStatus } from "@/lib/booking-status";
+import { BOOKING_STATUS_CLASSES, type Booking } from "@/lib/booking-types";
 
 export const Route = createFileRoute("/_authed/dashboard")({
   head: () => ({
@@ -15,34 +14,6 @@ export const Route = createFileRoute("/_authed/dashboard")({
   }),
   component: DashboardPage,
 });
-
-interface BillboardSnapshot {
-  city: string;
-  area: string;
-  billboardType: string;
-  size: string;
-  priceRange: string;
-  image?: string;
-}
-
-interface Booking {
-  id: string;
-  billboardId: string;
-  billboardSnapshot: BillboardSnapshot;
-  startDate: string;
-  endDate: string;
-  budget: string;
-  status: BookingStatus;
-  artworkPaths: string[];
-  createdAt: Timestamp | null;
-}
-
-const BOOKING_STATUS_CLASSES: Record<Booking["status"], StatusBadgeClasses> = {
-  pending_payment: { dot: "bg-gold", text: "text-gold", bg: "bg-gold/20", label: "Pending Payment" },
-  under_review: { dot: "bg-electric-soft", text: "text-electric-soft", bg: "bg-electric/15", label: "Under Review" },
-  confirmed: { dot: "bg-accent", text: "text-accent", bg: "bg-accent/20", label: "Confirmed" },
-  cancelled: { dot: "bg-muted-foreground", text: "text-muted-foreground", bg: "bg-muted/20", label: "Cancelled" },
-};
 
 async function fetchBookings(uid: string): Promise<Booking[]> {
   const q = query(collection(db, "bookings"), where("userId", "==", uid), orderBy("createdAt", "desc"));
