@@ -48,7 +48,7 @@ export function Footer() {
               { label: "Home", to: "/" },
               { label: "Locations", to: "/locations" },
               { label: "Industries", to: "/industries" },
-              { label: "Portfolio", to: "/portfolio" },
+              { label: "Campaign Ideas", to: "/portfolio" },
               { label: "About", to: "/about" },
               { label: "Contact", to: "/contact" },
             ]}

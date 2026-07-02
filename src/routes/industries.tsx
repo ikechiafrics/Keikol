@@ -151,12 +151,20 @@ function IndustriesPage() {
           <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
             Share your goals and our team will recommend the best placements for your sector.
           </p>
-          <Link
-            to="/contact"
-            className="mt-7 inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-primary-foreground shadow-gold transition-transform hover:-translate-y-0.5"
-          >
-            Request a Campaign Recommendation <ArrowRight className="h-4 w-4" />
-          </Link>
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-primary-foreground shadow-gold transition-transform hover:-translate-y-0.5"
+            >
+              Request a Campaign Recommendation <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              to="/portfolio"
+              className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-gold hover:text-gold"
+            >
+              See Example Campaign Directions <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </Section>
 

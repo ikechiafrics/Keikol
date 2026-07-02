@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   CheckCircle2,
-  ChevronRight,
   Cpu,
   Eye,
   Globe2,
@@ -382,9 +381,9 @@ function PortfolioPreview() {
   return (
     <Section tone="surface">
       <SectionHeader
-        eyebrow="Portfolio"
-        title={<>Campaigns that <span className="text-gradient-gold">command attention.</span></>}
-        subtitle="A glimpse of the kind of high-impact outdoor work Keikol delivers for ambitious brands."
+        eyebrow="Campaign Ideas"
+        title={<>See what's <span className="text-gradient-gold">possible.</span></>}
+        subtitle="A glimpse of the kind of high-impact outdoor campaigns Keikol can help bring to life for ambitious brands."
       />
       <div className="mt-14 grid gap-6 lg:grid-cols-3">
         {items.map((c) => (
@@ -401,9 +400,8 @@ function PortfolioPreview() {
                 <h3 className="mt-1 font-display text-lg font-bold">{c.title}</h3>
               </div>
             </div>
-            <div className="flex items-center justify-between p-5">
+            <div className="p-5">
               <p className="text-sm text-muted-foreground">{c.campaignType}</p>
-              <ChevronRight className="h-4 w-4 text-gold transition-transform group-hover:translate-x-1" />
             </div>
           </article>
         ))}
@@ -413,7 +411,7 @@ function PortfolioPreview() {
           to="/portfolio"
           className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-primary-foreground shadow-gold transition-transform hover:-translate-y-0.5"
         >
-          View Portfolio <ArrowRight className="h-4 w-4" />
+          See Campaign Ideas <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
     </Section>

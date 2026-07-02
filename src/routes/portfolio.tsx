@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ChevronRight, Eye, MapPin, Palette, Sparkles, Target } from "lucide-react";
+import { Eye, MapPin, Palette, Sparkles, Target } from "lucide-react";
 
 import { PageHero, Section, SectionHeader, CTASection } from "@/components";
 import { PORTFOLIO_SAMPLES, heroImg } from "@/data/billboards";
@@ -7,14 +7,14 @@ import { PORTFOLIO_SAMPLES, heroImg } from "@/data/billboards";
 export const Route = createFileRoute("/portfolio")({
   head: () => ({
     meta: [
-      { title: "Portfolio — Campaign Concepts | Keikol" },
+      { title: "Campaign Ideas — Keikol Billboard Advertising" },
       {
         name: "description",
         content:
-          "Explore sample billboard campaign concepts across real estate, FMCG, fashion, telecom, and more from Keikol.",
+          "See example billboard campaign directions across real estate, FMCG, fashion, telecom, and more — ideas Keikol can help bring to life for your brand.",
       },
-      { property: "og:title", content: "Portfolio — Keikol" },
-      { property: "og:description", content: "Sample outdoor advertising campaign concepts by Keikol." },
+      { property: "og:title", content: "Campaign Ideas — Keikol" },
+      { property: "og:description", content: "Example outdoor advertising campaign directions from Keikol." },
       { property: "og:url", content: "/portfolio" },
       { property: "og:image", content: heroImg },
     ],
@@ -27,10 +27,10 @@ function PortfolioPage() {
   return (
     <>
       <PageHero
-        eyebrow="Portfolio"
+        eyebrow="Campaign Ideas"
         title={
           <>
-            Campaigns that <span className="text-gradient-gold">command attention.</span>
+            See what's <span className="text-gradient-gold">possible.</span>
           </>
         }
         subtitle="Explore examples of how brands can use outdoor advertising to increase visibility, launch products, and build credibility in high-traffic locations."
@@ -69,16 +69,13 @@ function PortfolioPage() {
                   <span className="text-xs text-muted-foreground">{c.campaignType}</span>
                 </div>
                 <p className="mt-4 flex-1 text-sm leading-relaxed text-muted-foreground">{c.description}</p>
-                <p className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-gold">
-                  Example campaign direction <ChevronRight className="h-4 w-4" />
-                </p>
               </div>
             </article>
           ))}
         </div>
 
         <p className="mt-10 text-center text-xs text-muted-foreground">
-          Cards above are illustrative campaign concepts created to demonstrate possible directions, not completed client work.
+          These are illustrative campaign directions, not completed client work.
         </p>
       </Section>
 
