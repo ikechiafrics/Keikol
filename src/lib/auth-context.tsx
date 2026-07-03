@@ -10,7 +10,7 @@ import {
   sendEmailVerification,
   type User,
 } from "firebase/auth";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, onSnapshot, setDoc, serverTimestamp } from "firebase/firestore";
 
 import { auth, db } from "@/lib/firebase";
 
@@ -75,35 +75,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    let cancelled = false;
     setProfileLoading(true);
 
-    // The very first Firestore read right after sign-in can transiently
-    // fail (token propagation, a slow network, etc.) — retry once after a
-    // beat before failing closed, instead of permanently showing "not
-    // admin" for the rest of the session until a manual refresh.
-    async function loadProfile() {
-      for (let attempt = 0; attempt < 2; attempt++) {
-        try {
-          const snap = await getDoc(doc(db, "users", user!.uid));
-          if (cancelled) return;
-          setProfile(snap.exists() ? (snap.data() as UserProfile) : null);
-          return;
-        } catch (err) {
-          console.error(`Failed to load user profile (attempt ${attempt + 1}/2):`, err);
-          if (attempt === 0) await new Promise((r) => setTimeout(r, 800));
-        }
-      }
-      if (!cancelled) setProfile(null); // fail closed only after retrying
-    }
+    // A live subscription instead of a one-shot read: the SDK handles
+    // retrying under the hood (token warm-up, transient network blips) and
+    // pushes the correct data the moment it's actually available, rather
+    // than us guessing a fixed retry delay and permanently failing closed
+    // if that guess was too short.
+    const unsubscribe = onSnapshot(
+      doc(db, "users", user.uid),
+      (snap) => {
+        setProfile(snap.exists() ? (snap.data() as UserProfile) : null);
+        setProfileLoading(false);
+      },
+      (err) => {
+        console.error("Failed to load user profile:", err);
+        setProfile(null);
+        setProfileLoading(false);
+      },
+    );
 
-    loadProfile().finally(() => {
-      if (!cancelled) setProfileLoading(false);
-    });
-
-    return () => {
-      cancelled = true;
-    };
+    return unsubscribe;
   }, [user, loading]);
 
   async function signUpWithEmail(email: string, password: string) {
