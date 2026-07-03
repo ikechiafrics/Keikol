@@ -6,11 +6,17 @@ export function Field({
   name,
   type = "text",
   placeholder,
+  hint,
+  value,
+  onChange,
 }: {
   label: string;
   name: string;
   type?: string;
   placeholder?: string;
+  hint?: string;
+  value?: string;
+  onChange?: (value: string) => void;
 }) {
   const id = `field-${name}`;
   const [visible, setVisible] = useState(false);
@@ -18,7 +24,10 @@ export function Field({
 
   return (
     <div>
-      <label htmlFor={id} className="mb-2 block text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+      <label
+        htmlFor={id}
+        className="mb-2 block text-xs font-semibold uppercase tracking-widest text-muted-foreground"
+      >
         {label}
       </label>
       <div className="relative">
@@ -28,6 +37,8 @@ export function Field({
           type={isPassword ? (visible ? "text" : "password") : type}
           required
           placeholder={placeholder}
+          value={value}
+          onChange={onChange ? (e) => onChange(e.target.value) : undefined}
           className={`w-full rounded-xl border border-border bg-background/60 px-4 py-3 text-sm placeholder:text-muted-foreground/70 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30 ${isPassword ? "pr-11" : ""}`}
         />
         {isPassword && (
@@ -41,6 +52,7 @@ export function Field({
           </button>
         )}
       </div>
+      {hint && <p className="mt-1.5 text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
 }

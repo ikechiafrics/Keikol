@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check, X } from "lucide-react";
 
 import { Field, PageHero, Section } from "@/components";
 import { useAuth } from "@/lib/auth-context";
@@ -44,12 +44,57 @@ function GoogleIcon() {
 
 type Mode = "signin" | "signup" | "reset";
 
+function getPasswordError(password: string): string | null {
+  if (password.length < 8) return "Password must be at least 8 characters.";
+  if (!/[a-z]/.test(password)) return "Password must include a lowercase letter.";
+  if (!/[A-Z]/.test(password)) return "Password must include an uppercase letter.";
+  if (!/[0-9]/.test(password)) return "Password must include a number.";
+  return null;
+}
+
+const STRENGTH_LABELS = ["Weak", "Weak", "Fair", "Good", "Strong"];
+const STRENGTH_COLORS = [
+  "bg-destructive",
+  "bg-destructive",
+  "bg-gold",
+  "bg-electric",
+  "bg-green-500",
+];
+
+function getPasswordStrength(password: string): { label: string; score: number } {
+  let score = 0;
+  if (password.length >= 8) score++;
+  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+  return { label: STRENGTH_LABELS[score], score };
+}
+
+function PasswordStrengthMeter({ password }: { password: string }) {
+  if (!password) return null;
+  const { label, score } = getPasswordStrength(password);
+  const color = STRENGTH_COLORS[score];
+
+  return (
+    <div className="mt-2">
+      <div className="flex gap-1">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className={`h-1 flex-1 rounded-full ${i < score ? color : "bg-border"}`} />
+        ))}
+      </div>
+      <p className={`mt-1 text-xs font-semibold ${color.replace("bg-", "text-")}`}>{label}</p>
+    </div>
+  );
+}
+
 function SignInPage() {
   const { redirect } = Route.useSearch();
   const navigate = useNavigate();
   const { signInWithEmail, signUpWithEmail, signInWithGoogle, resetPassword } = useAuth();
   const [mode, setMode] = useState<Mode>("signin");
   const [submitting, setSubmitting] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   function goToDestination() {
     navigate({ to: redirect || "/dashboard" });
@@ -59,7 +104,18 @@ function SignInPage() {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const email = String(fd.get("email") ?? "");
-    const password = String(fd.get("password") ?? "");
+
+    if (mode === "signup") {
+      const passwordError = getPasswordError(password);
+      if (passwordError) {
+        toast.error(passwordError);
+        return;
+      }
+      if (password !== confirmPassword) {
+        toast.error("Passwords don't match.");
+        return;
+      }
+    }
 
     setSubmitting(true);
     try {
@@ -194,7 +250,20 @@ function SignInPage() {
                   placeholder="you@brand.com"
                 />
                 <div>
-                  <Field label="Password" name="password" type="password" placeholder="••••••••" />
+                  <Field
+                    label="Password"
+                    name="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={setPassword}
+                    hint={
+                      mode === "signup"
+                        ? "At least 8 characters, with an uppercase letter, a lowercase letter, and a number."
+                        : undefined
+                    }
+                  />
+                  {mode === "signup" && <PasswordStrengthMeter password={password} />}
                   {mode === "signin" && (
                     <div className="mt-2 text-right">
                       <button
@@ -207,6 +276,35 @@ function SignInPage() {
                     </div>
                   )}
                 </div>
+                {mode === "signup" && (
+                  <div>
+                    <Field
+                      label="Confirm Password"
+                      name="confirmPassword"
+                      type="password"
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={setConfirmPassword}
+                    />
+                    {confirmPassword.length > 0 && (
+                      <p
+                        className={`mt-1.5 flex items-center gap-1.5 text-xs font-medium ${
+                          password === confirmPassword ? "text-green-600" : "text-destructive"
+                        }`}
+                      >
+                        {password === confirmPassword ? (
+                          <>
+                            <Check className="h-3.5 w-3.5" /> Passwords match
+                          </>
+                        ) : (
+                          <>
+                            <X className="h-3.5 w-3.5" /> Passwords don't match
+                          </>
+                        )}
+                      </p>
+                    )}
+                  </div>
+                )}
                 <button
                   type="submit"
                   disabled={submitting}
