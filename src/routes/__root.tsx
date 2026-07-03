@@ -16,6 +16,7 @@ import { trackEvent } from "../lib/analytics";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { Toaster } from "../components/ui/sonner";
+import { CookieConsentBanner } from "../components/CookieConsentBanner";
 
 function NotFoundComponent() {
   return (
@@ -95,6 +96,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap",
       },
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
+      { rel: "apple-touch-icon", href: "/favicon.png" },
     ],
     scripts: [
       {
@@ -166,6 +169,7 @@ function RootComponent() {
           <Footer />
         </div>
         <Toaster />
+        <CookieConsentBanner />
       </AuthProvider>
     </QueryClientProvider>
   );

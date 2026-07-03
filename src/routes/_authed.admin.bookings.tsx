@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { collection, doc, getDocs, orderBy, query, serverTimestamp, writeBatch } from "firebase/firestore";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { doc, serverTimestamp, writeBatch } from "firebase/firestore";
 import { Paperclip } from "lucide-react";
 import { toast } from "sonner";
 
 import { Section, SectionHeader } from "@/components";
 import { db } from "@/lib/firebase";
+import { useBookings } from "@/lib/bookings-data";
 import { BOOKING_STATUS_CLASSES, type Booking } from "@/lib/booking-types";
 import type { BookingStatus } from "@/lib/booking-status";
 
@@ -17,12 +18,6 @@ export const Route = createFileRoute("/_authed/admin/bookings")({
 });
 
 const STATUS_OPTIONS: BookingStatus[] = ["pending_payment", "under_review", "confirmed", "cancelled"];
-
-async function fetchAllBookings(): Promise<Booking[]> {
-  const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Booking);
-}
 
 async function updateBookingStatus(booking: Booking, status: BookingStatus) {
   const batch = writeBatch(db);
@@ -48,10 +43,7 @@ async function updateBookingStatus(booking: Booking, status: BookingStatus) {
 function AdminBookingsPage() {
   const queryClient = useQueryClient();
 
-  const { data: bookings, isLoading } = useQuery({
-    queryKey: ["admin-bookings"],
-    queryFn: fetchAllBookings,
-  });
+  const { data: bookings, isLoading } = useBookings();
 
   const mutation = useMutation({
     mutationFn: ({ booking, status }: { booking: Booking; status: BookingStatus }) =>

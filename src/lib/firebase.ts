@@ -39,24 +39,34 @@ let analyticsInstance: Analytics | undefined;
 if (typeof window !== "undefined") {
   authInstance = getAuth(app);
   storageInstance = getStorage(app);
-
-  // Only send real hits from production builds, so local `npm run dev`
-  // sessions don't pollute the live GA4 property with test traffic.
-  if (import.meta.env.PROD) {
-    try {
-      analyticsInstance = getAnalytics(app);
-    } catch {
-      // Unsupported environment (rare) — analytics is non-critical, fail silently.
-    }
-  }
 }
 
 export const auth = authInstance as Auth;
 export const storage = storageInstance as FirebaseStorage;
-// Unlike auth/storage, analytics can legitimately fail to initialize even in
-// a real browser (see try/catch above), so this stays possibly-undefined
-// rather than cast away — callers (src/lib/analytics.ts) check truthiness.
-export const analytics = analyticsInstance;
+
+// Not initialized eagerly — cookie-consent policy requires analytics to only
+// start after the visitor has explicitly accepted (or on a return visit
+// where consent was already "accepted"; see src/lib/cookie-consent.ts and
+// CookieConsentBanner). Call `initAnalytics()` from that consent flow only.
+// Only ever sends real hits from production builds, so local `npm run dev`
+// sessions don't pollute the live GA4 property with test traffic.
+export function initAnalytics(): void {
+  if (analyticsInstance) return;
+  if (typeof window === "undefined" || !import.meta.env.PROD) return;
+  try {
+    analyticsInstance = getAnalytics(app);
+  } catch {
+    // Unsupported environment (rare) — analytics is non-critical, fail silently.
+  }
+}
+
+// A getter, not a static export — `analyticsInstance` may still be undefined
+// when this module first loads and only become defined later once
+// `initAnalytics()` runs, so callers (src/lib/analytics.ts) must always read
+// the current live value rather than a stale snapshot.
+export function getAnalyticsInstance(): Analytics | undefined {
+  return analyticsInstance;
+}
 
 // Storage path convention for uploaded campaign artwork. Must stay in sync
 // with the `artwork/{userId}/{allPaths=**}` match in storage.rules.

@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { collection, deleteDoc, doc, getDocs, orderBy, query, serverTimestamp, updateDoc } from "firebase/firestore";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 
 import { Section, SectionHeader } from "@/components";
 import { db } from "@/lib/firebase";
+import { useQuoteRequests } from "@/lib/quotes-data";
 import { QUOTE_STATUS_CLASSES, type QuoteRequest } from "@/lib/quote-types";
 import type { QuoteStatus } from "@/lib/quote-status";
 import {
@@ -29,12 +30,6 @@ export const Route = createFileRoute("/_authed/admin/quotes")({
 
 const STATUS_OPTIONS: QuoteStatus[] = ["new", "contacted", "closed"];
 
-async function fetchAllQuoteRequests(): Promise<QuoteRequest[]> {
-  const q = query(collection(db, "quoteRequests"), orderBy("createdAt", "desc"));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as QuoteRequest);
-}
-
 async function updateQuoteStatus(quote: QuoteRequest, status: QuoteStatus) {
   await updateDoc(doc(db, "quoteRequests", quote.id), { status, updatedAt: serverTimestamp() });
 }
@@ -47,10 +42,7 @@ function AdminQuotesPage() {
   const queryClient = useQueryClient();
   const [pendingDelete, setPendingDelete] = useState<QuoteRequest | null>(null);
 
-  const { data: quotes, isLoading } = useQuery({
-    queryKey: ["admin-quotes"],
-    queryFn: fetchAllQuoteRequests,
-  });
+  const { data: quotes, isLoading } = useQuoteRequests();
 
   const statusMutation = useMutation({
     mutationFn: ({ quote, status }: { quote: QuoteRequest; status: QuoteStatus }) => updateQuoteStatus(quote, status),

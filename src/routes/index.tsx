@@ -130,17 +130,11 @@ function Hero() {
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
-            <div className="flex items-center justify-between p-5">
-              <div>
-                <p className="text-xs uppercase tracking-widest text-muted-foreground">
-                  Featured placement
-                </p>
-                <p className="mt-1 font-display text-lg font-bold">Lekki Expressway · Lagos</p>
-              </div>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold text-accent">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-glow" />
-                Live
-              </span>
+            <div className="p-5">
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">
+                Featured placement
+              </p>
+              <p className="mt-1 font-display text-lg font-bold">Premium Digital Billboard</p>
             </div>
           </div>
         </div>

@@ -73,7 +73,7 @@ export function Header() {
             <>
               {isAdmin && (
                 <Link
-                  to="/admin/bookings"
+                  to="/admin"
                   className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-5 py-2.5 text-sm font-semibold hover:border-gold hover:text-gold"
                 >
                   <Shield className="h-4 w-4" /> Admin
@@ -136,7 +136,7 @@ export function Header() {
               <>
                 {isAdmin && (
                   <Link
-                    to="/admin/bookings"
+                    to="/admin"
                     onClick={() => setOpen(false)}
                     className="mt-2 inline-flex items-center justify-center gap-2 rounded-full border border-border px-5 py-3 text-sm font-semibold hover:border-gold hover:text-gold"
                   >
