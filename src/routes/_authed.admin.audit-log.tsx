@@ -13,7 +13,8 @@ export const Route = createFileRoute("/_authed/admin/audit-log")({
 });
 
 function AdminAuditLogPage() {
-  const { data: logs, isLoading } = useAuditLogs();
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useAuditLogs();
+  const logs = data?.pages.flatMap((page) => page.entries);
 
   return (
     <Section>
@@ -75,6 +76,18 @@ function AdminAuditLogPage() {
           </table>
         )}
       </div>
+
+      {hasNextPage && (
+        <div className="mt-6 flex justify-center">
+          <button
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+            className="rounded-full bg-surface-2 px-5 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-gold disabled:opacity-60"
+          >
+            {isFetchingNextPage ? "Loading…" : "Load more"}
+          </button>
+        </div>
+      )}
     </Section>
   );
 }

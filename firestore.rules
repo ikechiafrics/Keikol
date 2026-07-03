@@ -27,21 +27,33 @@ service cloud.firestore {
                     || (isAdmin()
                         && request.resource.data.status in ["pending_payment", "under_review", "confirmed", "cancellation_requested", "cancelled"]);
 
-      // Admins can update a booking's status/contract amount freely. The
-      // owner may also update status directly, but only for two narrow,
+      // Admins can update a booking's status/contract amount freely, plus
+      // correct data-entry mistakes in the descriptive/scheduling fields
+      // (e.g. a typo'd company name, or wrong dates on a phoned-in
+      // booking) — but not change which billboard/customer it belongs to.
+      // The owner may also update status directly, but only for two narrow
       // self-service transitions: cancelling outright while nothing has
       // been invoiced yet (pending_payment/under_review), or flagging a
       // confirmed booking for admin-mediated cancellation (since a
       // confirmed campaign may already have invoices/payment involved,
-      // which this app can't unwind automatically).
+      // which this app can't unwind automatically). The owner may also add
+      // artwork to their own booking at any time (e.g. if it wasn't ready
+      // yet at booking time), and admins may do the same on any booking.
       allow update: if (isAdmin()
-                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "updatedAt", "contractAmount"])
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+                             "status", "updatedAt", "contractAmount", "artworkPaths",
+                             "companyName", "contactEmail", "contactPhone", "campaignDetails",
+                             "budget", "goal", "duration", "startDate", "endDate"
+                           ])
                         && request.resource.data.status in ["pending_payment", "under_review", "confirmed", "cancellation_requested", "cancelled"])
                     || (isSignedIn()
                         && request.auth.uid == resource.data.userId
                         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "updatedAt"])
                         && ((resource.data.status in ["pending_payment", "under_review"] && request.resource.data.status == "cancelled")
-                            || (resource.data.status == "confirmed" && request.resource.data.status == "cancellation_requested")));
+                            || (resource.data.status == "confirmed" && request.resource.data.status == "cancellation_requested")))
+                    || (isSignedIn()
+                        && request.auth.uid == resource.data.userId
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["artworkPaths", "updatedAt"]));
 
       // Only cancelled bookings can be deleted — anything still active
       // (pending, under review, confirmed, or awaiting a cancellation

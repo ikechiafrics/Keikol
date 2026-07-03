@@ -31,6 +31,18 @@ export interface Booking {
   contractAmount?: number;
 }
 
+export const STALE_PENDING_DAYS = 7;
+
+// Computed at view-time rather than by a background job — this app has no
+// server/scheduled functions (Firestore client SDK only), so "flagging" a
+// stale booking just means highlighting it whenever an admin looks at the
+// list, rather than a persisted state or a notification.
+export function isStalePendingBooking(booking: Booking): boolean {
+  if (booking.status !== "pending_payment" || !booking.createdAt) return false;
+  const ageMs = Date.now() - booking.createdAt.toDate().getTime();
+  return ageMs > STALE_PENDING_DAYS * 24 * 60 * 60 * 1000;
+}
+
 export const BOOKING_STATUS_CLASSES: Record<BookingStatus, StatusBadgeClasses> = {
   pending_payment: {
     dot: "bg-gold",

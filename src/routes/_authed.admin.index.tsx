@@ -1,12 +1,16 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Building2, CalendarClock, FileText } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { AlertTriangle, Building2, CalendarClock, FileText } from "lucide-react";
 
 import { Section, SectionHeader } from "@/components";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useBillboards } from "@/lib/billboards-data";
 import { useBookings } from "@/lib/bookings-data";
 import { useQuoteRequests } from "@/lib/quotes-data";
-import { BOOKING_STATUS_CLASSES } from "@/lib/booking-types";
+import {
+  BOOKING_STATUS_CLASSES,
+  isStalePendingBooking,
+  STALE_PENDING_DAYS,
+} from "@/lib/booking-types";
 import { QUOTE_STATUS_CLASSES } from "@/lib/quote-types";
 
 export const Route = createFileRoute("/_authed/admin/")({
@@ -22,6 +26,7 @@ function AdminOverviewPage() {
   const { data: bookings, isLoading: bookingsLoading } = useBookings();
 
   const isLoading = billboardsLoading || quotesLoading || bookingsLoading;
+  const staleCount = (bookings ?? []).filter(isStalePendingBooking).length;
 
   const quoteCounts = {
     new: quotes?.filter((q) => q.status === "new").length ?? 0,
@@ -50,6 +55,19 @@ function AdminOverviewPage() {
         }
         subtitle="A quick snapshot of billboard inventory, quote requests, and bookings that need attention."
       />
+
+      {!isLoading && staleCount > 0 && (
+        <Link
+          to="/admin/bookings"
+          className="mt-8 flex items-center gap-3 rounded-2xl border border-destructive/30 bg-destructive/10 p-4 transition-colors hover:border-destructive/50"
+        >
+          <AlertTriangle className="h-5 w-5 shrink-0 text-destructive" />
+          <p className="text-sm">
+            <strong>{staleCount}</strong> booking{staleCount > 1 ? "s" : ""} pending payment for
+            over {STALE_PENDING_DAYS} days — may need follow-up.
+          </p>
+        </Link>
+      )}
 
       {isLoading && (
         <div className="mt-10 grid gap-6 lg:grid-cols-3">

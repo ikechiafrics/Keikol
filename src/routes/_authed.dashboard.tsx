@@ -11,6 +11,7 @@ import {
   Paperclip,
   Receipt,
   RefreshCw,
+  Upload,
   Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -34,6 +35,7 @@ import { useImageLoaded } from "@/lib/use-image-loaded";
 import { useArtworkUrls } from "@/lib/use-artwork-urls";
 import { useInvoicesForBooking, useInvoicesForUser } from "@/lib/invoices-data";
 import { cancelBooking, requestBookingCancellation } from "@/lib/bookings-data";
+import { addBookingArtwork } from "@/lib/booking-artwork";
 import { formatNaira } from "@/lib/invoice";
 import { BOOKING_STATUS_CLASSES, type Booking } from "@/lib/booking-types";
 
@@ -209,6 +211,37 @@ function BookingCard({ booking }: { booking: Booking }) {
     onError: () => toast.error("Couldn't update this booking. Please try again."),
   });
 
+  const [artworkProgress, setArtworkProgress] = useState<number | null>(null);
+  const artworkMutation = useMutation({
+    mutationFn: (file: File) =>
+      addBookingArtwork(booking.id, booking.userId, file, setArtworkProgress),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["bookings", booking.userId] });
+      toast.success("Artwork added.");
+      setArtworkProgress(null);
+    },
+    onError: (err) => {
+      console.error("Artwork upload failed:", err);
+      toast.error("Couldn't upload that file. Please try again.");
+      setArtworkProgress(null);
+    },
+  });
+
+  function onArtworkFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 20 * 1024 * 1024) {
+      toast.error("File must be under 20MB.");
+      return;
+    }
+    if (!/^image\/|^application\/pdf$/.test(file.type)) {
+      toast.error("Only images or PDF files are accepted.");
+      return;
+    }
+    artworkMutation.mutate(file);
+  }
+
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl bg-card-premium shadow-elegant ring-hairline">
       <div className="relative aspect-[4/3] overflow-hidden bg-surface">
@@ -252,6 +285,22 @@ function BookingCard({ booking }: { booking: Booking }) {
         </p>
 
         {hasArtwork && <ArtworkLinks paths={booking.artworkPaths} />}
+
+        <label className="mt-3 flex w-fit cursor-pointer items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-gold">
+          <Upload className="h-3 w-3" />
+          {artworkMutation.isPending
+            ? `Uploading… ${artworkProgress ?? 0}%`
+            : hasArtwork
+              ? "Add more artwork"
+              : "Add artwork"}
+          <input
+            type="file"
+            accept="image/*,application/pdf"
+            onChange={onArtworkFileChange}
+            disabled={artworkMutation.isPending}
+            className="hidden"
+          />
+        </label>
 
         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
           <Link

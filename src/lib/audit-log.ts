@@ -1,14 +1,18 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import {
   collection,
   doc,
   getDocs,
+  limit,
   orderBy,
   query,
   serverTimestamp,
+  startAfter,
+  type DocumentData,
+  type QueryDocumentSnapshot,
+  type Timestamp,
   type WriteBatch,
 } from "firebase/firestore";
-import type { Timestamp } from "firebase/firestore";
 
 import { db } from "@/lib/firebase";
 
@@ -44,12 +48,41 @@ export function logAudit(
   });
 }
 
-export async function fetchAuditLogs(): Promise<AuditLogEntry[]> {
-  const q = query(collection(db, "auditLogs"), orderBy("createdAt", "desc"));
+const AUDIT_LOG_PAGE_SIZE = 100;
+
+type Cursor = QueryDocumentSnapshot<DocumentData> | null;
+
+interface AuditLogPage {
+  entries: AuditLogEntry[];
+  cursor: Cursor;
+  hasMore: boolean;
+}
+
+// Fetches one page at a time (cursor-based, via startAfter) rather than the
+// whole collection — this is an append-only, ever-growing log, so loading
+// it in full on every visit would get slower and more expensive forever.
+async function fetchAuditLogsPage(cursor: Cursor): Promise<AuditLogPage> {
+  const base = [collection(db, "auditLogs"), orderBy("createdAt", "desc")] as const;
+  // Fetch one extra document to know whether another page exists, without
+  // a separate count query.
+  const q = cursor
+    ? query(...base, startAfter(cursor), limit(AUDIT_LOG_PAGE_SIZE + 1))
+    : query(...base, limit(AUDIT_LOG_PAGE_SIZE + 1));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as AuditLogEntry);
+  const hasMore = snap.docs.length > AUDIT_LOG_PAGE_SIZE;
+  const docs = hasMore ? snap.docs.slice(0, AUDIT_LOG_PAGE_SIZE) : snap.docs;
+  return {
+    entries: docs.map((d) => ({ id: d.id, ...d.data() }) as AuditLogEntry),
+    cursor: docs.length > 0 ? docs[docs.length - 1] : null,
+    hasMore,
+  };
 }
 
 export function useAuditLogs() {
-  return useQuery({ queryKey: ["audit-logs"], queryFn: fetchAuditLogs });
+  return useInfiniteQuery({
+    queryKey: ["audit-logs"],
+    queryFn: ({ pageParam }: { pageParam: Cursor }) => fetchAuditLogsPage(pageParam),
+    initialPageParam: null as Cursor,
+    getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.cursor : undefined),
+  });
 }

@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   orderBy,
   query,
@@ -16,6 +17,11 @@ export async function fetchAllBookings(): Promise<Booking[]> {
   const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
   const snap = await getDocs(q);
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Booking);
+}
+
+export async function fetchBookingById(id: string): Promise<Booking | null> {
+  const snap = await getDoc(doc(db, "bookings", id));
+  return snap.exists() ? ({ id: snap.id, ...snap.data() } as Booking) : null;
 }
 
 export function useBookings() {

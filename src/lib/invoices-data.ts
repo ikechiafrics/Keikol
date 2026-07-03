@@ -38,3 +38,11 @@ export function useInvoicesForUser(userId: string | undefined) {
     enabled: !!userId,
   });
 }
+
+// Every invoice across every booking — admin-only (per firestore.rules),
+// used for the "Export Invoices CSV" action rather than any reactive
+// display, so a plain fetch is enough without a query hook wrapper.
+export async function fetchAllInvoices(): Promise<Invoice[]> {
+  const snap = await getDocs(collection(db, "invoices"));
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Invoice);
+}

@@ -9,7 +9,19 @@ import {
   where,
   writeBatch,
 } from "firebase/firestore";
-import { Ban, Calendar as CalIcon, Paperclip, Plus, Receipt, Trash2, Undo2 } from "lucide-react";
+import {
+  AlertTriangle,
+  Ban,
+  Calendar as CalIcon,
+  FileUp,
+  Paperclip,
+  Pencil,
+  Plus,
+  Receipt,
+  Trash2,
+  Undo2,
+  Upload,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -37,11 +49,19 @@ import { Calendar } from "@/components/ui/calendar";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
 import { useBookings } from "@/lib/bookings-data";
-import { useInvoicesForBooking } from "@/lib/invoices-data";
+import { useInvoicesForBooking, fetchAllInvoices } from "@/lib/invoices-data";
+import { useArtworkUrls } from "@/lib/use-artwork-urls";
+import { addBookingArtwork } from "@/lib/booking-artwork";
 import { generateInvoiceNumber, formatNaira } from "@/lib/invoice";
 import { parseAmount, formatAmountInput } from "@/lib/currency-input";
 import { logAudit, type AuditActor } from "@/lib/audit-log";
-import { BOOKING_STATUS_CLASSES, type Booking } from "@/lib/booking-types";
+import { downloadCsv } from "@/lib/csv-export";
+import {
+  BOOKING_STATUS_CLASSES,
+  isStalePendingBooking,
+  STALE_PENDING_DAYS,
+  type Booking,
+} from "@/lib/booking-types";
 import { INVOICE_STATUS_CLASSES, type Invoice } from "@/lib/invoice-types";
 import type { BookingStatus } from "@/lib/booking-status";
 
@@ -207,6 +227,78 @@ function AdminBookingsPage() {
     onError: () => toast.error("Couldn't delete this booking. Please try again."),
   });
 
+  const [exportingInvoices, setExportingInvoices] = useState(false);
+
+  function handleExportBookings() {
+    if (!bookings || bookings.length === 0) {
+      toast.error("No bookings to export.");
+      return;
+    }
+    downloadCsv(
+      `keikol-bookings-${toISODate(new Date())}.csv`,
+      [
+        "Company",
+        "Contact Email",
+        "Contact Phone",
+        "City",
+        "Area",
+        "Billboard Type",
+        "Start Date",
+        "End Date",
+        "Budget",
+        "Goal",
+        "Duration",
+        "Status",
+        "Contract Amount",
+        "Created At",
+      ],
+      bookings.map((b) => [
+        b.companyName,
+        b.contactEmail,
+        b.contactPhone,
+        b.billboardSnapshot.city,
+        b.billboardSnapshot.area,
+        b.billboardSnapshot.billboardType,
+        b.startDate,
+        b.endDate,
+        b.budget,
+        b.goal,
+        b.duration,
+        BOOKING_STATUS_CLASSES[b.status].label ?? b.status,
+        b.contractAmount ?? "",
+        b.createdAt ? b.createdAt.toDate().toISOString() : "",
+      ]),
+    );
+  }
+
+  async function handleExportInvoices() {
+    setExportingInvoices(true);
+    try {
+      const invoices = await fetchAllInvoices();
+      if (invoices.length === 0) {
+        toast.error("No invoices to export.");
+        return;
+      }
+      downloadCsv(
+        `keikol-invoices-${toISODate(new Date())}.csv`,
+        ["Invoice Number", "Company", "Amount", "Status", "Due Date", "Issued At", "Paid At"],
+        invoices.map((inv) => [
+          inv.invoiceNumber,
+          inv.bookingSnapshot.companyName,
+          inv.amount,
+          inv.status,
+          inv.dueDate ?? "",
+          inv.issuedAt ? inv.issuedAt.toDate().toISOString() : "",
+          inv.paidAt ? inv.paidAt.toDate().toISOString() : "",
+        ]),
+      );
+    } catch {
+      toast.error("Couldn't export invoices. Please try again.");
+    } finally {
+      setExportingInvoices(false);
+    }
+  }
+
   return (
     <Section>
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -220,12 +312,28 @@ function AdminBookingsPage() {
           }
           subtitle="Review campaign bookings across all customers and update their status."
         />
-        <Link
-          to="/admin/bookings/new"
-          className="inline-flex items-center gap-2 rounded-full bg-gold px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-gold transition-transform hover:-translate-y-0.5"
-        >
-          <Plus className="h-4 w-4" /> Create Booking
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={handleExportBookings}
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-5 py-2.5 text-sm font-semibold hover:border-gold hover:text-gold"
+          >
+            <FileUp className="h-4 w-4" /> Export Bookings CSV
+          </button>
+          <button
+            onClick={handleExportInvoices}
+            disabled={exportingInvoices}
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-5 py-2.5 text-sm font-semibold hover:border-gold hover:text-gold disabled:opacity-60"
+          >
+            <FileUp className="h-4 w-4" />{" "}
+            {exportingInvoices ? "Exporting…" : "Export Invoices CSV"}
+          </button>
+          <Link
+            to="/admin/bookings/new"
+            className="inline-flex items-center gap-2 rounded-full bg-gold px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-gold transition-transform hover:-translate-y-0.5"
+          >
+            <Plus className="h-4 w-4" /> Create Booking
+          </Link>
+        </div>
       </div>
 
       <div className="mt-10 overflow-x-auto rounded-2xl bg-card-premium shadow-elegant ring-hairline">
@@ -257,11 +365,20 @@ function AdminBookingsPage() {
               {bookings.map((b) => {
                 const s = BOOKING_STATUS_CLASSES[b.status];
                 const isSaving = mutation.isPending && mutation.variables?.booking.id === b.id;
+                const stale = isStalePendingBooking(b);
                 return (
-                  <tr key={b.id} className="border-b border-border last:border-0">
+                  <tr
+                    key={b.id}
+                    className={`border-b border-border last:border-0 ${stale ? "bg-destructive/5" : ""}`}
+                  >
                     <td className="px-5 py-4">
                       <p className="font-semibold">{b.companyName || "—"}</p>
                       <p className="text-xs text-muted-foreground">{b.contactEmail}</p>
+                      {stale && (
+                        <span className="mt-1 inline-flex items-center gap-1 text-[11px] font-semibold text-destructive">
+                          <AlertTriangle className="h-3 w-3" /> Pending {STALE_PENDING_DAYS}+ days
+                        </span>
+                      )}
                       {b.artworkPaths?.length > 0 && (
                         <span className="mt-1 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
                           <Paperclip className="h-3 w-3" /> Artwork attached
@@ -332,6 +449,13 @@ function AdminBookingsPage() {
                         >
                           <Receipt className="h-3.5 w-3.5" /> Manage
                         </button>
+                        <Link
+                          to="/admin/bookings/$id"
+                          params={{ id: b.id }}
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-gold hover:underline"
+                        >
+                          <Pencil className="h-3.5 w-3.5" /> Edit
+                        </Link>
                         {b.status === "cancelled" && (
                           <button
                             onClick={() => setPendingDelete(b)}
@@ -350,7 +474,7 @@ function AdminBookingsPage() {
         )}
       </div>
 
-      <ManageInvoicesDialog
+      <ManageBookingDialog
         booking={managingBooking}
         onOpenChange={(open) => !open && setManagingBooking(null)}
       />
@@ -383,7 +507,7 @@ function AdminBookingsPage() {
   );
 }
 
-function ManageInvoicesDialog({
+function ManageBookingDialog({
   booking,
   onOpenChange,
 }: {
@@ -435,6 +559,37 @@ function ManageInvoicesDialog({
     onError: () => toast.error("Couldn't update invoice status. Please try again."),
   });
 
+  const [artworkProgress, setArtworkProgress] = useState<number | null>(null);
+  const artworkMutation = useMutation({
+    mutationFn: (file: File) =>
+      addBookingArtwork(booking!.id, booking!.userId, file, setArtworkProgress),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-bookings"] });
+      toast.success("Artwork added.");
+      setArtworkProgress(null);
+    },
+    onError: (err) => {
+      console.error("Artwork upload failed:", err);
+      toast.error("Couldn't upload that file. Please try again.");
+      setArtworkProgress(null);
+    },
+  });
+
+  function onArtworkFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !booking) return;
+    if (file.size > 20 * 1024 * 1024) {
+      toast.error("File must be under 20MB.");
+      return;
+    }
+    if (!/^image\/|^application\/pdf$/.test(file.type)) {
+      toast.error("Only images or PDF files are accepted.");
+      return;
+    }
+    artworkMutation.mutate(file);
+  }
+
   function submitContractAmount() {
     if (!booking) return;
     const amount = parseAmount(contractAmountInput);
@@ -459,7 +614,7 @@ function ManageInvoicesDialog({
     <Dialog open={booking !== null} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Invoices — {booking?.companyName || "Booking"}</DialogTitle>
+          <DialogTitle>Manage Booking — {booking?.companyName || "Booking"}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -493,6 +648,26 @@ function ManageInvoicesDialog({
                 {formatNaira(totalInvoiced)} of {formatNaira(booking.contractAmount)} invoiced
               </p>
             )}
+          </div>
+
+          <div className="border-t border-border pt-4">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Artwork
+            </p>
+            {booking && <ArtworkList paths={booking.artworkPaths} />}
+            <label className="mt-2 flex w-fit cursor-pointer items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1 text-xs font-medium text-muted-foreground hover:text-gold">
+              <Upload className="h-3 w-3" />
+              {artworkMutation.isPending
+                ? `Uploading… ${artworkProgress ?? 0}%`
+                : "Attach artwork on customer's behalf"}
+              <input
+                type="file"
+                accept="image/*,application/pdf"
+                onChange={onArtworkFileChange}
+                disabled={artworkMutation.isPending}
+                className="hidden"
+              />
+            </label>
           </div>
 
           <div className="border-t border-border pt-4">
@@ -606,5 +781,29 @@ function ManageInvoicesDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function ArtworkList({ paths }: { paths: string[] }) {
+  const { data: files } = useArtworkUrls(paths);
+
+  if (!files || files.length === 0) {
+    return <p className="text-sm text-muted-foreground">No artwork attached yet.</p>;
+  }
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {files.map((f) => (
+        <a
+          key={f.path}
+          href={f.url}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1 text-xs font-medium text-muted-foreground hover:text-gold"
+        >
+          <Paperclip className="h-3 w-3 shrink-0" /> <span className="truncate">{f.name}</span>
+        </a>
+      ))}
+    </div>
   );
 }

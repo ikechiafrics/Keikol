@@ -81,9 +81,12 @@ export function Header() {
               )}
               <Link
                 to="/dashboard"
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-5 py-2.5 text-sm font-semibold hover:border-gold hover:text-gold"
+                className="group inline-flex items-center overflow-hidden rounded-full border border-border bg-surface/60 px-3 py-2.5 text-sm font-semibold transition-colors hover:border-gold hover:text-gold"
               >
-                <LayoutDashboard className="h-4 w-4" /> Dashboard
+                <LayoutDashboard className="h-4 w-4 shrink-0" />
+                <span className="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-500 ease-out group-hover:ml-2 group-hover:max-w-xs">
+                  Dashboard
+                </span>
               </Link>
               <button
                 onClick={onSignOut}
