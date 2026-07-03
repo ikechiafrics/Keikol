@@ -7,6 +7,7 @@ import {
   GoogleAuthProvider,
   signOut,
   sendPasswordResetEmail,
+  sendEmailVerification,
   type User,
 } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -28,6 +29,7 @@ interface AuthContextValue {
   signInWithGoogle: () => Promise<void>;
   signOutUser: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  resendVerificationEmail: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -72,16 +74,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfileLoading(false);
       return;
     }
+
+    let cancelled = false;
     setProfileLoading(true);
-    getDoc(doc(db, "users", user.uid))
-      .then((snap) => setProfile(snap.exists() ? (snap.data() as UserProfile) : null))
-      .catch(() => setProfile(null)) // fail closed — never fail open to admin on error
-      .finally(() => setProfileLoading(false));
+
+    // The very first Firestore read right after sign-in can transiently
+    // fail (token propagation, a slow network, etc.) — retry once after a
+    // beat before failing closed, instead of permanently showing "not
+    // admin" for the rest of the session until a manual refresh.
+    async function loadProfile() {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          const snap = await getDoc(doc(db, "users", user!.uid));
+          if (cancelled) return;
+          setProfile(snap.exists() ? (snap.data() as UserProfile) : null);
+          return;
+        } catch (err) {
+          console.error(`Failed to load user profile (attempt ${attempt + 1}/2):`, err);
+          if (attempt === 0) await new Promise((r) => setTimeout(r, 800));
+        }
+      }
+      if (!cancelled) setProfile(null); // fail closed only after retrying
+    }
+
+    loadProfile().finally(() => {
+      if (!cancelled) setProfileLoading(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [user, loading]);
 
   async function signUpWithEmail(email: string, password: string) {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     await createUserProfile(cred.user);
+    // Google sign-in accounts are already verified by Google — only
+    // email/password sign-ups need this.
+    await sendEmailVerification(cred.user);
   }
 
   async function signInWithEmail(email: string, password: string) {
@@ -101,6 +131,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await sendPasswordResetEmail(auth, email);
   }
 
+  async function resendVerificationEmail() {
+    if (!auth.currentUser) return;
+    await sendEmailVerification(auth.currentUser);
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -114,6 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signInWithGoogle,
         signOutUser,
         resetPassword,
+        resendVerificationEmail,
       }}
     >
       {children}

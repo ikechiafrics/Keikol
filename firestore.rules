@@ -15,9 +15,17 @@ service cloud.firestore {
       allow read: if isSignedIn()
                   && (request.auth.uid == resource.data.userId || isAdmin());
 
-      allow create: if isSignedIn()
-                    && request.auth.uid == request.resource.data.userId
-                    && request.resource.data.status == "pending_payment";
+      // A customer can self-book, but only once their email is verified
+      // (mirrors the client-side check on the booking form). Admins can
+      // create a booking on behalf of any customer — e.g. one phoned in —
+      // with any valid status, bypassing that verification requirement
+      // since the admin is vouching for it directly.
+      allow create: if (isSignedIn()
+                        && request.auth.uid == request.resource.data.userId
+                        && request.resource.data.status == "pending_payment"
+                        && request.auth.token.email_verified == true)
+                    || (isAdmin()
+                        && request.resource.data.status in ["pending_payment", "under_review", "confirmed", "cancellation_requested", "cancelled"]);
 
       // Admins can update a booking's status/contract amount freely. The
       // owner may also update status directly, but only for two narrow,
@@ -42,7 +50,12 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Admins can also read profiles — needed to look up a customer by
+      // email when creating a booking on their behalf. Writes stay
+      // self-only so an admin can't grant themselves/others a role through
+      // this path; role changes are made directly in the Firebase Console.
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow write: if request.auth != null && request.auth.uid == userId;
     }
 
     // Public-safe mirror of confirmed booking date ranges — only the fields

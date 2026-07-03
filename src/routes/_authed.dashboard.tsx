@@ -6,6 +6,7 @@ import {
   Ban,
   Calendar,
   ImageOff,
+  MailWarning,
   MapPin,
   Paperclip,
   Receipt,
@@ -54,7 +55,18 @@ async function fetchBookings(uid: string): Promise<Booking[]> {
 }
 
 function DashboardPage() {
-  const { user } = useAuth();
+  const { user, resendVerificationEmail } = useAuth();
+  const [verificationSent, setVerificationSent] = useState(false);
+
+  async function handleResendVerification() {
+    try {
+      await resendVerificationEmail();
+      setVerificationSent(true);
+      toast.success("Verification email sent — check your inbox.");
+    } catch {
+      toast.error("Couldn't send the verification email. Please try again shortly.");
+    }
+  }
 
   const { data: bookings, isLoading } = useQuery({
     queryKey: ["bookings", user?.uid],
@@ -79,6 +91,22 @@ function DashboardPage() {
           title={<>Welcome back{user?.displayName ? `, ${user.displayName}` : ""}</>}
           subtitle="Track your campaign bookings and their status below."
         />
+
+        {user && !user.emailVerified && (
+          <div className="mt-8 flex flex-wrap items-center gap-3 rounded-2xl border border-destructive/30 bg-destructive/10 p-4">
+            <MailWarning className="h-5 w-5 shrink-0 text-destructive" />
+            <p className="flex-1 text-sm">
+              Please verify your email address — you'll need to before booking a campaign.
+            </p>
+            <button
+              onClick={handleResendVerification}
+              disabled={verificationSent}
+              className="rounded-full border border-destructive/40 px-4 py-1.5 text-xs font-semibold text-destructive hover:bg-destructive/10 disabled:opacity-60"
+            >
+              {verificationSent ? "Email sent" : "Resend verification email"}
+            </button>
+          </div>
+        )}
 
         {unpaidInvoices.length > 0 && (
           <div className="mt-8 flex items-center gap-3 rounded-2xl border border-gold/30 bg-gold/10 p-4">

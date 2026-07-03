@@ -31,6 +31,7 @@ import {
 } from "@/lib/billboard-availability";
 import { getRatesSummary } from "@/lib/billboard-rates";
 import { fetchBillboardById } from "@/lib/billboards-data";
+import { BUDGET_OPTIONS, GOAL_OPTIONS } from "@/lib/booking-options";
 import { BILLBOARD_DURATIONS } from "@/data/billboards";
 
 export const Route = createFileRoute("/_authed/book/$id")({
@@ -42,19 +43,6 @@ export const Route = createFileRoute("/_authed/book/$id")({
   component: BookBillboardPage,
 });
 
-const BUDGET_OPTIONS = [
-  "Below ₦500,000",
-  "₦500,000 – ₦1,000,000",
-  "₦1,000,000 – ₦2,000,000",
-  "₦2,000,000+",
-];
-const GOAL_OPTIONS = [
-  "Brand Awareness",
-  "Product Launch",
-  "Event Promotion",
-  "Store/Branch Launch",
-  "Political/Public Awareness",
-];
 const DURATION_OPTIONS: string[] = [...BILLBOARD_DURATIONS];
 
 const bookingSchema = z.object({
@@ -142,6 +130,10 @@ function BookBillboardPage() {
       return;
     }
     if (!user) return;
+    if (!user.emailVerified) {
+      toast.error("Please verify your email address before booking a campaign.");
+      return;
+    }
 
     setSubmitting(true);
     try {

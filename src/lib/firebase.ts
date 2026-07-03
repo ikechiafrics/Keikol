@@ -1,4 +1,5 @@
 import { getApps, initializeApp, type FirebaseApp } from "firebase/app";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "firebase/app-check";
 import { getAnalytics, type Analytics } from "firebase/analytics";
 import { getAuth, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
@@ -29,6 +30,23 @@ const firebaseConfig = {
 };
 
 const app: FirebaseApp = getApps().length ? getApps()[0]! : initializeApp(firebaseConfig);
+
+// App Check guards Firestore/Storage against traffic that didn't come from
+// this real app (bots hitting the API directly). Only initializes once a
+// reCAPTCHA site key is actually configured — see .env.example — so this is
+// a no-op until that's set up. Uses the Enterprise provider since the
+// registered key is Enterprise-backed (created via the Google Cloud
+// Console reCAPTCHA product, not the classic recaptcha.net/admin one).
+// Enforcement itself (rejecting requests without a valid token) is a
+// separate opt-in toggle in the Firebase Console; set that to
+// "unenforced/monitoring" first and watch real traffic before ever
+// switching it to "Enforce".
+if (typeof window !== "undefined" && import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
+  initializeAppCheck(app, {
+    provider: new ReCaptchaEnterpriseProvider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
+    isTokenAutoRefreshEnabled: true,
+  });
+}
 
 export const db: Firestore = getFirestore(app);
 

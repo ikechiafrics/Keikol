@@ -40,3 +40,11 @@ env:
     availability:
       - BUILD
       - RUNTIME
+  # reCAPTCHA Enterprise site keys are meant to be public (embedded
+  # client-side to render the challenge) — verification happens
+  # server-side via Firebase App Check, which never exposes a secret here.
+  - variable: VITE_RECAPTCHA_SITE_KEY
+    value: "6LczPkMtAAAAALeckFP86eDIGkE3EHvtqem8aBJB"
+    availability:
+      - BUILD
+      - RUNTIME
