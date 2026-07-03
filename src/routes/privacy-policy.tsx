@@ -94,8 +94,8 @@ function PrivacyPolicyPage() {
           <h2 className="mt-10 font-display text-2xl font-bold">7. Contact us</h2>
           <p className="text-muted-foreground">
             If you have questions about this Privacy Policy or how we handle your information, please contact us at{" "}
-            <a href="mailto:info@keikolmedia.com" className="text-gold hover:underline">
-              info@keikolmedia.com
+            <a href="mailto:info@keikol.com" className="text-gold hover:underline">
+              info@keikol.com
             </a>.
           </p>
         </div>

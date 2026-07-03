@@ -93,8 +93,8 @@ function TermsOfUsePage() {
           <h2 className="mt-10 font-display text-2xl font-bold">9. Contact us</h2>
           <p className="text-muted-foreground">
             If you have questions about these Terms of Use, please contact us at{" "}
-            <a href="mailto:info@keikolmedia.com" className="text-gold hover:underline">
-              info@keikolmedia.com
+            <a href="mailto:info@keikol.com" className="text-gold hover:underline">
+              info@keikol.com
             </a>.
           </p>
         </div>

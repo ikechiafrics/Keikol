@@ -163,7 +163,7 @@ export function ContactSidebar() {
   return (
     <aside className="flex flex-col gap-4">
       {[
-        { icon: Mail, label: "Email", value: "info@keikolmedia.com", href: "mailto:info@keikolmedia.com" },
+        { icon: Mail, label: "Email", value: "info@keikol.com", href: "mailto:info@keikol.com" },
         { icon: Phone, label: "Phone", value: "+234 XXX XXX XXXX", href: "tel:+234" },
         { icon: MapPin, label: "Location", value: "Nigeria", href: "#" },
       ].map(({ icon: Icon, label, value, href }) => (

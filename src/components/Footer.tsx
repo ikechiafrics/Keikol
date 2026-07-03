@@ -68,8 +68,8 @@ export function Footer() {
             <h4 className="font-display text-sm font-bold uppercase tracking-widest">Contact</h4>
             <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
               <li>
-                <a href="mailto:info@keikolmedia.com" className="hover:text-gold">
-                  info@keikolmedia.com
+                <a href="mailto:info@keikol.com" className="hover:text-gold">
+                  info@keikol.com
                 </a>
               </li>
               <li>
