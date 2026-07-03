@@ -6,8 +6,6 @@ import {
   getDocs,
   query,
   serverTimestamp,
-  setDoc,
-  updateDoc,
   where,
   writeBatch,
 } from "firebase/firestore";
@@ -37,10 +35,12 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { db } from "@/lib/firebase";
+import { useAuth } from "@/lib/auth-context";
 import { useBookings } from "@/lib/bookings-data";
 import { useInvoicesForBooking } from "@/lib/invoices-data";
 import { generateInvoiceNumber, formatNaira } from "@/lib/invoice";
 import { parseAmount, formatAmountInput } from "@/lib/currency-input";
+import { logAudit, type AuditActor } from "@/lib/audit-log";
 import { BOOKING_STATUS_CLASSES, type Booking } from "@/lib/booking-types";
 import { INVOICE_STATUS_CLASSES, type Invoice } from "@/lib/invoice-types";
 import type { BookingStatus } from "@/lib/booking-status";
@@ -64,7 +64,7 @@ function toISODate(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-async function updateBookingStatus(booking: Booking, status: BookingStatus) {
+async function updateBookingStatus(booking: Booking, status: BookingStatus, actor: AuditActor) {
   const batch = writeBatch(db);
   batch.update(doc(db, "bookings", booking.id), { status, updatedAt: serverTimestamp() });
 
@@ -82,10 +82,17 @@ async function updateBookingStatus(booking: Booking, status: BookingStatus) {
     batch.delete(windowRef);
   }
 
+  logAudit(batch, actor, {
+    action: "booking.status_changed",
+    targetType: "booking",
+    targetId: booking.id,
+    summary: `Changed booking status for ${booking.companyName || booking.id} from "${booking.status}" to "${status}"`,
+  });
+
   await batch.commit();
 }
 
-async function deleteBooking(booking: Booking) {
+async function deleteBooking(booking: Booking, actor: AuditActor) {
   const invoicesSnap = await getDocs(
     query(collection(db, "invoices"), where("bookingId", "==", booking.id)),
   );
@@ -93,21 +100,38 @@ async function deleteBooking(booking: Booking) {
   const batch = writeBatch(db);
   invoicesSnap.docs.forEach((d) => batch.delete(d.ref));
   batch.delete(doc(db, "bookings", booking.id));
+  logAudit(batch, actor, {
+    action: "booking.deleted",
+    targetType: "booking",
+    targetId: booking.id,
+    summary: `Deleted cancelled booking for ${booking.companyName || booking.id}`,
+  });
   await batch.commit();
 }
 
-async function setContractAmount(booking: Booking, amount: number) {
-  await updateDoc(doc(db, "bookings", booking.id), {
+async function setContractAmount(booking: Booking, amount: number, actor: AuditActor) {
+  const batch = writeBatch(db);
+  batch.update(doc(db, "bookings", booking.id), {
     contractAmount: amount,
     updatedAt: serverTimestamp(),
   });
+  logAudit(batch, actor, {
+    action: "booking.contract_amount_set",
+    targetType: "booking",
+    targetId: booking.id,
+    summary: `Set contract amount for ${booking.companyName || booking.id} to ${formatNaira(amount)}`,
+  });
+  await batch.commit();
 }
 
-async function createInvoice(booking: Booking, amount: number, dueDate: string) {
-  await setDoc(doc(collection(db, "invoices")), {
+async function createInvoice(booking: Booking, amount: number, dueDate: string, actor: AuditActor) {
+  const invoiceRef = doc(collection(db, "invoices"));
+  const invoiceNumber = generateInvoiceNumber(booking.id);
+  const batch = writeBatch(db);
+  batch.set(invoiceRef, {
     bookingId: booking.id,
     userId: booking.userId,
-    invoiceNumber: generateInvoiceNumber(booking.id),
+    invoiceNumber,
     amount,
     status: "unpaid",
     dueDate: dueDate || null,
@@ -127,17 +151,33 @@ async function createInvoice(booking: Booking, amount: number, dueDate: string) 
       campaignGoal: booking.goal,
     },
   });
+  logAudit(batch, actor, {
+    action: "invoice.created",
+    targetType: "invoice",
+    targetId: invoiceRef.id,
+    summary: `Created invoice ${invoiceNumber} for ${formatNaira(amount)} on booking ${booking.companyName || booking.id}`,
+  });
+  await batch.commit();
 }
 
-async function toggleInvoicePaid(invoice: Invoice) {
+async function toggleInvoicePaid(invoice: Invoice, actor: AuditActor) {
   const next = invoice.status === "paid" ? "unpaid" : "paid";
-  await updateDoc(doc(db, "invoices", invoice.id), {
+  const batch = writeBatch(db);
+  batch.update(doc(db, "invoices", invoice.id), {
     status: next,
     paidAt: next === "paid" ? serverTimestamp() : null,
   });
+  logAudit(batch, actor, {
+    action: "invoice.status_changed",
+    targetType: "invoice",
+    targetId: invoice.id,
+    summary: `Marked invoice ${invoice.invoiceNumber} as ${next}`,
+  });
+  await batch.commit();
 }
 
 function AdminBookingsPage() {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [managingBooking, setManagingBooking] = useState<Booking | null>(null);
   const [pendingDelete, setPendingDelete] = useState<Booking | null>(null);
@@ -146,7 +186,7 @@ function AdminBookingsPage() {
 
   const mutation = useMutation({
     mutationFn: ({ booking, status }: { booking: Booking; status: BookingStatus }) =>
-      updateBookingStatus(booking, status),
+      updateBookingStatus(booking, status, { uid: user!.uid, email: user!.email }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-bookings"] });
       queryClient.invalidateQueries({ queryKey: ["public-booking-windows"] });
@@ -157,7 +197,8 @@ function AdminBookingsPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteBooking,
+    mutationFn: (booking: Booking) =>
+      deleteBooking(booking, { uid: user!.uid, email: user!.email }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-bookings"] });
       toast.success("Booking deleted.");
@@ -341,6 +382,7 @@ function ManageInvoicesDialog({
   booking: Booking | null;
   onOpenChange: (open: boolean) => void;
 }) {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [contractAmountInput, setContractAmountInput] = useState("");
   const [amountInput, setAmountInput] = useState("");
@@ -351,7 +393,7 @@ function ManageInvoicesDialog({
 
   const contractMutation = useMutation({
     mutationFn: ({ booking, amount }: { booking: Booking; amount: number }) =>
-      setContractAmount(booking, amount),
+      setContractAmount(booking, amount, { uid: user!.uid, email: user!.email }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-bookings"] });
       toast.success("Contract amount saved.");
@@ -368,7 +410,7 @@ function ManageInvoicesDialog({
       booking: Booking;
       amount: number;
       dueDate: string;
-    }) => createInvoice(booking, amount, dueDate),
+    }) => createInvoice(booking, amount, dueDate, { uid: user!.uid, email: user!.email }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["invoices", booking?.id] });
       toast.success("Invoice added.");
@@ -379,7 +421,8 @@ function ManageInvoicesDialog({
   });
 
   const paidMutation = useMutation({
-    mutationFn: (invoice: Invoice) => toggleInvoicePaid(invoice),
+    mutationFn: (invoice: Invoice) =>
+      toggleInvoicePaid(invoice, { uid: user!.uid, email: user!.email }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["invoices", booking?.id] }),
     onError: () => toast.error("Couldn't update invoice status. Please try again."),
   });

@@ -120,6 +120,17 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Append-only trail of admin actions for accountability. Only admins
+    // can read it, and once written an entry can never be edited or
+    // deleted — that immutability is the entire point of an audit log.
+    // actorUid must match the caller so no admin can misattribute an
+    // action to someone else.
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin() && request.resource.data.actorUid == request.auth.uid;
+      allow update, delete: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

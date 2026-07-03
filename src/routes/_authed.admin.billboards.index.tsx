@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { doc, deleteDoc } from "firebase/firestore";
+import { doc, writeBatch } from "firebase/firestore";
 import { ImageOff, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -8,8 +8,10 @@ import { useState } from "react";
 import { Section, SectionHeader } from "@/components";
 import { Skeleton } from "@/components/ui/skeleton";
 import { db } from "@/lib/firebase";
+import { useAuth } from "@/lib/auth-context";
 import { useBillboards } from "@/lib/billboards-data";
 import { getPriceTierLabel } from "@/lib/billboard-rates";
+import { logAudit, type AuditActor } from "@/lib/audit-log";
 import type { Billboard } from "@/data/billboards";
 import {
   AlertDialog,
@@ -29,17 +31,27 @@ export const Route = createFileRoute("/_authed/admin/billboards/")({
   component: AdminBillboardsPage,
 });
 
-async function deleteBillboard(id: string) {
-  await deleteDoc(doc(db, "billboards", id));
+async function deleteBillboard(billboard: Billboard, actor: AuditActor) {
+  const batch = writeBatch(db);
+  batch.delete(doc(db, "billboards", billboard.id));
+  logAudit(batch, actor, {
+    action: "billboard.deleted",
+    targetType: "billboard",
+    targetId: billboard.id,
+    summary: `Deleted billboard "${billboard.area}, ${billboard.city}"`,
+  });
+  await batch.commit();
 }
 
 function AdminBillboardsPage() {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const { data: billboards, isLoading } = useBillboards();
   const [pendingDelete, setPendingDelete] = useState<Billboard | null>(null);
 
   const mutation = useMutation({
-    mutationFn: deleteBillboard,
+    mutationFn: (billboard: Billboard) =>
+      deleteBillboard(billboard, { uid: user!.uid, email: user!.email }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-billboards"] });
       queryClient.invalidateQueries({ queryKey: ["billboards"] });
@@ -164,7 +176,7 @@ function AdminBillboardsPage() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => pendingDelete && mutation.mutate(pendingDelete.id)}
+              onClick={() => pendingDelete && mutation.mutate(pendingDelete)}
               disabled={mutation.isPending}
             >
               {mutation.isPending ? "Deleting…" : "Delete"}

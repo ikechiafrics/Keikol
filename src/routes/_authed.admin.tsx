@@ -14,6 +14,7 @@ const ADMIN_NAV_LINKS = [
   { label: "Bookings", to: "/admin/bookings" },
   { label: "Billboards", to: "/admin/billboards" },
   { label: "Quotes", to: "/admin/quotes" },
+  { label: "Audit Log", to: "/admin/audit-log" },
 ] as const;
 
 function AdminNav() {
@@ -26,7 +27,9 @@ function AdminNav() {
             to={l.to}
             activeOptions={{ exact: l.to === "/admin" }}
             activeProps={{ className: "bg-gold text-primary-foreground shadow-gold" }}
-            inactiveProps={{ className: "text-muted-foreground hover:bg-surface hover:text-foreground" }}
+            inactiveProps={{
+              className: "text-muted-foreground hover:bg-surface hover:text-foreground",
+            }}
             className="rounded-xl px-4 py-2 text-sm font-semibold transition-colors"
           >
             {l.label}

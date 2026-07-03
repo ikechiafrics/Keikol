@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import { doc, serverTimestamp, writeBatch } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { toast } from "sonner";
 import type { DateRange } from "react-day-picker";
@@ -23,8 +23,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { db, storage, billboardStoragePath } from "@/lib/firebase";
+import { useAuth } from "@/lib/auth-context";
 import { useBillboards } from "@/lib/billboards-data";
 import { parseAmount, formatAmountInput } from "@/lib/currency-input";
+import { logAudit } from "@/lib/audit-log";
 import {
   BILLBOARD_TYPES,
   AVAILABILITIES,
@@ -94,6 +96,7 @@ export function BillboardForm({
 }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { data: existingBillboards } = useBillboards();
   const cityOptions = Array.from(
@@ -237,11 +240,23 @@ export function BillboardForm({
         updatedAt: serverTimestamp(),
       };
 
+      const batch = writeBatch(db);
       if (mode === "create") {
-        await setDoc(doc(db, "billboards", id), { ...data, createdAt: serverTimestamp() });
+        batch.set(doc(db, "billboards", id), { ...data, createdAt: serverTimestamp() });
       } else {
-        await updateDoc(doc(db, "billboards", id), data);
+        batch.update(doc(db, "billboards", id), data);
       }
+      logAudit(
+        batch,
+        { uid: user!.uid, email: user!.email },
+        {
+          action: mode === "create" ? "billboard.created" : "billboard.updated",
+          targetType: "billboard",
+          targetId: id,
+          summary: `${mode === "create" ? "Created" : "Updated"} billboard "${values.area}, ${values.city}"`,
+        },
+      );
+      await batch.commit();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-billboards"] });

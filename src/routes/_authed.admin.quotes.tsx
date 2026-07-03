@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { doc, serverTimestamp, writeBatch } from "firebase/firestore";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -8,7 +8,9 @@ import { useState } from "react";
 import { Section, SectionHeader } from "@/components";
 import { Skeleton } from "@/components/ui/skeleton";
 import { db } from "@/lib/firebase";
+import { useAuth } from "@/lib/auth-context";
 import { useQuoteRequests } from "@/lib/quotes-data";
+import { logAudit, type AuditActor } from "@/lib/audit-log";
 import { QUOTE_STATUS_CLASSES, type QuoteRequest } from "@/lib/quote-types";
 import type { QuoteStatus } from "@/lib/quote-status";
 import {
@@ -31,15 +33,32 @@ export const Route = createFileRoute("/_authed/admin/quotes")({
 
 const STATUS_OPTIONS: QuoteStatus[] = ["new", "contacted", "closed"];
 
-async function updateQuoteStatus(quote: QuoteRequest, status: QuoteStatus) {
-  await updateDoc(doc(db, "quoteRequests", quote.id), { status, updatedAt: serverTimestamp() });
+async function updateQuoteStatus(quote: QuoteRequest, status: QuoteStatus, actor: AuditActor) {
+  const batch = writeBatch(db);
+  batch.update(doc(db, "quoteRequests", quote.id), { status, updatedAt: serverTimestamp() });
+  logAudit(batch, actor, {
+    action: "quote.status_changed",
+    targetType: "quote",
+    targetId: quote.id,
+    summary: `Changed quote status for ${quote.name} from "${quote.status}" to "${status}"`,
+  });
+  await batch.commit();
 }
 
-async function deleteQuoteRequest(id: string) {
-  await deleteDoc(doc(db, "quoteRequests", id));
+async function deleteQuoteRequest(quote: QuoteRequest, actor: AuditActor) {
+  const batch = writeBatch(db);
+  batch.delete(doc(db, "quoteRequests", quote.id));
+  logAudit(batch, actor, {
+    action: "quote.deleted",
+    targetType: "quote",
+    targetId: quote.id,
+    summary: `Deleted quote request from ${quote.name}`,
+  });
+  await batch.commit();
 }
 
 function AdminQuotesPage() {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [pendingDelete, setPendingDelete] = useState<QuoteRequest | null>(null);
 
@@ -47,13 +66,14 @@ function AdminQuotesPage() {
 
   const statusMutation = useMutation({
     mutationFn: ({ quote, status }: { quote: QuoteRequest; status: QuoteStatus }) =>
-      updateQuoteStatus(quote, status),
+      updateQuoteStatus(quote, status, { uid: user!.uid, email: user!.email }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-quotes"] }),
     onError: () => toast.error("Couldn't update this quote's status. Please try again."),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteQuoteRequest,
+    mutationFn: (quote: QuoteRequest) =>
+      deleteQuoteRequest(quote, { uid: user!.uid, email: user!.email }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-quotes"] });
       toast.success("Quote request deleted.");
@@ -187,7 +207,7 @@ function AdminQuotesPage() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => pendingDelete && deleteMutation.mutate(pendingDelete.id)}
+              onClick={() => pendingDelete && deleteMutation.mutate(pendingDelete)}
               disabled={deleteMutation.isPending}
             >
               {deleteMutation.isPending ? "Deleting…" : "Delete"}
