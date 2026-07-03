@@ -33,6 +33,6 @@ export interface Booking {
 export const BOOKING_STATUS_CLASSES: Record<BookingStatus, StatusBadgeClasses> = {
   pending_payment: { dot: "bg-gold", text: "text-gold", bg: "bg-gold/20", label: "Pending Payment" },
   under_review: { dot: "bg-electric-soft", text: "text-electric-soft", bg: "bg-electric/15", label: "Under Review" },
-  confirmed: { dot: "bg-accent", text: "text-accent", bg: "bg-accent/20", label: "Confirmed" },
+  confirmed: { dot: "bg-green-500", text: "text-green-600", bg: "bg-green-500/20", label: "Confirmed" },
   cancelled: { dot: "bg-muted-foreground", text: "text-muted-foreground", bg: "bg-muted/20", label: "Cancelled" },
 };

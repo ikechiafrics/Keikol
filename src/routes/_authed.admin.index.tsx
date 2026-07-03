@@ -76,12 +76,12 @@ function AdminOverviewPage() {
               <FileText className="h-4 w-4 text-gold" /> Quote Requests
             </div>
             <dl className="mt-4 space-y-3">
-              <div className="flex items-center justify-between rounded-xl bg-gold/10 px-3 py-2 ring-1 ring-gold/30">
-                <dt className="flex items-center gap-1.5 text-sm font-semibold text-gold">
+              <div className="flex items-center justify-between px-3 py-1">
+                <dt className="flex items-center gap-1.5 text-sm text-muted-foreground">
                   <span className={`h-1.5 w-1.5 rounded-full ${QUOTE_STATUS_CLASSES.new.dot}`} />
                   {QUOTE_STATUS_CLASSES.new.label}
                 </dt>
-                <dd className="font-display text-xl font-extrabold text-gold">{quoteCounts.new}</dd>
+                <dd className="font-semibold">{quoteCounts.new}</dd>
               </div>
               <div className="flex items-center justify-between px-3 py-1">
                 <dt className="flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -107,27 +107,23 @@ function AdminOverviewPage() {
               <CalendarClock className="h-4 w-4 text-gold" /> Bookings
             </div>
             <dl className="mt-4 space-y-3">
-              <div className="flex items-center justify-between rounded-xl bg-gold/10 px-3 py-2 ring-1 ring-gold/30">
-                <dt className="flex items-center gap-1.5 text-sm font-semibold text-gold">
+              <div className="flex items-center justify-between px-3 py-1">
+                <dt className="flex items-center gap-1.5 text-sm text-muted-foreground">
                   <span
                     className={`h-1.5 w-1.5 rounded-full ${BOOKING_STATUS_CLASSES.pending_payment.dot}`}
                   />
                   {BOOKING_STATUS_CLASSES.pending_payment.label}
                 </dt>
-                <dd className="font-display text-xl font-extrabold text-gold">
-                  {bookingCounts.pending_payment}
-                </dd>
+                <dd className="font-semibold">{bookingCounts.pending_payment}</dd>
               </div>
-              <div className="flex items-center justify-between rounded-xl bg-electric/10 px-3 py-2 ring-1 ring-electric-soft/30">
-                <dt className="flex items-center gap-1.5 text-sm font-semibold text-electric-soft">
+              <div className="flex items-center justify-between px-3 py-1">
+                <dt className="flex items-center gap-1.5 text-sm text-muted-foreground">
                   <span
                     className={`h-1.5 w-1.5 rounded-full ${BOOKING_STATUS_CLASSES.under_review.dot}`}
                   />
                   {BOOKING_STATUS_CLASSES.under_review.label}
                 </dt>
-                <dd className="font-display text-xl font-extrabold text-electric-soft">
-                  {bookingCounts.under_review}
-                </dd>
+                <dd className="font-semibold">{bookingCounts.under_review}</dd>
               </div>
               <div className="flex items-center justify-between px-3 py-1">
                 <dt className="flex items-center gap-1.5 text-sm text-muted-foreground">

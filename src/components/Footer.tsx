@@ -15,7 +15,7 @@ export function Footer() {
   return (
     <footer className="border-t border-border bg-background">
       <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
-        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
+        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
             <Logo />
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted-foreground">
@@ -61,17 +61,6 @@ export function Footer() {
             ]}
           />
 
-          <FooterCol
-            title="Services"
-            links={[
-              { label: "Billboard Advertising", to: "/locations" },
-              { label: "Digital Billboards", to: "/locations" },
-              { label: "Static Billboards", to: "/locations" },
-              { label: "Campaign Visibility", to: "/portfolio" },
-              { label: "Media Placement Strategy", to: "/industries" },
-              { label: "Outdoor Brand Awareness", to: "/portfolio" },
-            ]}
-          />
           <div>
             <h4 className="font-display text-sm font-bold uppercase tracking-widest">Contact</h4>
             <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
