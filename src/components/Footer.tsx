@@ -91,7 +91,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center">
-          <p>© 2026 Keikol Media Group Ltd. All rights reserved.</p>
+          <p>© 2026 Keikol Media Ltd. All rights reserved.</p>
           <p>Built for brands that want to be seen.</p>
         </div>
       </div>

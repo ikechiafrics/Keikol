@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "../lib/auth-context";
+import { trackEvent } from "../lib/analytics";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { Toaster } from "../components/ui/sonner";
@@ -81,7 +82,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "author", content: "Keikol Media Group Ltd" },
+      { name: "author", content: "Keikol Media Ltd" },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Keikol" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -102,7 +103,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@context": "https://schema.org",
           "@type": "Organization",
           name: "Keikol",
-          legalName: "Keikol Media Group Ltd",
+          legalName: "Keikol Media Ltd",
           url: "/",
           description:
             "Modern advertising and media company offering premium billboard placements and technology-driven outdoor campaigns across Nigeria.",
@@ -142,6 +143,17 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    return router.subscribe("onResolved", (event) => {
+      trackEvent("page_view", {
+        page_path: event.toLocation.pathname,
+        page_location: window.location.href,
+        page_title: document.title,
+      });
+    });
+  }, [router]);
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { Field } from "./FormField";
 import { db } from "@/lib/firebase";
+import { trackEvent } from "@/lib/analytics";
 
 export function ContactForm({
   interestedBillboard = "Not sure yet",
@@ -47,6 +48,7 @@ export function ContactForm({
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
+      trackEvent("quote_request_submitted");
       setSubmitted(true);
     } catch (err) {
       console.error(err);
@@ -189,7 +191,7 @@ export function ContactSidebar() {
         Chat on WhatsApp
       </a>
       <div className="rounded-2xl border border-border bg-surface/40 p-5 text-sm text-muted-foreground">
-        <p className="font-semibold text-foreground">Keikol Media Group Ltd</p>
+        <p className="font-semibold text-foreground">Keikol Media Ltd</p>
         <p className="mt-1">A modern advertising and media company focused on premium outdoor advertising across Nigeria.</p>
       </div>
     </aside>

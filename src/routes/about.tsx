@@ -11,7 +11,7 @@ export const Route = createFileRoute("/about")({
       {
         name: "description",
         content:
-          "Keikol Media Group Ltd is building a modern, transparent, and technology-driven outdoor advertising company in Nigeria.",
+          "Keikol Media Ltd is building a modern, transparent, and technology-driven outdoor advertising company in Nigeria.",
       },
       { property: "og:title", content: "About Keikol" },
       { property: "og:description", content: "Building the future of outdoor advertising in Nigeria." },
@@ -70,7 +70,7 @@ function AboutPage() {
             />
             <div className="mt-6 space-y-5 text-base leading-relaxed text-muted-foreground">
               <p>
-                Keikol is the public-facing brand of <strong className="text-foreground">Keikol Media Group Ltd</strong>,
+                Keikol is the public-facing brand of <strong className="text-foreground">Keikol Media Ltd</strong>,
                 a modern advertising and media company focused on outdoor advertising, billboard placements,
                 digital media solutions, and future technology-driven campaign management.
               </p>

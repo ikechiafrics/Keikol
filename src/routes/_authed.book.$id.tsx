@@ -14,6 +14,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Progress } from "@/components/ui/progress";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { db, storage, artworkStoragePath } from "@/lib/firebase";
+import { trackEvent } from "@/lib/analytics";
 import { useAuth } from "@/lib/auth-context";
 import type { BookingStatus } from "@/lib/booking-status";
 import {
@@ -157,6 +158,7 @@ function BookBillboardPage() {
         updatedAt: serverTimestamp(),
       });
 
+      trackEvent("booking_submitted", { billboard_id: bb.id });
       toast.success("Booking submitted! We'll be in touch to confirm payment.");
       navigate({ to: "/dashboard" });
     } catch (err) {

@@ -37,7 +37,7 @@ function TermsOfUsePage() {
           <p className="text-muted-foreground">
             Welcome to the Keikol website. These Terms of Use describe the rules for using our website and submitting quote requests.
             By using this website, you agree to these terms. Keikol is the public brand of{" "}
-            <strong className="text-foreground">Keikol Media Group Ltd</strong>.
+            <strong className="text-foreground">Keikol Media Ltd</strong>.
           </p>
 
           <h2 className="mt-10 font-display text-2xl font-bold">1. Website content is for general information</h2>
@@ -68,19 +68,19 @@ function TermsOfUsePage() {
 
           <h2 className="mt-10 font-display text-2xl font-bold">5. Updates to website content</h2>
           <p className="text-muted-foreground">
-            Keikol Media Group Ltd may update website content, features, and services over time.
+            Keikol Media Ltd may update website content, features, and services over time.
             We do our best to keep information accurate, but we are not responsible for outdated or incomplete information that may appear between updates.
           </p>
 
           <h2 className="mt-10 font-display text-2xl font-bold">6. Intellectual property</h2>
           <p className="text-muted-foreground">
-            The website design, text, images, logos, and other content are owned by or licensed to Keikol Media Group Ltd.
+            The website design, text, images, logos, and other content are owned by or licensed to Keikol Media Ltd.
             You may view and share the website for personal or business reference, but you may not copy, modify, or reuse content without permission.
           </p>
 
           <h2 className="mt-10 font-display text-2xl font-bold">7. Limitation of liability</h2>
           <p className="text-muted-foreground">
-            To the fullest extent allowed by law, Keikol Media Group Ltd is not liable for any loss or damage resulting from your use of this website or reliance on its content.
+            To the fullest extent allowed by law, Keikol Media Ltd is not liable for any loss or damage resulting from your use of this website or reliance on its content.
             All campaign decisions should be made after direct confirmation with the Keikol team.
           </p>
 

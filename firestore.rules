@@ -19,17 +19,12 @@ service cloud.firestore {
                     && request.auth.uid == request.resource.data.userId
                     && request.resource.data.status == "pending_payment";
 
-      allow update: if isSignedIn()
-                    && request.resource.data.userId == resource.data.userId
-                    && (
-                         request.auth.uid == resource.data.userId
-                         ||
-                         (
-                           isAdmin()
-                           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "updatedAt"])
-                           && request.resource.data.status in ["pending_payment", "under_review", "confirmed", "cancelled"]
-                         )
-                       );
+      // Only admins can update a booking after creation, and only its status —
+      // the app has no customer-facing "edit my booking" UI, so there is no
+      // legitimate case for the owner to write to their own booking post-create.
+      allow update: if isAdmin()
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "updatedAt"])
+                    && request.resource.data.status in ["pending_payment", "under_review", "confirmed", "cancelled"];
 
       allow delete: if false;
     }

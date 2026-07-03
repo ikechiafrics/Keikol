@@ -63,7 +63,7 @@ export const Route = createFileRoute("/locations/$id")({
                 provider: {
                   "@type": "Organization",
                   name: "Keikol",
-                  legalName: "Keikol Media Group Ltd",
+                  legalName: "Keikol Media Ltd",
                 },
                 areaServed: { "@type": "Place", name: `${b.area}, ${b.city}, Nigeria` },
                 category: b.billboardType,
@@ -192,6 +192,29 @@ function BillboardDetailPage() {
           </div>
         </div>
       </Section>
+
+      {/* Gallery */}
+      {b.gallery.length > 0 && (
+        <Section>
+          <SectionHeader
+            align="left"
+            eyebrow="Gallery"
+            title={<>See <span className="text-gradient-gold">{b.area}</span> up close.</>}
+          />
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {b.gallery.map((src, i) => (
+              <div key={src} className="overflow-hidden rounded-2xl bg-card-premium shadow-elegant ring-hairline">
+                <img
+                  src={src}
+                  alt={`${b.area} — photo ${i + 1}`}
+                  loading="lazy"
+                  className="aspect-[4/3] w-full object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
 
       {/* Industries + bestFor + nearby */}
       <Section>

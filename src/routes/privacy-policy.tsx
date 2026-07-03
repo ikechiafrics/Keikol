@@ -35,7 +35,7 @@ function PrivacyPolicyPage() {
       <Section className="prose prose-invert max-w-none">
         <div className="mx-auto max-w-3xl">
           <p className="text-muted-foreground">
-            Keikol (the public brand of <strong className="text-foreground">Keikol Media Group Ltd</strong>) is committed to respecting your privacy.
+            Keikol (the public brand of <strong className="text-foreground">Keikol Media Ltd</strong>) is committed to respecting your privacy.
             This Privacy Policy explains what information we collect through the Keikol website and how we use it.
           </p>
 
@@ -87,7 +87,7 @@ function PrivacyPolicyPage() {
 
           <h2 className="mt-10 font-display text-2xl font-bold">6. Changes to this policy</h2>
           <p className="text-muted-foreground">
-            Keikol Media Group Ltd may update this Privacy Policy from time to time as our services and website evolve.
+            Keikol Media Ltd may update this Privacy Policy from time to time as our services and website evolve.
             We will post the updated version on this page with a revised date.
           </p>
 
