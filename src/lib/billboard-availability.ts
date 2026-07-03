@@ -43,6 +43,17 @@ export function isDateInAnyConfirmedRange(date: Date, ranges: ConfirmedWindow[])
   return ranges.some((r) => r.startDate <= iso && iso <= r.endDate);
 }
 
+// ISO "YYYY-MM-DD" strings compare correctly with plain string ops, so this
+// works without parsing to Date objects.
+export function rangesOverlap(
+  aStart: string,
+  aEnd: string,
+  bStart: string,
+  bEnd: string,
+): boolean {
+  return aStart <= bEnd && bStart <= aEnd;
+}
+
 export function getEffectiveAvailability(
   billboard: Billboard,
   windows: ConfirmedWindow[],

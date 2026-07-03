@@ -47,6 +47,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { db } from "@/lib/firebase";
+import { rangesOverlap } from "@/lib/billboard-availability";
 import { useAuth } from "@/lib/auth-context";
 import { useBookings } from "@/lib/bookings-data";
 import { useInvoicesForBooking, fetchAllInvoices } from "@/lib/invoices-data";
@@ -84,7 +85,32 @@ function toISODate(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
+class BookingConflictError extends Error {}
+
+async function assertNoConfirmedConflict(booking: Booking) {
+  const snap = await getDocs(
+    query(
+      collection(db, "publicBookingWindows"),
+      where("billboardId", "==", booking.billboardId),
+    ),
+  );
+  const conflict = snap.docs.some((d) => {
+    if (d.id === booking.id) return false;
+    const w = d.data() as { startDate: string; endDate: string };
+    return rangesOverlap(booking.startDate, booking.endDate, w.startDate, w.endDate);
+  });
+  if (conflict) {
+    throw new BookingConflictError(
+      "This billboard already has a confirmed booking for an overlapping date range.",
+    );
+  }
+}
+
 async function updateBookingStatus(booking: Booking, status: BookingStatus, actor: AuditActor) {
+  if (status === "confirmed") {
+    await assertNoConfirmedConflict(booking);
+  }
+
   const batch = writeBatch(db);
   batch.update(doc(db, "bookings", booking.id), { status, updatedAt: serverTimestamp() });
 
@@ -211,8 +237,12 @@ function AdminBookingsPage() {
       queryClient.invalidateQueries({ queryKey: ["admin-bookings"] });
       queryClient.invalidateQueries({ queryKey: ["public-booking-windows"] });
     },
-    onError: () => {
-      toast.error("Couldn't update booking status. Please try again.");
+    onError: (err) => {
+      toast.error(
+        err instanceof BookingConflictError
+          ? err.message
+          : "Couldn't update booking status. Please try again.",
+      );
     },
   });
 
