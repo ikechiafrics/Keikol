@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowRight,
   CheckCircle2,
@@ -8,9 +8,7 @@ import {
   Globe2,
   Headphones,
   MapPin,
-  Quote,
   Sparkles,
-  Star,
   Zap,
   Building2,
   Landmark,
@@ -59,9 +57,7 @@ function HomePage() {
       <FeaturedLocations />
       <WhyKeikol />
       <IndustriesPreview />
-      <Stats />
       <PortfolioPreview />
-      <Testimonials />
       <CTASection />
     </>
   );
@@ -146,10 +142,6 @@ function Hero() {
                 Live
               </span>
             </div>
-          </div>
-          <div className="absolute -left-6 bottom-10 rounded-2xl border border-border bg-surface/80 p-4 backdrop-blur-xl shadow-elegant">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">Daily reach</p>
-            <p className="mt-1 font-display text-2xl font-extrabold text-gradient-gold">120,000+</p>
           </div>
         </div>
       </div>
@@ -327,54 +319,6 @@ function IndustriesPreview() {
   );
 }
 
-const STATS = [
-  { value: "5+", label: "Major Cities Targeted" },
-  { value: "50K+", label: "Estimated Daily Impressions Per Location" },
-  { value: "24/7", label: "Brand Visibility" },
-  { value: "100%", label: "Customer-Focused Campaign Support" },
-];
-
-function StatCounter({ value, label }: { value: string; label: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    if (!ref.current) return;
-    const io = new IntersectionObserver(
-      ([entry]) => entry.isIntersecting && setVisible(true),
-      { threshold: 0.4 },
-    );
-    io.observe(ref.current);
-    return () => io.disconnect();
-  }, []);
-  return (
-    <div
-      ref={ref}
-      className={`rounded-2xl bg-card-premium p-6 text-center shadow-elegant ring-hairline transition-all duration-700 ${
-        visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-      }`}
-    >
-      <p className="font-display text-4xl font-extrabold text-gradient-gold sm:text-5xl">{value}</p>
-      <p className="mt-3 text-sm text-muted-foreground">{label}</p>
-    </div>
-  );
-}
-
-function Stats() {
-  return (
-    <Section>
-      <SectionHeader
-        eyebrow="Impact"
-        title={<>Built to deliver <span className="text-gradient-gold">measurable reach.</span></>}
-      />
-      <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {STATS.map((s) => <StatCounter key={s.label} {...s} />)}
-      </div>
-      <p className="mt-8 text-center text-xs text-muted-foreground">
-        Statistics are early estimates and may be updated as Keikol expands its billboard network.
-      </p>
-    </Section>
-  );
-}
 
 function PortfolioPreview() {
   const items = PORTFOLIO_SAMPLES.slice(0, 3);
@@ -418,41 +362,3 @@ function PortfolioPreview() {
   );
 }
 
-const TESTIMONIALS = [
-  { quote: "Keikol gives brands a modern way to access premium billboard advertising with clarity and confidence.", name: "Marketing Director", role: "Real Estate Brand" },
-  { quote: "The experience feels professional, modern, and built for brands that care about visibility.", name: "Founder", role: "Restaurant Group" },
-  { quote: "Keikol's approach to outdoor media feels more transparent and technology-forward than traditional advertising options.", name: "Brand Manager", role: "FMCG Company" },
-];
-
-function Testimonials() {
-  return (
-    <Section>
-      <SectionHeader
-        eyebrow="Trusted Words"
-        title={<>What partners say about <span className="text-gradient-electric">working with Keikol.</span></>}
-      />
-      <div className="mt-14 grid gap-6 lg:grid-cols-3">
-        {TESTIMONIALS.map((t) => (
-          <figure key={t.name + t.role} className="relative flex flex-col rounded-2xl bg-card-premium p-7 shadow-elegant ring-hairline">
-            <Quote className="h-7 w-7 text-gold/70" />
-            <blockquote className="mt-4 flex-1 text-base leading-relaxed text-foreground/90">"{t.quote}"</blockquote>
-            <div className="mt-6 flex items-center gap-3 border-t border-border pt-5">
-              <div className="grid h-10 w-10 place-items-center rounded-full bg-gold text-sm font-bold text-primary-foreground">
-                {t.name.charAt(0)}
-              </div>
-              <div className="min-w-0">
-                <figcaption className="truncate text-sm font-semibold">{t.name}</figcaption>
-                <p className="truncate text-xs text-muted-foreground">{t.role}</p>
-              </div>
-              <div className="ml-auto flex gap-0.5">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className="h-3.5 w-3.5 fill-gold text-gold" />
-                ))}
-              </div>
-            </div>
-          </figure>
-        ))}
-      </div>
-    </Section>
-  );
-}

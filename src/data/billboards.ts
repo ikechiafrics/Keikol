@@ -30,7 +30,6 @@ export interface Billboard {
   tags: string[];
 }
 
-export const CITIES = ["All", "Lagos", "Abuja", "Port Harcourt", "Kano"] as const;
 export const BILLBOARD_TYPES = ["All", "Digital Billboard", "Static Billboard", "Premium Static Billboard"] as const;
 export const AVAILABILITIES = ["All", "Available", "Coming Soon", "Available Soon"] as const;
 export const INDUSTRY_FILTERS = [

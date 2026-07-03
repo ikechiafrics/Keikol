@@ -9,8 +9,6 @@ import {
 import { PageHero, Section, SectionHeader, CTASection } from "@/components";
 import { BillboardCard } from "@/components/BillboardCard";
 import {
-  CITIES,
-  BILLBOARD_TYPES,
   AVAILABILITIES,
   INDUSTRY_FILTERS,
   heroImg,
@@ -26,7 +24,7 @@ export const Route = createFileRoute("/locations/")({
       {
         name: "description",
         content:
-          "Explore Keikol's billboard inventory on an interactive map of Nigeria. Filter by city, type, industry, and availability across Lagos, Abuja, Port Harcourt, and Kano.",
+          "Explore Keikol's billboard inventory on an interactive map of Nigeria. Filter by city, type, industry, and availability across Nigeria's major cities.",
       },
       { property: "og:title", content: "Billboard Locations — Interactive Map | Keikol" },
       {
@@ -48,8 +46,8 @@ type View = "map" | "grid";
 
 function LocationsPage() {
   const [q, setQ] = useState("");
-  const [city, setCity] = useState<(typeof CITIES)[number]>("All");
-  const [type, setType] = useState<(typeof BILLBOARD_TYPES)[number]>("All");
+  const [city, setCity] = useState("All");
+  const [type, setType] = useState("All");
   const [avail, setAvail] = useState<(typeof AVAILABILITIES)[number]>("All");
   const [industry, setIndustry] = useState<(typeof INDUSTRY_FILTERS)[number]>("All");
 
@@ -60,6 +58,17 @@ function LocationsPage() {
 
   const { data: windows } = useConfirmedWindows();
   const { data: billboards } = useBillboards();
+
+  // Derived live from actual inventory, not a hardcoded guess — only ever
+  // offers filter options that have at least one real billboard right now.
+  const cityOptions = useMemo(
+    () => ["All", ...Array.from(new Set((billboards ?? []).map((b) => b.city))).sort()],
+    [billboards],
+  );
+  const typeOptions = useMemo(
+    () => ["All", ...Array.from(new Set((billboards ?? []).map((b) => b.billboardType))).sort()],
+    [billboards],
+  );
 
   const filtered = useMemo(() => {
     return (billboards ?? []).filter((b) => {
@@ -119,8 +128,8 @@ function LocationsPage() {
                 className="w-full rounded-xl border border-border bg-background/60 py-3 pl-9 pr-3 text-sm placeholder:text-muted-foreground/70 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
               />
             </label>
-            <Select value={city} onChange={(v) => setCity(v as typeof city)} options={CITIES} label="City" />
-            <Select value={type} onChange={(v) => setType(v as typeof type)} options={BILLBOARD_TYPES} label="Type" />
+            <Select value={city} onChange={setCity} options={cityOptions} label="City" />
+            <Select value={type} onChange={setType} options={typeOptions} label="Type" />
             <Select value={avail} onChange={(v) => setAvail(v as typeof avail)} options={AVAILABILITIES} label="Availability" />
             <Select value={industry} onChange={(v) => setIndustry(v as typeof industry)} options={INDUSTRY_FILTERS} label="Industry" />
           </div>
