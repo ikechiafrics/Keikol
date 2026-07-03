@@ -1,5 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 
 import { db } from "@/lib/firebase";
 import type { Booking } from "@/lib/booking-types";
@@ -12,4 +20,23 @@ export async function fetchAllBookings(): Promise<Booking[]> {
 
 export function useBookings() {
   return useQuery({ queryKey: ["admin-bookings"], queryFn: fetchAllBookings });
+}
+
+// Self-service cancellation for a booking that hasn't been confirmed yet
+// (nothing invoiced/paid, so the owner can cancel outright).
+export async function cancelBooking(bookingId: string) {
+  await updateDoc(doc(db, "bookings", bookingId), {
+    status: "cancelled",
+    updatedAt: serverTimestamp(),
+  });
+}
+
+// For an already-confirmed booking, the owner can only flag it for admin
+// review rather than cancel it directly, since a confirmed campaign may
+// already have invoices/payment attached.
+export async function requestBookingCancellation(bookingId: string) {
+  await updateDoc(doc(db, "bookings", bookingId), {
+    status: "cancellation_requested",
+    updatedAt: serverTimestamp(),
+  });
 }

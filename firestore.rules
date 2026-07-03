@@ -19,15 +19,26 @@ service cloud.firestore {
                     && request.auth.uid == request.resource.data.userId
                     && request.resource.data.status == "pending_payment";
 
-      // Only admins can update a booking after creation, and only its status
-      // or contract amount — the app has no customer-facing "edit my
-      // booking" UI, so there is no legitimate case for the owner to write
-      // to their own booking post-create.
-      allow update: if isAdmin()
-                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "updatedAt", "contractAmount"])
-                    && request.resource.data.status in ["pending_payment", "under_review", "confirmed", "cancelled"];
+      // Admins can update a booking's status/contract amount freely. The
+      // owner may also update status directly, but only for two narrow,
+      // self-service transitions: cancelling outright while nothing has
+      // been invoiced yet (pending_payment/under_review), or flagging a
+      // confirmed booking for admin-mediated cancellation (since a
+      // confirmed campaign may already have invoices/payment involved,
+      // which this app can't unwind automatically).
+      allow update: if (isAdmin()
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "updatedAt", "contractAmount"])
+                        && request.resource.data.status in ["pending_payment", "under_review", "confirmed", "cancellation_requested", "cancelled"])
+                    || (isSignedIn()
+                        && request.auth.uid == resource.data.userId
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "updatedAt"])
+                        && ((resource.data.status in ["pending_payment", "under_review"] && request.resource.data.status == "cancelled")
+                            || (resource.data.status == "confirmed" && request.resource.data.status == "cancellation_requested")));
 
-      allow delete: if false;
+      // Only cancelled bookings can be deleted — anything still active
+      // (pending, under review, confirmed, or awaiting a cancellation
+      // decision) must go through a status change first.
+      allow delete: if isAdmin() && resource.data.status == "cancelled";
     }
 
     match /users/{userId} {

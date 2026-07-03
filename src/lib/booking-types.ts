@@ -50,6 +50,12 @@ export const BOOKING_STATUS_CLASSES: Record<BookingStatus, StatusBadgeClasses> =
     bg: "bg-green-500/20",
     label: "Confirmed",
   },
+  cancellation_requested: {
+    dot: "bg-orange-500",
+    text: "text-orange-600",
+    bg: "bg-orange-500/20",
+    label: "Cancellation Requested",
+  },
   cancelled: {
     dot: "bg-muted-foreground",
     text: "text-muted-foreground",

@@ -33,6 +33,8 @@ function AdminOverviewPage() {
     pending_payment: bookings?.filter((b) => b.status === "pending_payment").length ?? 0,
     under_review: bookings?.filter((b) => b.status === "under_review").length ?? 0,
     confirmed: bookings?.filter((b) => b.status === "confirmed").length ?? 0,
+    cancellation_requested:
+      bookings?.filter((b) => b.status === "cancellation_requested").length ?? 0,
     cancelled: bookings?.filter((b) => b.status === "cancelled").length ?? 0,
   };
 
@@ -133,6 +135,15 @@ function AdminOverviewPage() {
                   {BOOKING_STATUS_CLASSES.confirmed.label}
                 </dt>
                 <dd className="font-semibold">{bookingCounts.confirmed}</dd>
+              </div>
+              <div className="flex items-center justify-between px-3 py-1">
+                <dt className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${BOOKING_STATUS_CLASSES.cancellation_requested.dot}`}
+                  />
+                  {BOOKING_STATUS_CLASSES.cancellation_requested.label}
+                </dt>
+                <dd className="font-semibold">{bookingCounts.cancellation_requested}</dd>
               </div>
               <div className="flex items-center justify-between px-3 py-1">
                 <dt className="flex items-center gap-1.5 text-sm text-muted-foreground">

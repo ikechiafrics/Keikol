@@ -3,12 +3,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   collection,
   doc,
+  getDocs,
+  query,
   serverTimestamp,
   setDoc,
   updateDoc,
+  where,
   writeBatch,
 } from "firebase/firestore";
-import { Calendar as CalIcon, Paperclip, Receipt } from "lucide-react";
+import { Ban, Calendar as CalIcon, Paperclip, Receipt, Trash2, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -21,6 +24,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { db } from "@/lib/firebase";
@@ -42,6 +55,7 @@ const STATUS_OPTIONS: BookingStatus[] = [
   "pending_payment",
   "under_review",
   "confirmed",
+  "cancellation_requested",
   "cancelled",
 ];
 
@@ -81,6 +95,17 @@ async function updateBookingStatus(booking: Booking, status: BookingStatus) {
     batch.delete(windowRef);
   }
 
+  await batch.commit();
+}
+
+async function deleteBooking(booking: Booking) {
+  const invoicesSnap = await getDocs(
+    query(collection(db, "invoices"), where("bookingId", "==", booking.id)),
+  );
+
+  const batch = writeBatch(db);
+  invoicesSnap.docs.forEach((d) => batch.delete(d.ref));
+  batch.delete(doc(db, "bookings", booking.id));
   await batch.commit();
 }
 
@@ -128,6 +153,7 @@ async function toggleInvoicePaid(invoice: Invoice) {
 function AdminBookingsPage() {
   const queryClient = useQueryClient();
   const [managingBooking, setManagingBooking] = useState<Booking | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Booking | null>(null);
 
   const { data: bookings, isLoading } = useBookings();
 
@@ -141,6 +167,16 @@ function AdminBookingsPage() {
     onError: () => {
       toast.error("Couldn't update booking status. Please try again.");
     },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteBooking,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-bookings"] });
+      toast.success("Booking deleted.");
+      setPendingDelete(null);
+    },
+    onError: () => toast.error("Couldn't delete this booking. Please try again."),
   });
 
   return (
@@ -178,7 +214,7 @@ function AdminBookingsPage() {
                 <th className="px-5 py-4">Dates</th>
                 <th className="px-5 py-4">Budget</th>
                 <th className="px-5 py-4">Status</th>
-                <th className="px-5 py-4">Invoices</th>
+                <th className="px-5 py-4">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -215,28 +251,60 @@ function AdminBookingsPage() {
                       >
                         <span className={`h-1.5 w-1.5 rounded-full ${s.dot}`} /> {s.label}
                       </span>
-                      <select
-                        value={b.status}
-                        disabled={isSaving}
-                        onChange={(e) =>
-                          mutation.mutate({ booking: b, status: e.target.value as BookingStatus })
-                        }
-                        className="block w-full appearance-none rounded-lg border border-border bg-background/60 px-3 py-2 text-xs focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30 disabled:opacity-60"
-                      >
-                        {STATUS_OPTIONS.map((opt) => (
-                          <option key={opt} value={opt}>
-                            {BOOKING_STATUS_CLASSES[opt].label}
-                          </option>
-                        ))}
-                      </select>
+                      {b.status === "cancellation_requested" ? (
+                        <div className="flex flex-col gap-1.5">
+                          <button
+                            onClick={() => mutation.mutate({ booking: b, status: "cancelled" })}
+                            disabled={isSaving}
+                            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-destructive/40 px-3 py-1.5 text-xs font-semibold text-destructive hover:bg-destructive/10 disabled:opacity-60"
+                          >
+                            <Ban className="h-3.5 w-3.5" /> Approve Cancellation
+                          </button>
+                          <button
+                            onClick={() => mutation.mutate({ booking: b, status: "confirmed" })}
+                            disabled={isSaving}
+                            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gold/40 px-3 py-1.5 text-xs font-semibold text-gold hover:bg-gold/10 disabled:opacity-60"
+                          >
+                            <Undo2 className="h-3.5 w-3.5" /> Deny
+                          </button>
+                        </div>
+                      ) : (
+                        <select
+                          value={b.status}
+                          disabled={isSaving}
+                          onChange={(e) =>
+                            mutation.mutate({
+                              booking: b,
+                              status: e.target.value as BookingStatus,
+                            })
+                          }
+                          className="block w-full appearance-none rounded-lg border border-border bg-background/60 px-3 py-2 text-xs focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30 disabled:opacity-60"
+                        >
+                          {STATUS_OPTIONS.map((opt) => (
+                            <option key={opt} value={opt}>
+                              {BOOKING_STATUS_CLASSES[opt].label}
+                            </option>
+                          ))}
+                        </select>
+                      )}
                     </td>
                     <td className="px-5 py-4">
-                      <button
-                        onClick={() => setManagingBooking(b)}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold hover:underline"
-                      >
-                        <Receipt className="h-3.5 w-3.5" /> Manage
-                      </button>
+                      <div className="flex items-center gap-4">
+                        <button
+                          onClick={() => setManagingBooking(b)}
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold hover:underline"
+                        >
+                          <Receipt className="h-3.5 w-3.5" /> Manage
+                        </button>
+                        {b.status === "cancelled" && (
+                          <button
+                            onClick={() => setPendingDelete(b)}
+                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-destructive hover:underline"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" /> Delete
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -250,6 +318,31 @@ function AdminBookingsPage() {
         booking={managingBooking}
         onOpenChange={(open) => !open && setManagingBooking(null)}
       />
+
+      <AlertDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => !open && setPendingDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this booking?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently removes the cancelled booking for{" "}
+              {pendingDelete?.companyName || "this customer"} along with any invoices issued against
+              it. This can't be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => pendingDelete && deleteMutation.mutate(pendingDelete)}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? "Deleting…" : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Section>
   );
 }
