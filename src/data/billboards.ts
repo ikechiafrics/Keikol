@@ -2,6 +2,9 @@ import heroImg from "@/assets/hero-billboard.jpg";
 import campRealEstate from "@/assets/camp-realestate.jpg";
 import campRestaurant from "@/assets/camp-restaurant.jpg";
 import campTelecom from "@/assets/camp-telecom.jpg";
+import campFmcg from "@/assets/portfolio-fmcg.jpg";
+import campFashion from "@/assets/portfolio-fashion.jpg";
+import campEducation from "@/assets/portfolio-education.jpg";
 
 export type Availability = "Available" | "Coming Soon" | "Available Soon";
 export type BillboardType = "Digital Billboard" | "Static Billboard" | "Premium Static Billboard";
@@ -74,7 +77,7 @@ export const PORTFOLIO_SAMPLES = [
       "A mass visibility campaign built for telecom offers, brand recall, and customer acquisition.",
   },
   {
-    img: campRealEstate,
+    img: campFmcg,
     title: "FMCG Product Launch",
     location: "Kano",
     campaignType: "Consumer Awareness Campaign",
@@ -83,7 +86,7 @@ export const PORTFOLIO_SAMPLES = [
       "A campaign designed to support product recognition and retail demand in busy commercial areas.",
   },
   {
-    img: campRestaurant,
+    img: campFashion,
     title: "Fashion Collection Drop",
     location: "Victoria Island",
     campaignType: "Lifestyle Visibility Campaign",
@@ -92,7 +95,7 @@ export const PORTFOLIO_SAMPLES = [
       "A premium visual campaign for fashion brands looking to create aspiration and high-end brand presence.",
   },
   {
-    img: campTelecom,
+    img: campEducation,
     title: "Education Admissions Campaign",
     location: "Abuja",
     campaignType: "Public Awareness Campaign",

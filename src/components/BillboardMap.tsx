@@ -1,10 +1,24 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { RotateCcw } from "lucide-react";
+import { Moon, RotateCcw, Sun } from "lucide-react";
 import type { Billboard } from "@/data/billboards";
 import { useConfirmedWindows, getEffectiveAvailability } from "@/lib/billboard-availability";
+
+const TILE_THEMES = {
+  dark: {
+    url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    background: "#14141c",
+  },
+  light: {
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    background: "#e5e7eb",
+  },
+} as const;
 
 function makeIcon(color: string) {
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='34' height='46' viewBox='0 0 34 46'>
@@ -77,9 +91,22 @@ function ResetViewControl({
       type="button"
       onClick={handleReset}
       onDoubleClick={(e) => e.stopPropagation()}
-      className="absolute bottom-3 left-3 z-[500] inline-flex items-center gap-1.5 rounded-full border border-border bg-background/85 px-3 py-1.5 text-[11px] font-semibold text-muted-foreground shadow-elegant backdrop-blur transition-colors hover:text-gold"
+      className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/85 px-3 py-1.5 text-[11px] font-semibold text-muted-foreground shadow-elegant backdrop-blur transition-colors hover:text-gold"
     >
       <RotateCcw className="h-3.5 w-3.5" /> Reset view
+    </button>
+  );
+}
+
+function MapThemeToggle({ dark, onToggle }: { dark: boolean; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/85 px-3 py-1.5 text-[11px] font-semibold text-muted-foreground shadow-elegant backdrop-blur transition-colors hover:text-gold"
+    >
+      {dark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+      {dark ? "Light map" : "Dark map"}
     </button>
   );
 }
@@ -94,6 +121,8 @@ export function BillboardMap({
   onSelect: (id: string | null) => void;
 }) {
   const { data: windows } = useConfirmedWindows();
+  const [dark, setDark] = useState(true);
+  const theme = TILE_THEMES[dark ? "dark" : "light"];
 
   return (
     <MapContainer
@@ -101,12 +130,9 @@ export function BillboardMap({
       zoom={6}
       scrollWheelZoom
       className="h-full w-full"
-      style={{ background: "#e5e7eb" }}
+      style={{ background: theme.background }}
     >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+      <TileLayer key={dark ? "dark" : "light"} attribution={theme.attribution} url={theme.url} />
       {billboards.map((b) => (
         <Marker
           key={b.id}
@@ -120,7 +146,10 @@ export function BillboardMap({
         />
       ))}
       <FitBounds billboards={billboards} selectedId={selectedId} />
-      <ResetViewControl billboards={billboards} onReset={() => onSelect(null)} />
+      <div className="absolute bottom-3 left-3 z-[500] flex items-center gap-2">
+        <ResetViewControl billboards={billboards} onReset={() => onSelect(null)} />
+        <MapThemeToggle dark={dark} onToggle={() => setDark((d) => !d)} />
+      </div>
     </MapContainer>
   );
 }
