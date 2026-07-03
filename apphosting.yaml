@@ -1,0 +1,42 @@
+# Firebase App Hosting build/runtime config.
+# The Firebase web SDK's apiKey is not a secret (it identifies the project;
+# access is controlled by Firestore/Storage security rules, not by hiding
+# this value) so it's safe to commit as a plain env value rather than a
+# Secret Manager secret. Vite inlines import.meta.env.VITE_* at build time,
+# so BUILD availability is what actually matters here.
+env:
+  - variable: VITE_FIREBASE_API_KEY
+    value: "AIzaSyDcM-b5TlBzvvhqTpq_zBeFTJE4EGMhDsw"
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: VITE_FIREBASE_AUTH_DOMAIN
+    value: "keikol-35a6b.firebaseapp.com"
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: VITE_FIREBASE_PROJECT_ID
+    value: "keikol-35a6b"
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: VITE_FIREBASE_STORAGE_BUCKET
+    value: "keikol-35a6b.firebasestorage.app"
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: VITE_FIREBASE_MESSAGING_SENDER_ID
+    value: "851648132857"
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: VITE_FIREBASE_APP_ID
+    value: "1:851648132857:web:ed53b4d6b5c69711f69428"
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: VITE_FIREBASE_MEASUREMENT_ID
+    value: "G-16EZJBF6X5"
+    availability:
+      - BUILD
+      - RUNTIME
