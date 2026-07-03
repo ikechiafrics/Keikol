@@ -43,8 +43,13 @@ export function isDateInAnyConfirmedRange(date: Date, ranges: ConfirmedWindow[])
   return ranges.some((r) => r.startDate <= iso && iso <= r.endDate);
 }
 
-export function getEffectiveAvailability(billboard: Billboard, windows: ConfirmedWindow[]): Availability {
-  if (billboard.availability === "Coming Soon") return billboard.availability;
+export function getEffectiveAvailability(
+  billboard: Billboard,
+  windows: ConfirmedWindow[],
+): Availability {
+  if (billboard.availability === "Coming Soon" || billboard.availability === "Not Available") {
+    return billboard.availability;
+  }
   const today = todayISO();
   const isOccupiedNow = getConfirmedRangesForBillboard(billboard.id, windows).some(
     (r) => r.startDate <= today && today <= r.endDate,

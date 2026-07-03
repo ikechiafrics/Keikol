@@ -9,6 +9,7 @@ import { Section, SectionHeader } from "@/components";
 import { Skeleton } from "@/components/ui/skeleton";
 import { db } from "@/lib/firebase";
 import { useBillboards } from "@/lib/billboards-data";
+import { getPriceTierLabel } from "@/lib/billboard-rates";
 import type { Billboard } from "@/data/billboards";
 import {
   AlertDialog,
@@ -123,7 +124,7 @@ function AdminBillboardsPage() {
                   </td>
                   <td className="px-5 py-4 text-muted-foreground">{b.billboardType}</td>
                   <td className="px-5 py-4 text-muted-foreground">{b.availability}</td>
-                  <td className="px-5 py-4 text-muted-foreground">{b.priceTier}</td>
+                  <td className="px-5 py-4 text-muted-foreground">{getPriceTierLabel(b.rates)}</td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <Link

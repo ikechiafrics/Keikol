@@ -10,6 +10,7 @@ const AVAILABILITY_CLASSES: Record<Billboard["availability"], StatusBadgeClasses
   Available: { dot: "bg-accent", text: "text-accent", bg: "bg-accent/20" },
   "Available Soon": { dot: "bg-electric-soft", text: "text-electric-soft", bg: "bg-electric/15" },
   "Coming Soon": { dot: "bg-gold", text: "text-gold", bg: "bg-gold/20" },
+  "Not Available": { dot: "bg-destructive", text: "text-destructive", bg: "bg-destructive/15" },
 };
 
 export function BillboardCard({

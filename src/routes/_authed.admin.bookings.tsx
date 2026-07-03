@@ -40,6 +40,7 @@ import { db } from "@/lib/firebase";
 import { useBookings } from "@/lib/bookings-data";
 import { useInvoicesForBooking } from "@/lib/invoices-data";
 import { generateInvoiceNumber, formatNaira } from "@/lib/invoice";
+import { parseAmount, formatAmountInput } from "@/lib/currency-input";
 import { BOOKING_STATUS_CLASSES, type Booking } from "@/lib/booking-types";
 import { INVOICE_STATUS_CLASSES, type Invoice } from "@/lib/invoice-types";
 import type { BookingStatus } from "@/lib/booking-status";
@@ -61,20 +62,6 @@ const STATUS_OPTIONS: BookingStatus[] = [
 
 function toISODate(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-
-// Amount inputs accept comma-formatted numbers ("500,000") — strip everything
-// but digits to get the real number back out.
-function parseAmount(input: string): number {
-  return Number(input.replace(/[^0-9]/g, ""));
-}
-
-// Re-inserts thousands separators as the user types, so "500000" becomes
-// "500,000" without them needing to type the commas themselves.
-function formatAmountInput(input: string): string {
-  const digits = input.replace(/[^0-9]/g, "");
-  if (!digits) return "";
-  return Number(digits).toLocaleString("en-NG");
 }
 
 async function updateBookingStatus(booking: Booking, status: BookingStatus) {

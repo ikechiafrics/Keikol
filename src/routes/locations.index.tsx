@@ -25,6 +25,7 @@ import { BillboardCard } from "@/components/BillboardCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AVAILABILITIES, INDUSTRY_FILTERS, heroImg, type Billboard } from "@/data/billboards";
 import { useConfirmedWindows, getEffectiveAvailability } from "@/lib/billboard-availability";
+import { getPriceTierLabel } from "@/lib/billboard-rates";
 import { useBillboards } from "@/lib/billboards-data";
 import { useImageLoaded } from "@/lib/use-image-loaded";
 
@@ -197,6 +198,7 @@ function LocationsPage() {
                 <Legend color="#F4C430" label="Available" />
                 <Legend color="#60A5FA" label="Available Soon" />
                 <Legend color="#9CA3AF" label="Coming Soon" />
+                <Legend color="#EF4444" label="Not Available" />
               </div>
               <div className="pointer-events-none absolute bottom-3 left-1/2 z-[500] hidden -translate-x-1/2 rounded-full bg-background/85 px-3 py-1.5 text-[11px] font-semibold text-muted-foreground shadow-elegant backdrop-blur sm:block">
                 Tap a pin to see details
@@ -407,7 +409,7 @@ function ResultCard({
             <Eye className="h-3 w-3 text-accent" />
             {b.estimatedDailyImpressions}
           </span>
-          <span className="font-bold text-gold">{b.priceTier}</span>
+          <span className="font-bold text-gold">{getPriceTierLabel(b.rates)}</span>
         </div>
       </div>
     </button>
@@ -614,7 +616,11 @@ function DetailsSidebar({
                 <div className="grid grid-cols-3 gap-2 rounded-xl bg-card-premium p-3 ring-hairline">
                   <Stat icon={Eye} label="Traffic" value={b.estimatedDailyImpressions} />
                   <Stat icon={Ruler} label="Size" value={b.size} />
-                  <Stat label="Price tier" value={b.priceTier} valueClass="text-gold" />
+                  <Stat
+                    label="Price tier"
+                    value={getPriceTierLabel(b.rates)}
+                    valueClass="text-gold"
+                  />
                 </div>
 
                 <p className="text-sm leading-relaxed text-muted-foreground">{b.description}</p>

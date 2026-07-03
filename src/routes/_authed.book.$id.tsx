@@ -12,7 +12,14 @@ import { ArrowLeft, ArrowRight, Upload } from "lucide-react";
 import { Section, SectionHeader, SelectedBillboardSummary } from "@/components";
 import { Calendar } from "@/components/ui/calendar";
 import { Progress } from "@/components/ui/progress";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { db, storage, artworkStoragePath } from "@/lib/firebase";
 import { trackEvent } from "@/lib/analytics";
 import { useAuth } from "@/lib/auth-context";
@@ -22,7 +29,9 @@ import {
   getConfirmedRangesForBillboard,
   isDateInAnyConfirmedRange,
 } from "@/lib/billboard-availability";
+import { getRatesSummary } from "@/lib/billboard-rates";
 import { fetchBillboardById } from "@/lib/billboards-data";
+import { BILLBOARD_DURATIONS } from "@/data/billboards";
 
 export const Route = createFileRoute("/_authed/book/$id")({
   loader: async ({ params }) => ({ billboard: await fetchBillboardById(params.id) }),
@@ -33,9 +42,20 @@ export const Route = createFileRoute("/_authed/book/$id")({
   component: BookBillboardPage,
 });
 
-const BUDGET_OPTIONS = ["Below ₦500,000", "₦500,000 – ₦1,000,000", "₦1,000,000 – ₦2,000,000", "₦2,000,000+"];
-const GOAL_OPTIONS = ["Brand Awareness", "Product Launch", "Event Promotion", "Store/Branch Launch", "Political/Public Awareness"];
-const DURATION_OPTIONS = ["1 Week", "2 Weeks", "1 Month", "3 Months"];
+const BUDGET_OPTIONS = [
+  "Below ₦500,000",
+  "₦500,000 – ₦1,000,000",
+  "₦1,000,000 – ₦2,000,000",
+  "₦2,000,000+",
+];
+const GOAL_OPTIONS = [
+  "Brand Awareness",
+  "Product Launch",
+  "Event Promotion",
+  "Store/Branch Launch",
+  "Political/Public Awareness",
+];
+const DURATION_OPTIONS: string[] = [...BILLBOARD_DURATIONS];
 
 const bookingSchema = z.object({
   budget: z.string().min(1, "Select a budget range"),
@@ -71,15 +91,27 @@ function BookBillboardPage() {
 
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
-    defaultValues: { budget: "", goal: "", duration: "", companyName: "", contactPhone: "", campaignDetails: "" },
+    defaultValues: {
+      budget: "",
+      goal: "",
+      duration: "",
+      companyName: "",
+      contactPhone: "",
+      campaignDetails: "",
+    },
   });
 
   if (!billboard) {
     return (
       <div className="mx-auto max-w-2xl px-5 py-32 text-center">
         <h1 className="font-display text-3xl font-extrabold">Billboard Not Found</h1>
-        <p className="mt-4 text-muted-foreground">This billboard listing may have been moved or is no longer available.</p>
-        <Link to="/locations" className="mt-6 inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-primary-foreground shadow-gold">
+        <p className="mt-4 text-muted-foreground">
+          This billboard listing may have been moved or is no longer available.
+        </p>
+        <Link
+          to="/locations"
+          className="mt-6 inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-primary-foreground shadow-gold"
+        >
           <ArrowLeft className="h-4 w-4" /> Back to Locations
         </Link>
       </div>
@@ -123,7 +155,8 @@ function BookBillboardPage() {
           const task = uploadBytesResumable(storageRef, file);
           task.on(
             "state_changed",
-            (snap) => setUploadProgress(Math.round((snap.bytesTransferred / snap.totalBytes) * 100)),
+            (snap) =>
+              setUploadProgress(Math.round((snap.bytesTransferred / snap.totalBytes) * 100)),
             reject,
             () => resolve(),
           );
@@ -140,7 +173,7 @@ function BookBillboardPage() {
           area: bb.area,
           billboardType: bb.billboardType,
           size: bb.size,
-          priceRange: bb.priceRange,
+          priceRange: getRatesSummary(bb.rates),
           image: bb.image,
         },
         startDate: toISODate(range.from),
@@ -175,7 +208,11 @@ function BookBillboardPage() {
       <SectionHeader
         align="left"
         eyebrow="Book This Billboard"
-        title={<>Complete your <span className="text-gradient-gold">booking request.</span></>}
+        title={
+          <>
+            Complete your <span className="text-gradient-gold">booking request.</span>
+          </>
+        }
       />
 
       <SelectedBillboardSummary billboard={billboard} className="mt-8 mb-8" />
@@ -188,6 +225,7 @@ function BookBillboardPage() {
               mode="range"
               selected={range}
               onSelect={setRange}
+              excludeDisabled
               disabled={(date) =>
                 date < new Date(new Date().toDateString()) ||
                 bookedSet.has(toISODate(date)) ||
@@ -203,19 +241,43 @@ function BookBillboardPage() {
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 rounded-3xl bg-card-premium p-7 shadow-elegant ring-hairline">
-            <SelectFormField control={form.control} name="budget" label="Campaign Budget" options={BUDGET_OPTIONS} />
-            <SelectFormField control={form.control} name="goal" label="Campaign Goal" options={GOAL_OPTIONS} />
-            <SelectFormField control={form.control} name="duration" label="Campaign Duration" options={DURATION_OPTIONS} />
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 rounded-3xl bg-card-premium p-7 shadow-elegant ring-hairline"
+          >
+            <SelectFormField
+              control={form.control}
+              name="budget"
+              label="Campaign Budget"
+              options={BUDGET_OPTIONS}
+            />
+            <SelectFormField
+              control={form.control}
+              name="goal"
+              label="Campaign Goal"
+              options={GOAL_OPTIONS}
+            />
+            <SelectFormField
+              control={form.control}
+              name="duration"
+              label="Campaign Duration"
+              options={DURATION_OPTIONS}
+            />
 
             <FormField
               control={form.control}
               name="companyName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Company Name</FormLabel>
+                  <FormLabel className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                    Company Name
+                  </FormLabel>
                   <FormControl>
-                    <input {...field} placeholder="Company / brand" className="w-full rounded-xl border border-border bg-background/60 px-4 py-3 text-sm placeholder:text-muted-foreground/70 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30" />
+                    <input
+                      {...field}
+                      placeholder="Company / brand"
+                      className="w-full rounded-xl border border-border bg-background/60 px-4 py-3 text-sm placeholder:text-muted-foreground/70 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -227,9 +289,15 @@ function BookBillboardPage() {
               name="contactPhone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Phone Number</FormLabel>
+                  <FormLabel className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                    Phone Number
+                  </FormLabel>
                   <FormControl>
-                    <input {...field} placeholder="+234 ..." className="w-full rounded-xl border border-border bg-background/60 px-4 py-3 text-sm placeholder:text-muted-foreground/70 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30" />
+                    <input
+                      {...field}
+                      placeholder="+234 ..."
+                      className="w-full rounded-xl border border-border bg-background/60 px-4 py-3 text-sm placeholder:text-muted-foreground/70 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -241,9 +309,16 @@ function BookBillboardPage() {
               name="campaignDetails"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Campaign Details</FormLabel>
+                  <FormLabel className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                    Campaign Details
+                  </FormLabel>
                   <FormControl>
-                    <textarea {...field} rows={4} placeholder="Tell us about your campaign goals..." className="w-full rounded-xl border border-border bg-background/60 px-4 py-3 text-sm placeholder:text-muted-foreground/70 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30" />
+                    <textarea
+                      {...field}
+                      rows={4}
+                      placeholder="Tell us about your campaign goals..."
+                      className="w-full rounded-xl border border-border bg-background/60 px-4 py-3 text-sm placeholder:text-muted-foreground/70 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -257,9 +332,16 @@ function BookBillboardPage() {
               <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-border bg-background/60 px-4 py-3 text-sm text-muted-foreground hover:border-gold hover:text-gold">
                 <Upload className="h-4 w-4" />
                 {file ? file.name : "Upload image or PDF (max 20MB)"}
-                <input type="file" accept="image/*,application/pdf" onChange={onFileChange} className="hidden" />
+                <input
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={onFileChange}
+                  className="hidden"
+                />
               </label>
-              {fileError && <p className="mt-1.5 text-[0.8rem] font-medium text-destructive">{fileError}</p>}
+              {fileError && (
+                <p className="mt-1.5 text-[0.8rem] font-medium text-destructive">{fileError}</p>
+              )}
               {uploadProgress !== null && (
                 <div className="mt-3">
                   <Progress value={uploadProgress} />
@@ -273,10 +355,12 @@ function BookBillboardPage() {
               disabled={submitting}
               className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gold px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-gold transition-transform hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0"
             >
-              {submitting ? "Submitting…" : "Submit Booking Request"} <ArrowRight className="h-4 w-4" />
+              {submitting ? "Submitting…" : "Submit Booking Request"}{" "}
+              <ArrowRight className="h-4 w-4" />
             </button>
             <p className="text-center text-[11px] text-muted-foreground">
-              Your booking will be marked pending payment. The Keikol team will follow up to confirm and process payment.
+              Your booking will be marked pending payment. The Keikol team will follow up to confirm
+              and process payment.
             </p>
           </form>
         </Form>
@@ -302,14 +386,22 @@ function SelectFormField({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{label}</FormLabel>
+          <FormLabel className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            {label}
+          </FormLabel>
           <FormControl>
             <select
               {...field}
               className="w-full appearance-none rounded-xl border border-border bg-background/60 px-4 py-3 text-sm focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
             >
-              <option value="" disabled>Select...</option>
-              {options.map((o) => <option key={o} value={o}>{o}</option>)}
+              <option value="" disabled>
+                Select...
+              </option>
+              {options.map((o) => (
+                <option key={o} value={o}>
+                  {o}
+                </option>
+              ))}
             </select>
           </FormControl>
           <FormMessage />

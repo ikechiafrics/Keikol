@@ -6,8 +6,21 @@ import campFmcg from "@/assets/portfolio-fmcg.jpg";
 import campFashion from "@/assets/portfolio-fashion.jpg";
 import campEducation from "@/assets/portfolio-education.jpg";
 
-export type Availability = "Available" | "Coming Soon" | "Available Soon";
-export type BillboardType = "Digital Billboard" | "Static Billboard" | "Premium Static Billboard";
+export type Availability = "Available" | "Coming Soon" | "Available Soon" | "Not Available";
+export type BillboardType =
+  | "Digital Billboard"
+  | "Static Billboard"
+  | "Premium Static Billboard"
+  | "Static Gantry"
+  | "Digital Gantry"
+  | "Static Unipole"
+  | "Digital Unipole";
+
+// Shared with the booking form's "Campaign Duration" select — a billboard's
+// rates and a customer's booking duration are the same set of options, kept
+// as one source of truth so they can't drift apart.
+export const BILLBOARD_DURATIONS = ["1 Week", "2 Weeks", "1 Month", "3 Months", "1 Year"] as const;
+export type BillboardDuration = (typeof BILLBOARD_DURATIONS)[number];
 
 export interface Billboard {
   id: string;
@@ -20,8 +33,10 @@ export interface Billboard {
   size: string;
   estimatedDailyImpressions: string;
   availability: Availability;
-  priceRange: string;
-  priceTier: string;
+  // Price per campaign duration — not every duration needs a rate (e.g. some
+  // billboards might not offer a 1-week rate). "Price Tier"/"Price Range"
+  // display strings are derived from this rather than entered separately.
+  rates: Partial<Record<BillboardDuration, number>>;
   lighting: string;
   description: string;
   recommendedIndustries: string[];
@@ -33,8 +48,23 @@ export interface Billboard {
   tags: string[];
 }
 
-export const BILLBOARD_TYPES = ["All", "Digital Billboard", "Static Billboard", "Premium Static Billboard"] as const;
-export const AVAILABILITIES = ["All", "Available", "Coming Soon", "Available Soon"] as const;
+export const BILLBOARD_TYPES = [
+  "All",
+  "Digital Billboard",
+  "Static Billboard",
+  "Premium Static Billboard",
+  "Static Gantry",
+  "Digital Gantry",
+  "Static Unipole",
+  "Digital Unipole",
+] as const;
+export const AVAILABILITIES = [
+  "All",
+  "Available",
+  "Coming Soon",
+  "Available Soon",
+  "Not Available",
+] as const;
 export const INDUSTRY_FILTERS = [
   "All",
   "Real Estate",

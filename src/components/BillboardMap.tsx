@@ -15,7 +15,8 @@ const TILE_THEMES = {
   },
   light: {
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     background: "#e5e7eb",
   },
 } as const;
@@ -38,6 +39,7 @@ const STATUS_COLORS: Record<Billboard["availability"], string> = {
   Available: "#F4C430",
   "Available Soon": "#60A5FA",
   "Coming Soon": "#9CA3AF",
+  "Not Available": "#EF4444",
 };
 const SELECTED_COLOR = "#22D3EE";
 
@@ -54,7 +56,13 @@ function flyToFit(map: L.Map, billboards: Billboard[]) {
   map.flyToBounds(bounds, { padding: [40, 40], duration: 0.6 });
 }
 
-function FitBounds({ billboards, selectedId }: { billboards: Billboard[]; selectedId: string | null }) {
+function FitBounds({
+  billboards,
+  selectedId,
+}: {
+  billboards: Billboard[];
+  selectedId: string | null;
+}) {
   const map = useMap();
   useEffect(() => {
     if (selectedId) {
@@ -121,7 +129,7 @@ export function BillboardMap({
   onSelect: (id: string | null) => void;
 }) {
   const { data: windows } = useConfirmedWindows();
-  const [dark, setDark] = useState(true);
+  const [dark, setDark] = useState(false);
   const theme = TILE_THEMES[dark ? "dark" : "light"];
 
   return (
@@ -138,7 +146,9 @@ export function BillboardMap({
           key={b.id}
           position={[b.lat, b.lng]}
           icon={makeIcon(
-            selectedId === b.id ? SELECTED_COLOR : STATUS_COLORS[getEffectiveAvailability(b, windows ?? [])],
+            selectedId === b.id
+              ? SELECTED_COLOR
+              : STATUS_COLORS[getEffectiveAvailability(b, windows ?? [])],
           )}
           alt={`${b.area}, ${b.city}`}
           title={`${b.area}, ${b.city}`}
