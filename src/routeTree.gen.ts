@@ -24,6 +24,8 @@ import { Route as LocationsIdRouteImport } from './routes/locations.$id'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed.dashboard'
 import { Route as AuthedAdminRouteImport } from './routes/_authed.admin'
 import { Route as AuthedAdminIndexRouteImport } from './routes/_authed.admin.index'
+import { Route as AuthedInvoicesBookingIdRouteImport } from './routes/_authed.invoices.$bookingId'
+import { Route as AuthedInvoiceIdRouteImport } from './routes/_authed.invoice.$id'
 import { Route as AuthedBookIdRouteImport } from './routes/_authed.book.$id'
 import { Route as AuthedAdminQuotesRouteImport } from './routes/_authed.admin.quotes'
 import { Route as AuthedAdminBookingsRouteImport } from './routes/_authed.admin.bookings'
@@ -106,6 +108,16 @@ const AuthedAdminIndexRoute = AuthedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthedAdminRoute,
 } as any)
+const AuthedInvoicesBookingIdRoute = AuthedInvoicesBookingIdRouteImport.update({
+  id: '/invoices/$bookingId',
+  path: '/invoices/$bookingId',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedInvoiceIdRoute = AuthedInvoiceIdRouteImport.update({
+  id: '/invoice/$id',
+  path: '/invoice/$id',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedBookIdRoute = AuthedBookIdRouteImport.update({
   id: '/book/$id',
   path: '/book/$id',
@@ -162,6 +174,8 @@ export interface FileRoutesByFullPath {
   '/admin/bookings': typeof AuthedAdminBookingsRoute
   '/admin/quotes': typeof AuthedAdminQuotesRoute
   '/book/$id': typeof AuthedBookIdRoute
+  '/invoice/$id': typeof AuthedInvoiceIdRoute
+  '/invoices/$bookingId': typeof AuthedInvoicesBookingIdRoute
   '/admin/': typeof AuthedAdminIndexRoute
   '/admin/billboards/$id': typeof AuthedAdminBillboardsIdRoute
   '/admin/billboards/new': typeof AuthedAdminBillboardsNewRoute
@@ -183,6 +197,8 @@ export interface FileRoutesByTo {
   '/admin/bookings': typeof AuthedAdminBookingsRoute
   '/admin/quotes': typeof AuthedAdminQuotesRoute
   '/book/$id': typeof AuthedBookIdRoute
+  '/invoice/$id': typeof AuthedInvoiceIdRoute
+  '/invoices/$bookingId': typeof AuthedInvoicesBookingIdRoute
   '/admin': typeof AuthedAdminIndexRoute
   '/admin/billboards/$id': typeof AuthedAdminBillboardsIdRoute
   '/admin/billboards/new': typeof AuthedAdminBillboardsNewRoute
@@ -208,6 +224,8 @@ export interface FileRoutesById {
   '/_authed/admin/bookings': typeof AuthedAdminBookingsRoute
   '/_authed/admin/quotes': typeof AuthedAdminQuotesRoute
   '/_authed/book/$id': typeof AuthedBookIdRoute
+  '/_authed/invoice/$id': typeof AuthedInvoiceIdRoute
+  '/_authed/invoices/$bookingId': typeof AuthedInvoicesBookingIdRoute
   '/_authed/admin/': typeof AuthedAdminIndexRoute
   '/_authed/admin/billboards/$id': typeof AuthedAdminBillboardsIdRoute
   '/_authed/admin/billboards/new': typeof AuthedAdminBillboardsNewRoute
@@ -233,6 +251,8 @@ export interface FileRouteTypes {
     | '/admin/bookings'
     | '/admin/quotes'
     | '/book/$id'
+    | '/invoice/$id'
+    | '/invoices/$bookingId'
     | '/admin/'
     | '/admin/billboards/$id'
     | '/admin/billboards/new'
@@ -254,6 +274,8 @@ export interface FileRouteTypes {
     | '/admin/bookings'
     | '/admin/quotes'
     | '/book/$id'
+    | '/invoice/$id'
+    | '/invoices/$bookingId'
     | '/admin'
     | '/admin/billboards/$id'
     | '/admin/billboards/new'
@@ -278,6 +300,8 @@ export interface FileRouteTypes {
     | '/_authed/admin/bookings'
     | '/_authed/admin/quotes'
     | '/_authed/book/$id'
+    | '/_authed/invoice/$id'
+    | '/_authed/invoices/$bookingId'
     | '/_authed/admin/'
     | '/_authed/admin/billboards/$id'
     | '/_authed/admin/billboards/new'
@@ -406,6 +430,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedAdminIndexRouteImport
       parentRoute: typeof AuthedAdminRoute
     }
+    '/_authed/invoices/$bookingId': {
+      id: '/_authed/invoices/$bookingId'
+      path: '/invoices/$bookingId'
+      fullPath: '/invoices/$bookingId'
+      preLoaderRoute: typeof AuthedInvoicesBookingIdRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/invoice/$id': {
+      id: '/_authed/invoice/$id'
+      path: '/invoice/$id'
+      fullPath: '/invoice/$id'
+      preLoaderRoute: typeof AuthedInvoiceIdRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/book/$id': {
       id: '/_authed/book/$id'
       path: '/book/$id'
@@ -497,12 +535,16 @@ interface AuthedRouteChildren {
   AuthedAdminRoute: typeof AuthedAdminRouteWithChildren
   AuthedDashboardRoute: typeof AuthedDashboardRoute
   AuthedBookIdRoute: typeof AuthedBookIdRoute
+  AuthedInvoiceIdRoute: typeof AuthedInvoiceIdRoute
+  AuthedInvoicesBookingIdRoute: typeof AuthedInvoicesBookingIdRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedAdminRoute: AuthedAdminRouteWithChildren,
   AuthedDashboardRoute: AuthedDashboardRoute,
   AuthedBookIdRoute: AuthedBookIdRoute,
+  AuthedInvoiceIdRoute: AuthedInvoiceIdRoute,
+  AuthedInvoicesBookingIdRoute: AuthedInvoicesBookingIdRoute,
 }
 
 const AuthedRouteWithChildren =

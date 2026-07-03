@@ -5,7 +5,11 @@ import keikolMark from "@/assets/Logo.png";
 function Logo() {
   return (
     <Link to="/" className="inline-flex items-center gap-2">
-      <img src={keikolMark} alt="Keikol Media Group logo" className="h-8 w-8 rounded-lg shadow-gold" />
+      <img
+        src={keikolMark}
+        alt="Keikol Media Group logo"
+        className="h-8 w-8 rounded-lg shadow-gold"
+      />
       <span className="font-display text-xl font-extrabold tracking-tight">Keikol</span>
     </Link>
   );
@@ -13,15 +17,14 @@ function Logo() {
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-background">
+    <footer className="print:hidden border-t border-border bg-background">
       <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
             <Logo />
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              Keikol is a modern advertising and media brand helping businesses grow through
-              premium billboard placements, outdoor media, and future technology-driven campaign
-              solutions.
+              Keikol is a modern advertising and media brand helping businesses grow through premium
+              billboard placements, outdoor media, and future technology-driven campaign solutions.
             </p>
             <div className="mt-6 flex items-center gap-2">
               {[
@@ -88,20 +91,17 @@ export function Footer() {
   );
 }
 
-function FooterCol({
-  title,
-  links,
-}: {
-  title: string;
-  links: { label: string; to: string }[];
-}) {
+function FooterCol({ title, links }: { title: string; links: { label: string; to: string }[] }) {
   return (
     <div>
       <h4 className="font-display text-sm font-bold uppercase tracking-widest">{title}</h4>
       <ul className="mt-5 space-y-3">
         {links.map((l) => (
           <li key={l.label}>
-            <Link to={l.to} className="text-sm text-muted-foreground transition-colors hover:text-gold">
+            <Link
+              to={l.to}
+              className="text-sm text-muted-foreground transition-colors hover:text-gold"
+            >
               {l.label}
             </Link>
           </li>

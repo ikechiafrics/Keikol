@@ -1,13 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
-import { ArrowRight, Calendar, ImageOff, MapPin, Paperclip, Wallet } from "lucide-react";
+import { ArrowRight, Calendar, ImageOff, MapPin, Paperclip, Receipt, Wallet } from "lucide-react";
 
 import { Section, SectionHeader } from "@/components";
 import { Skeleton } from "@/components/ui/skeleton";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
 import { useImageLoaded } from "@/lib/use-image-loaded";
+import { useInvoicesForBooking } from "@/lib/invoices-data";
 import { BOOKING_STATUS_CLASSES, type Booking } from "@/lib/booking-types";
 
 export const Route = createFileRoute("/_authed/dashboard")({
@@ -99,6 +100,7 @@ function BookingCard({ booking }: { booking: Booking }) {
   const s = BOOKING_STATUS_CLASSES[booking.status];
   const hasArtwork = (booking.artworkPaths?.length ?? 0) > 0;
   const { loaded, onLoad, imgRef } = useImageLoaded();
+  const { data: invoices } = useInvoicesForBooking(booking.id);
 
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl bg-card-premium shadow-elegant ring-hairline">
@@ -141,13 +143,24 @@ function BookingCard({ booking }: { booking: Booking }) {
         <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
           <Wallet className="h-3.5 w-3.5" /> {booking.budget}
         </p>
-        <Link
-          to="/locations/$id"
-          params={{ id: booking.billboardId }}
-          className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-gold hover:underline"
-        >
-          <MapPin className="h-3.5 w-3.5" /> View billboard
-        </Link>
+        <div className="mt-4 flex items-center gap-4">
+          <Link
+            to="/locations/$id"
+            params={{ id: booking.billboardId }}
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-gold hover:underline"
+          >
+            <MapPin className="h-3.5 w-3.5" /> View billboard
+          </Link>
+          {invoices && invoices.length > 0 && (
+            <Link
+              to="/invoices/$bookingId"
+              params={{ bookingId: booking.id }}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-gold hover:underline"
+            >
+              <Receipt className="h-3.5 w-3.5" /> View Invoices ({invoices.length})
+            </Link>
+          )}
+        </div>
       </div>
     </article>
   );

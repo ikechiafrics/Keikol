@@ -137,6 +137,9 @@
 @utility shadow-glow {
   box-shadow: var(--shadow-glow);
 }
+@utility shadow-glow-soft {
+  box-shadow: 0 0 60px -10px oklch(0.68 0.18 250 / 0.2);
+}
 @utility shadow-gold {
   box-shadow: var(--shadow-gold);
 }

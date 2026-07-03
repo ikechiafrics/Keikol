@@ -19,11 +19,12 @@ service cloud.firestore {
                     && request.auth.uid == request.resource.data.userId
                     && request.resource.data.status == "pending_payment";
 
-      // Only admins can update a booking after creation, and only its status —
-      // the app has no customer-facing "edit my booking" UI, so there is no
-      // legitimate case for the owner to write to their own booking post-create.
+      // Only admins can update a booking after creation, and only its status
+      // or contract amount — the app has no customer-facing "edit my
+      // booking" UI, so there is no legitimate case for the owner to write
+      // to their own booking post-create.
       allow update: if isAdmin()
-                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "updatedAt"])
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "updatedAt", "contractAmount"])
                     && request.resource.data.status in ["pending_payment", "under_review", "confirmed", "cancelled"];
 
       allow delete: if false;
@@ -48,6 +49,18 @@ service cloud.firestore {
       allow read: if true;
       allow create, update: if isAdmin();
       allow delete: if isAdmin();
+    }
+
+    // Invoices are manually created/managed by admins only (no payment
+    // gateway — amounts and paid/unpaid status are recorded by hand). Every
+    // invoice for a given bookingId shares that booking's userId, so a
+    // customer's query for their own booking's invoices always satisfies
+    // this read rule for every result, and is denied outright for anyone
+    // else's booking.
+    match /invoices/{invoiceId} {
+      allow read: if isSignedIn()
+                  && (request.auth.uid == resource.data.userId || isAdmin());
+      allow create, update, delete: if isAdmin();
     }
 
     // Quote requests are submitted anonymously from /contact — there is no

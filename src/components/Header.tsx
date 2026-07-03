@@ -46,7 +46,7 @@ export function Header() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
+      className={`print:hidden fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
         scrolled
           ? "border-b border-border/60 bg-background/80 backdrop-blur-xl"
           : "bg-background/40 backdrop-blur-md"
@@ -126,7 +126,9 @@ export function Header() {
                 onClick={() => setOpen(false)}
                 activeOptions={{ exact: l.to === "/" }}
                 activeProps={{ className: "bg-surface text-foreground" }}
-                inactiveProps={{ className: "text-muted-foreground hover:bg-surface hover:text-foreground" }}
+                inactiveProps={{
+                  className: "text-muted-foreground hover:bg-surface hover:text-foreground",
+                }}
                 className="rounded-lg px-3 py-3 text-sm font-medium"
               >
                 {l.label}
