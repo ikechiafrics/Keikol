@@ -1,4 +1,5 @@
 export { Section } from "./Section";
+export { Reveal } from "./Reveal";
 export { SectionHeader } from "./SectionHeader";
 export { PageHero } from "./PageHero";
 export { CTASection } from "./CTASection";

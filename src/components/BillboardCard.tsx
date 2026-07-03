@@ -3,6 +3,8 @@ import { ChevronRight, Eye, MapPin, Ruler } from "lucide-react";
 import type { Billboard } from "@/data/billboards";
 import type { StatusBadgeClasses } from "@/lib/status-badge";
 import { useConfirmedWindows, getEffectiveAvailability } from "@/lib/billboard-availability";
+import { useImageLoaded } from "@/lib/use-image-loaded";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const AVAILABILITY_CLASSES: Record<Billboard["availability"], StatusBadgeClasses> = {
   Available: { dot: "bg-accent", text: "text-accent", bg: "bg-accent/20" },
@@ -24,6 +26,7 @@ export function BillboardCard({
   const { data: windows } = useConfirmedWindows();
   const availability = getEffectiveAvailability(b, windows ?? []);
   const s = AVAILABILITY_CLASSES[availability];
+  const { loaded, onLoad, imgRef } = useImageLoaded();
   return (
     <article
       onClick={onSelect}
@@ -32,11 +35,14 @@ export function BillboardCard({
       }`}
     >
       <div className="relative aspect-[4/3] overflow-hidden">
+        {!loaded && <Skeleton className="absolute inset-0 rounded-none" />}
         <img
+          ref={imgRef}
           src={b.image}
           alt={`${b.billboardType} in ${b.area}, ${b.city}`}
           loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+          onLoad={onLoad}
+          className={`h-full w-full object-cover transition-all duration-700 group-hover:scale-105 ${loaded ? "opacity-100" : "opacity-0"}`}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
         <span

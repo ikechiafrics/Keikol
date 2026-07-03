@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 
 import { Section, SectionHeader } from "@/components";
+import { Skeleton } from "@/components/ui/skeleton";
 import { db } from "@/lib/firebase";
 import { useBillboards } from "@/lib/billboards-data";
 import type { Billboard } from "@/data/billboards";
@@ -55,7 +56,11 @@ function AdminBillboardsPage() {
         <SectionHeader
           align="left"
           eyebrow="Admin"
-          title={<>Manage <span className="text-gradient-gold">Billboards</span></>}
+          title={
+            <>
+              Manage <span className="text-gradient-gold">Billboards</span>
+            </>
+          }
           subtitle="Add, edit, or remove billboard inventory shown across the site."
         />
         <Link
@@ -67,10 +72,18 @@ function AdminBillboardsPage() {
       </div>
 
       <div className="mt-10 overflow-x-auto rounded-2xl bg-card-premium shadow-elegant ring-hairline">
-        {isLoading && <p className="p-6 text-sm text-muted-foreground">Loading billboards…</p>}
+        {isLoading && (
+          <div className="space-y-3 p-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-14 w-full" />
+            ))}
+          </div>
+        )}
 
         {!isLoading && (!billboards || billboards.length === 0) && (
-          <p className="p-6 text-sm text-muted-foreground">No billboards yet. Click "Add Billboard" to create one.</p>
+          <p className="p-6 text-sm text-muted-foreground">
+            No billboards yet. Click "Add Billboard" to create one.
+          </p>
         )}
 
         {!isLoading && billboards && billboards.length > 0 && (
@@ -90,14 +103,20 @@ function AdminBillboardsPage() {
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       {b.image ? (
-                        <img src={b.image} alt={b.area} className="h-12 w-16 flex-none rounded-lg object-cover" />
+                        <img
+                          src={b.image}
+                          alt={b.area}
+                          className="h-12 w-16 flex-none rounded-lg object-cover"
+                        />
                       ) : (
                         <div className="grid h-12 w-16 flex-none place-items-center rounded-lg bg-surface text-muted-foreground">
                           <ImageOff className="h-4 w-4" />
                         </div>
                       )}
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-gold">{b.city}</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-gold">
+                          {b.city}
+                        </p>
                         <p className="font-semibold">{b.area}</p>
                       </div>
                     </div>
@@ -129,12 +148,16 @@ function AdminBillboardsPage() {
         )}
       </div>
 
-      <AlertDialog open={pendingDelete !== null} onOpenChange={(open) => !open && setPendingDelete(null)}>
+      <AlertDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => !open && setPendingDelete(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete "{pendingDelete?.area}"?</AlertDialogTitle>
             <AlertDialogDescription>
-              This permanently removes the billboard from the site. Past bookings for it are unaffected. This can't be undone.
+              This permanently removes the billboard from the site. Past bookings for it are
+              unaffected. This can't be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

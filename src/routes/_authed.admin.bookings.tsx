@@ -5,6 +5,7 @@ import { Paperclip } from "lucide-react";
 import { toast } from "sonner";
 
 import { Section, SectionHeader } from "@/components";
+import { Skeleton } from "@/components/ui/skeleton";
 import { db } from "@/lib/firebase";
 import { useBookings } from "@/lib/bookings-data";
 import { BOOKING_STATUS_CLASSES, type Booking } from "@/lib/booking-types";
@@ -17,7 +18,12 @@ export const Route = createFileRoute("/_authed/admin/bookings")({
   component: AdminBookingsPage,
 });
 
-const STATUS_OPTIONS: BookingStatus[] = ["pending_payment", "under_review", "confirmed", "cancelled"];
+const STATUS_OPTIONS: BookingStatus[] = [
+  "pending_payment",
+  "under_review",
+  "confirmed",
+  "cancelled",
+];
 
 async function updateBookingStatus(booking: Booking, status: BookingStatus) {
   const batch = writeBatch(db);
@@ -62,12 +68,22 @@ function AdminBookingsPage() {
       <SectionHeader
         align="left"
         eyebrow="Admin"
-        title={<>All <span className="text-gradient-gold">Bookings</span></>}
+        title={
+          <>
+            All <span className="text-gradient-gold">Bookings</span>
+          </>
+        }
         subtitle="Review campaign bookings across all customers and update their status."
       />
 
       <div className="mt-10 overflow-x-auto rounded-2xl bg-card-premium shadow-elegant ring-hairline">
-        {isLoading && <p className="p-6 text-sm text-muted-foreground">Loading bookings…</p>}
+        {isLoading && (
+          <div className="space-y-3 p-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-14 w-full" />
+            ))}
+          </div>
+        )}
 
         {!isLoading && (!bookings || bookings.length === 0) && (
           <p className="p-6 text-sm text-muted-foreground">No bookings yet.</p>
@@ -100,24 +116,36 @@ function AdminBookingsPage() {
                       )}
                     </td>
                     <td className="px-5 py-4">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-gold">{b.billboardSnapshot.city}</p>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gold">
+                        {b.billboardSnapshot.city}
+                      </p>
                       <p>{b.billboardSnapshot.area}</p>
-                      <p className="text-xs text-muted-foreground">{b.billboardSnapshot.billboardType}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {b.billboardSnapshot.billboardType}
+                      </p>
                     </td>
-                    <td className="px-5 py-4 text-muted-foreground">{b.startDate} – {b.endDate}</td>
+                    <td className="px-5 py-4 text-muted-foreground">
+                      {b.startDate} – {b.endDate}
+                    </td>
                     <td className="px-5 py-4 text-muted-foreground">{b.budget}</td>
                     <td className="px-5 py-4">
-                      <span className={`mb-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${s.bg} ${s.text}`}>
+                      <span
+                        className={`mb-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${s.bg} ${s.text}`}
+                      >
                         <span className={`h-1.5 w-1.5 rounded-full ${s.dot}`} /> {s.label}
                       </span>
                       <select
                         value={b.status}
                         disabled={isSaving}
-                        onChange={(e) => mutation.mutate({ booking: b, status: e.target.value as BookingStatus })}
+                        onChange={(e) =>
+                          mutation.mutate({ booking: b, status: e.target.value as BookingStatus })
+                        }
                         className="block w-full appearance-none rounded-lg border border-border bg-background/60 px-3 py-2 text-xs focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30 disabled:opacity-60"
                       >
                         {STATUS_OPTIONS.map((opt) => (
-                          <option key={opt} value={opt}>{BOOKING_STATUS_CLASSES[opt].label}</option>
+                          <option key={opt} value={opt}>
+                            {BOOKING_STATUS_CLASSES[opt].label}
+                          </option>
                         ))}
                       </select>
                     </td>

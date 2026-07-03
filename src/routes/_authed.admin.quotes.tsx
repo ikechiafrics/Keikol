@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 
 import { Section, SectionHeader } from "@/components";
+import { Skeleton } from "@/components/ui/skeleton";
 import { db } from "@/lib/firebase";
 import { useQuoteRequests } from "@/lib/quotes-data";
 import { QUOTE_STATUS_CLASSES, type QuoteRequest } from "@/lib/quote-types";
@@ -45,7 +46,8 @@ function AdminQuotesPage() {
   const { data: quotes, isLoading } = useQuoteRequests();
 
   const statusMutation = useMutation({
-    mutationFn: ({ quote, status }: { quote: QuoteRequest; status: QuoteStatus }) => updateQuoteStatus(quote, status),
+    mutationFn: ({ quote, status }: { quote: QuoteRequest; status: QuoteStatus }) =>
+      updateQuoteStatus(quote, status),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-quotes"] }),
     onError: () => toast.error("Couldn't update this quote's status. Please try again."),
   });
@@ -65,12 +67,22 @@ function AdminQuotesPage() {
       <SectionHeader
         align="left"
         eyebrow="Admin"
-        title={<>Manage <span className="text-gradient-gold">Quote Requests</span></>}
+        title={
+          <>
+            Manage <span className="text-gradient-gold">Quote Requests</span>
+          </>
+        }
         subtitle="Review and follow up on billboard advertising quote requests submitted from the site."
       />
 
       <div className="mt-10 overflow-x-auto rounded-2xl bg-card-premium shadow-elegant ring-hairline">
-        {isLoading && <p className="p-6 text-sm text-muted-foreground">Loading quote requests…</p>}
+        {isLoading && (
+          <div className="space-y-3 p-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-14 w-full" />
+            ))}
+          </div>
+        )}
 
         {!isLoading && (!quotes || quotes.length === 0) && (
           <p className="p-6 text-sm text-muted-foreground">No quote requests yet.</p>
@@ -99,7 +111,9 @@ function AdminQuotesPage() {
                     </td>
                     <td className="px-5 py-4">
                       <p className="font-semibold">{qte.name}</p>
-                      {qte.company && <p className="text-xs text-muted-foreground">{qte.company}</p>}
+                      {qte.company && (
+                        <p className="text-xs text-muted-foreground">{qte.company}</p>
+                      )}
                       <p className="text-xs text-muted-foreground">{qte.email}</p>
                       <p className="text-xs text-muted-foreground">{qte.phone}</p>
                     </td>
@@ -113,19 +127,31 @@ function AdminQuotesPage() {
                       <p className="text-xs">{qte.goal}</p>
                     </td>
                     <td className="max-w-xs px-5 py-4">
-                      <p className="line-clamp-3 text-muted-foreground" title={qte.message}>{qte.message}</p>
+                      <p className="line-clamp-3 text-muted-foreground" title={qte.message}>
+                        {qte.message}
+                      </p>
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-2">
                         <span className={`inline-block h-1.5 w-1.5 rounded-full ${classes.dot}`} />
                         <select
                           value={qte.status}
-                          disabled={statusMutation.isPending && statusMutation.variables?.quote.id === qte.id}
-                          onChange={(e) => statusMutation.mutate({ quote: qte, status: e.target.value as QuoteStatus })}
+                          disabled={
+                            statusMutation.isPending &&
+                            statusMutation.variables?.quote.id === qte.id
+                          }
+                          onChange={(e) =>
+                            statusMutation.mutate({
+                              quote: qte,
+                              status: e.target.value as QuoteStatus,
+                            })
+                          }
                           className={`rounded-lg border border-border bg-background/60 px-2 py-1 text-xs font-semibold ${classes.text}`}
                         >
                           {STATUS_OPTIONS.map((s) => (
-                            <option key={s} value={s}>{QUOTE_STATUS_CLASSES[s].label}</option>
+                            <option key={s} value={s}>
+                              {QUOTE_STATUS_CLASSES[s].label}
+                            </option>
                           ))}
                         </select>
                       </div>
@@ -146,12 +172,16 @@ function AdminQuotesPage() {
         )}
       </div>
 
-      <AlertDialog open={pendingDelete !== null} onOpenChange={(open) => !open && setPendingDelete(null)}>
+      <AlertDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => !open && setPendingDelete(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete quote request from "{pendingDelete?.name}"?</AlertDialogTitle>
             <AlertDialogDescription>
-              This permanently removes the quote request. Use this to clear spam or duplicate submissions. This can't be undone.
+              This permanently removes the quote request. Use this to clear spam or duplicate
+              submissions. This can't be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

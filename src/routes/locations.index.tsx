@@ -1,21 +1,32 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, lazy, Suspense } from "react";
 import {
-  ArrowRight, Filter, MapPin, Search, Target, Clock, Users, Compass,
-  Map as MapIcon, LayoutGrid, X, ChevronLeft, ChevronRight, Eye, Ruler,
-  Calendar as CalIcon, Landmark,
+  ArrowRight,
+  Filter,
+  MapPin,
+  Search,
+  Target,
+  Clock,
+  Users,
+  Compass,
+  Map as MapIcon,
+  LayoutGrid,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  Ruler,
+  Calendar as CalIcon,
+  Landmark,
 } from "lucide-react";
 
 import { PageHero, Section, SectionHeader, CTASection } from "@/components";
 import { BillboardCard } from "@/components/BillboardCard";
-import {
-  AVAILABILITIES,
-  INDUSTRY_FILTERS,
-  heroImg,
-  type Billboard,
-} from "@/data/billboards";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AVAILABILITIES, INDUSTRY_FILTERS, heroImg, type Billboard } from "@/data/billboards";
 import { useConfirmedWindows, getEffectiveAvailability } from "@/lib/billboard-availability";
 import { useBillboards } from "@/lib/billboards-data";
+import { useImageLoaded } from "@/lib/use-image-loaded";
 
 export const Route = createFileRoute("/locations/")({
   head: () => ({
@@ -29,7 +40,8 @@ export const Route = createFileRoute("/locations/")({
       { property: "og:title", content: "Billboard Locations — Interactive Map | Keikol" },
       {
         property: "og:description",
-        content: "Interactive map, filters, traffic estimates, photos, and availability for Keikol billboards.",
+        content:
+          "Interactive map, filters, traffic estimates, photos, and availability for Keikol billboards.",
       },
       { property: "og:url", content: "/locations" },
       { property: "og:image", content: heroImg },
@@ -57,7 +69,7 @@ function LocationsPage() {
   useEffect(() => setMounted(true), []);
 
   const { data: windows } = useConfirmedWindows();
-  const { data: billboards } = useBillboards();
+  const { data: billboards, isLoading: billboardsLoading } = useBillboards();
 
   // Derived live from actual inventory, not a hardcoded guess — only ever
   // offers filter options that have at least one real billboard right now.
@@ -93,18 +105,28 @@ function LocationsPage() {
     });
   }, [q, city, type, avail, industry, windows, billboards]);
 
-  const selected = selectedId ? (billboards ?? []).find((b) => b.id === selectedId) ?? null : null;
+  const selected = selectedId
+    ? ((billboards ?? []).find((b) => b.id === selectedId) ?? null)
+    : null;
   const hasFilters = q || city !== "All" || type !== "All" || avail !== "All" || industry !== "All";
 
   function clearFilters() {
-    setQ(""); setCity("All"); setType("All"); setAvail("All"); setIndustry("All");
+    setQ("");
+    setCity("All");
+    setType("All");
+    setAvail("All");
+    setIndustry("All");
   }
 
   return (
     <>
       <PageHero
         eyebrow="Billboard Locations"
-        title={<>Explore Premium <span className="text-gradient-gold">Billboard Locations</span></>}
+        title={
+          <>
+            Explore Premium <span className="text-gradient-gold">Billboard Locations</span>
+          </>
+        }
         subtitle="Browse Keikol's inventory on an interactive map, filter by city or industry, and tap any pin to see photos, traffic, and availability."
         image={heroImg}
       />
@@ -130,8 +152,18 @@ function LocationsPage() {
             </label>
             <Select value={city} onChange={setCity} options={cityOptions} label="City" />
             <Select value={type} onChange={setType} options={typeOptions} label="Type" />
-            <Select value={avail} onChange={(v) => setAvail(v as typeof avail)} options={AVAILABILITIES} label="Availability" />
-            <Select value={industry} onChange={(v) => setIndustry(v as typeof industry)} options={INDUSTRY_FILTERS} label="Industry" />
+            <Select
+              value={avail}
+              onChange={(v) => setAvail(v as typeof avail)}
+              options={AVAILABILITIES}
+              label="Availability"
+            />
+            <Select
+              value={industry}
+              onChange={(v) => setIndustry(v as typeof industry)}
+              options={INDUSTRY_FILTERS}
+              label="Industry"
+            />
           </div>
           <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
             <span>
@@ -152,7 +184,11 @@ function LocationsPage() {
             <div className="relative isolate h-[360px] overflow-hidden rounded-2xl bg-card-premium shadow-elegant ring-hairline sm:h-[560px]">
               {mounted ? (
                 <Suspense fallback={<MapPlaceholder />}>
-                  <BillboardMap billboards={filtered} selectedId={selectedId} onSelect={setSelectedId} />
+                  <BillboardMap
+                    billboards={filtered}
+                    selectedId={selectedId}
+                    onSelect={setSelectedId}
+                  />
                 </Suspense>
               ) : (
                 <MapPlaceholder />
@@ -170,18 +206,21 @@ function LocationsPage() {
             {/* Compact side list */}
             <aside className="max-h-[560px] overflow-y-auto rounded-2xl bg-card-premium p-3 shadow-elegant ring-hairline">
               <p className="px-2 pb-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                {filtered.length} matching billboards
+                {billboardsLoading ? "Loading…" : `${filtered.length} matching billboards`}
               </p>
               <div className="grid gap-2">
-                {filtered.map((b) => (
-                  <ResultCard
-                    key={b.id}
-                    b={b}
-                    active={selectedId === b.id}
-                    onClick={() => setSelectedId(b.id)}
-                  />
-                ))}
-                {filtered.length === 0 && (
+                {billboardsLoading &&
+                  Array.from({ length: 4 }).map((_, i) => <ResultCardSkeleton key={i} />)}
+                {!billboardsLoading &&
+                  filtered.map((b) => (
+                    <ResultCard
+                      key={b.id}
+                      b={b}
+                      active={selectedId === b.id}
+                      onClick={() => setSelectedId(b.id)}
+                    />
+                  ))}
+                {!billboardsLoading && filtered.length === 0 && (
                   <EmptyState onClear={clearFilters} />
                 )}
               </div>
@@ -193,9 +232,11 @@ function LocationsPage() {
         {view === "grid" && (
           <>
             <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {filtered.map((b) => <BillboardCard key={b.id} b={b} />)}
+              {billboardsLoading &&
+                Array.from({ length: 6 }).map((_, i) => <BillboardCardSkeleton key={i} />)}
+              {!billboardsLoading && filtered.map((b) => <BillboardCard key={b.id} b={b} />)}
             </div>
-            {filtered.length === 0 && (
+            {!billboardsLoading && filtered.length === 0 && (
               <div className="mt-10">
                 <EmptyState onClear={clearFilters} />
               </div>
@@ -208,16 +249,39 @@ function LocationsPage() {
       <Section tone="surface">
         <SectionHeader
           eyebrow="Guidance"
-          title={<>How to choose the <span className="text-gradient-gold">right billboard.</span></>}
+          title={
+            <>
+              How to choose the <span className="text-gradient-gold">right billboard.</span>
+            </>
+          }
         />
         <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { icon: Users, title: "Audience Fit", body: "Choose locations where your target customers live, work, or commute." },
-            { icon: Target, title: "Traffic Volume", body: "High-traffic roads can improve daily visibility and campaign reach." },
-            { icon: Compass, title: "Campaign Objective", body: "Brand awareness, product launches, and retail campaigns each need a different placement." },
-            { icon: Clock, title: "Duration & Timing", body: "Longer campaigns can improve brand recall and customer familiarity." },
+            {
+              icon: Users,
+              title: "Audience Fit",
+              body: "Choose locations where your target customers live, work, or commute.",
+            },
+            {
+              icon: Target,
+              title: "Traffic Volume",
+              body: "High-traffic roads can improve daily visibility and campaign reach.",
+            },
+            {
+              icon: Compass,
+              title: "Campaign Objective",
+              body: "Brand awareness, product launches, and retail campaigns each need a different placement.",
+            },
+            {
+              icon: Clock,
+              title: "Duration & Timing",
+              body: "Longer campaigns can improve brand recall and customer familiarity.",
+            },
           ].map(({ icon: Icon, title, body }) => (
-            <div key={title} className="rounded-2xl bg-card-premium p-6 shadow-elegant ring-hairline">
+            <div
+              key={title}
+              className="rounded-2xl bg-card-premium p-6 shadow-elegant ring-hairline"
+            >
               <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-electric text-accent-foreground">
                 <Icon className="h-5 w-5" />
               </div>
@@ -229,7 +293,11 @@ function LocationsPage() {
       </Section>
 
       <CTASection
-        headline={<>Need help choosing the <span className="text-gradient-gold">right location?</span></>}
+        headline={
+          <>
+            Need help choosing the <span className="text-gradient-gold">right location?</span>
+          </>
+        }
         subheadline="Tell us about your campaign goals and the Keikol team will recommend the best billboard placements for your brand."
       />
 
@@ -242,7 +310,8 @@ function LocationsPage() {
 /* ---------- Sub-components ---------- */
 
 function ViewToggle({ view, setView }: { view: View; setView: (v: View) => void }) {
-  const base = "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors";
+  const base =
+    "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors";
   return (
     <div className="inline-flex rounded-xl border border-border bg-background/60 p-1">
       <button
@@ -287,7 +356,9 @@ function EmptyState({ onClear }: { onClear: () => void }) {
     <div className="rounded-2xl border border-border bg-surface/40 p-8 text-center">
       <MapPin className="mx-auto h-8 w-8 text-muted-foreground" />
       <p className="mt-3 font-display font-bold">No billboards match your filters</p>
-      <p className="mt-1 text-xs text-muted-foreground">Try clearing the filters or contact us for a tailored recommendation.</p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Try clearing the filters or contact us for a tailored recommendation.
+      </p>
       <button
         onClick={onClear}
         className="mt-4 inline-flex items-center gap-2 rounded-full bg-gold px-4 py-2 text-sm font-semibold text-primary-foreground shadow-gold"
@@ -298,7 +369,16 @@ function EmptyState({ onClear }: { onClear: () => void }) {
   );
 }
 
-function ResultCard({ b, active, onClick }: { b: Billboard; active: boolean; onClick: () => void }) {
+function ResultCard({
+  b,
+  active,
+  onClick,
+}: {
+  b: Billboard;
+  active: boolean;
+  onClick: () => void;
+}) {
+  const { loaded, onLoad, imgRef } = useImageLoaded();
   return (
     <button
       onClick={onClick}
@@ -306,7 +386,16 @@ function ResultCard({ b, active, onClick }: { b: Billboard; active: boolean; onC
         active ? "outline outline-2 outline-gold" : ""
       }`}
     >
-      <img src={b.image} alt={b.area} className="h-20 w-24 flex-none rounded-lg object-cover" />
+      <div className="relative h-20 w-24 flex-none overflow-hidden rounded-lg">
+        {!loaded && <Skeleton className="absolute inset-0 rounded-none" />}
+        <img
+          ref={imgRef}
+          src={b.image}
+          alt={b.area}
+          onLoad={onLoad}
+          className={`h-full w-full object-cover ${loaded ? "opacity-100" : "opacity-0"}`}
+        />
+      </div>
       <div className="flex flex-1 flex-col justify-between py-0.5 pr-1">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-wider text-gold">{b.city}</p>
@@ -314,7 +403,10 @@ function ResultCard({ b, active, onClick }: { b: Billboard; active: boolean; onC
           <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">{b.billboardType}</p>
         </div>
         <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
-          <span className="inline-flex items-center gap-1"><Eye className="h-3 w-3 text-accent" />{b.estimatedDailyImpressions}</span>
+          <span className="inline-flex items-center gap-1">
+            <Eye className="h-3 w-3 text-accent" />
+            {b.estimatedDailyImpressions}
+          </span>
           <span className="font-bold text-gold">{b.priceTier}</span>
         </div>
       </div>
@@ -322,10 +414,58 @@ function ResultCard({ b, active, onClick }: { b: Billboard; active: boolean; onC
   );
 }
 
+function ResultCardSkeleton() {
+  return (
+    <div className="flex items-stretch gap-3 rounded-xl bg-background/60 p-2 ring-hairline">
+      <Skeleton className="h-20 w-24 flex-none rounded-lg" />
+      <div className="flex-1 space-y-2 py-1">
+        <Skeleton className="h-2.5 w-12" />
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-3 w-16" />
+      </div>
+    </div>
+  );
+}
+
+function GalleryImage({ src, alt }: { src: string; alt: string }) {
+  const { loaded, onLoad, imgRef } = useImageLoaded();
+  return (
+    <>
+      {!loaded && <Skeleton className="absolute inset-0 rounded-none" />}
+      <img
+        ref={imgRef}
+        src={src}
+        alt={alt}
+        onLoad={onLoad}
+        className={`h-full w-full object-cover ${loaded ? "opacity-100" : "opacity-0"}`}
+      />
+    </>
+  );
+}
+
+function BillboardCardSkeleton() {
+  return (
+    <div className="overflow-hidden rounded-2xl bg-card-premium shadow-elegant ring-hairline">
+      <Skeleton className="aspect-[4/3] w-full rounded-none" />
+      <div className="space-y-2 p-5">
+        <Skeleton className="h-3 w-16" />
+        <Skeleton className="h-5 w-32" />
+        <Skeleton className="h-3 w-40" />
+      </div>
+    </div>
+  );
+}
+
 function Select({
-  value, onChange, options, label,
+  value,
+  onChange,
+  options,
+  label,
 }: {
-  value: string; onChange: (v: string) => void; options: readonly string[]; label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: readonly string[];
+  label: string;
 }) {
   return (
     <label className="block">
@@ -336,7 +476,9 @@ function Select({
         className="w-full appearance-none rounded-xl border border-border bg-background/60 px-3 py-3 text-sm focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30"
       >
         {options.map((o) => (
-          <option key={o} value={o}>{label}: {o}</option>
+          <option key={o} value={o}>
+            {label}: {o}
+          </option>
         ))}
       </select>
     </label>
@@ -346,9 +488,11 @@ function Select({
 /* ---------- Slide-in Details Sidebar ---------- */
 
 function DetailsSidebar({
-  billboard, onClose,
+  billboard,
+  onClose,
 }: {
-  billboard: Billboard | null; onClose: () => void;
+  billboard: Billboard | null;
+  onClose: () => void;
 }) {
   // Keep the last-shown billboard rendered during the close animation so
   // content doesn't disappear before the sidebar has finished sliding out.
@@ -368,7 +512,9 @@ function DetailsSidebar({
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
@@ -402,7 +548,9 @@ function DetailsSidebar({
             {/* Sticky header with close button */}
             <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-border bg-background/95 px-5 py-3 backdrop-blur">
               <div className="min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-gold">{b.city}</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-gold">
+                  {b.city}
+                </p>
                 <p className="truncate font-display text-sm font-bold">{b.area}</p>
               </div>
               <button
@@ -417,15 +565,17 @@ function DetailsSidebar({
             <div className="flex-1 overflow-y-auto">
               {/* Gallery */}
               <div className="relative aspect-[16/10] w-full flex-none bg-surface">
-                <img
+                <GalleryImage
+                  key={imgIdx}
                   src={b.gallery[imgIdx]}
                   alt={`${b.area} — photo ${imgIdx + 1}`}
-                  className="h-full w-full object-cover"
                 />
                 {b.gallery.length > 1 && (
                   <>
                     <button
-                      onClick={() => setImgIdx((i) => (i - 1 + b.gallery.length) % b.gallery.length)}
+                      onClick={() =>
+                        setImgIdx((i) => (i - 1 + b.gallery.length) % b.gallery.length)
+                      }
                       className="absolute left-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-background/80 backdrop-blur hover:bg-background"
                       aria-label="Previous photo"
                     >
@@ -440,7 +590,10 @@ function DetailsSidebar({
                     </button>
                     <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
                       {b.gallery.map((_, i) => (
-                        <span key={i} className={`h-1.5 w-6 rounded-full ${i === imgIdx ? "bg-gold" : "bg-white/40"}`} />
+                        <span
+                          key={i}
+                          className={`h-1.5 w-6 rounded-full ${i === imgIdx ? "bg-gold" : "bg-white/40"}`}
+                        />
                       ))}
                     </div>
                   </>
@@ -472,8 +625,12 @@ function DetailsSidebar({
                   </h3>
                   <AvailabilityCalendar bookedDates={b.bookedDates} />
                   <div className="mt-2 flex items-center gap-4 text-[11px] text-muted-foreground">
-                    <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-accent" /> Open</span>
-                    <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-muted" /> Booked</span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-sm bg-accent" /> Open
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-sm bg-muted" /> Booked
+                    </span>
                   </div>
                 </div>
 
@@ -494,7 +651,10 @@ function DetailsSidebar({
                   <h3 className="font-display text-sm font-bold">Recommended for</h3>
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {b.recommendedIndustries.map((i) => (
-                      <span key={i} className="rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs text-muted-foreground">
+                      <span
+                        key={i}
+                        className="rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs text-muted-foreground"
+                      >
                         {i}
                       </span>
                     ))}
@@ -527,8 +687,16 @@ function DetailsSidebar({
   );
 }
 
-function Stat({ icon: Icon, label, value, valueClass = "" }: {
-  icon?: typeof Eye; label: string; value: string; valueClass?: string;
+function Stat({
+  icon: Icon,
+  label,
+  value,
+  valueClass = "",
+}: {
+  icon?: typeof Eye;
+  label: string;
+  value: string;
+  valueClass?: string;
 }) {
   return (
     <div className="text-center">
@@ -549,7 +717,11 @@ function AvailabilityCalendar({ bookedDates }: { bookedDates: string[] }) {
   const view = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth() + monthOffset, 1));
   const year = view.getUTCFullYear();
   const month = view.getUTCMonth();
-  const monthName = view.toLocaleString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
+  const monthName = view.toLocaleString("en-US", {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 
   const firstDay = new Date(Date.UTC(year, month, 1)).getUTCDay();
   const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
@@ -584,7 +756,9 @@ function AvailabilityCalendar({ bookedDates }: { bookedDates: string[] }) {
         </button>
       </div>
       <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-semibold text-muted-foreground">
-        {["S","M","T","W","T","F","S"].map((d, i) => <div key={i}>{d}</div>)}
+        {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
+          <div key={i}>{d}</div>
+        ))}
       </div>
       <div className="mt-1 grid grid-cols-7 gap-1">
         {cells.map((c, i) => (

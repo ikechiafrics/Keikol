@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Building2, CalendarClock, FileText } from "lucide-react";
 
 import { Section, SectionHeader } from "@/components";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useBillboards } from "@/lib/billboards-data";
 import { useBookings } from "@/lib/bookings-data";
 import { useQuoteRequests } from "@/lib/quotes-data";
@@ -40,11 +41,25 @@ function AdminOverviewPage() {
       <SectionHeader
         align="left"
         eyebrow="Admin"
-        title={<>Admin <span className="text-gradient-gold">Overview</span></>}
+        title={
+          <>
+            Admin <span className="text-gradient-gold">Overview</span>
+          </>
+        }
         subtitle="A quick snapshot of billboard inventory, quote requests, and bookings that need attention."
       />
 
-      {isLoading && <p className="mt-10 text-sm text-muted-foreground">Loading overview…</p>}
+      {isLoading && (
+        <div className="mt-10 grid gap-6 lg:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="rounded-2xl bg-card-premium p-6 shadow-elegant ring-hairline">
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="mt-4 h-9 w-16" />
+              <Skeleton className="mt-2 h-3 w-32" />
+            </div>
+          ))}
+        </div>
+      )}
 
       {!isLoading && (
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
@@ -70,7 +85,9 @@ function AdminOverviewPage() {
               </div>
               <div className="flex items-center justify-between px-3 py-1">
                 <dt className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                  <span className={`h-1.5 w-1.5 rounded-full ${QUOTE_STATUS_CLASSES.contacted.dot}`} />
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${QUOTE_STATUS_CLASSES.contacted.dot}`}
+                  />
                   {QUOTE_STATUS_CLASSES.contacted.label}
                 </dt>
                 <dd className="font-semibold">{quoteCounts.contacted}</dd>
@@ -92,28 +109,40 @@ function AdminOverviewPage() {
             <dl className="mt-4 space-y-3">
               <div className="flex items-center justify-between rounded-xl bg-gold/10 px-3 py-2 ring-1 ring-gold/30">
                 <dt className="flex items-center gap-1.5 text-sm font-semibold text-gold">
-                  <span className={`h-1.5 w-1.5 rounded-full ${BOOKING_STATUS_CLASSES.pending_payment.dot}`} />
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${BOOKING_STATUS_CLASSES.pending_payment.dot}`}
+                  />
                   {BOOKING_STATUS_CLASSES.pending_payment.label}
                 </dt>
-                <dd className="font-display text-xl font-extrabold text-gold">{bookingCounts.pending_payment}</dd>
+                <dd className="font-display text-xl font-extrabold text-gold">
+                  {bookingCounts.pending_payment}
+                </dd>
               </div>
               <div className="flex items-center justify-between rounded-xl bg-electric/10 px-3 py-2 ring-1 ring-electric-soft/30">
                 <dt className="flex items-center gap-1.5 text-sm font-semibold text-electric-soft">
-                  <span className={`h-1.5 w-1.5 rounded-full ${BOOKING_STATUS_CLASSES.under_review.dot}`} />
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${BOOKING_STATUS_CLASSES.under_review.dot}`}
+                  />
                   {BOOKING_STATUS_CLASSES.under_review.label}
                 </dt>
-                <dd className="font-display text-xl font-extrabold text-electric-soft">{bookingCounts.under_review}</dd>
+                <dd className="font-display text-xl font-extrabold text-electric-soft">
+                  {bookingCounts.under_review}
+                </dd>
               </div>
               <div className="flex items-center justify-between px-3 py-1">
                 <dt className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                  <span className={`h-1.5 w-1.5 rounded-full ${BOOKING_STATUS_CLASSES.confirmed.dot}`} />
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${BOOKING_STATUS_CLASSES.confirmed.dot}`}
+                  />
                   {BOOKING_STATUS_CLASSES.confirmed.label}
                 </dt>
                 <dd className="font-semibold">{bookingCounts.confirmed}</dd>
               </div>
               <div className="flex items-center justify-between px-3 py-1">
                 <dt className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                  <span className={`h-1.5 w-1.5 rounded-full ${BOOKING_STATUS_CLASSES.cancelled.dot}`} />
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${BOOKING_STATUS_CLASSES.cancelled.dot}`}
+                  />
                   {BOOKING_STATUS_CLASSES.cancelled.label}
                 </dt>
                 <dd className="font-semibold">{bookingCounts.cancelled}</dd>

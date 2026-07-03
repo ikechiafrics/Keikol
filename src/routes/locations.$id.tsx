@@ -27,9 +27,11 @@ import {
   SectionHeader,
   TagList,
 } from "@/components";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { Billboard } from "@/data/billboards";
 import { useConfirmedWindows, getEffectiveAvailability } from "@/lib/billboard-availability";
 import { fetchBillboardById, useBillboards } from "@/lib/billboards-data";
+import { useImageLoaded } from "@/lib/use-image-loaded";
 
 export const Route = createFileRoute("/locations/$id")({
   loader: async ({ params }) => ({ billboard: await fetchBillboardById(params.id) }),
@@ -106,11 +108,12 @@ function BillboardDetailPage() {
             ]}
           />
 
-
           <div className="mt-6 grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-center">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">{b.city}</p>
-              <h1 className="mt-3 font-display text-4xl font-extrabold tracking-tight sm:text-5xl">{b.area}</h1>
+              <h1 className="mt-3 font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
+                {b.area}
+              </h1>
               <p className="mt-3 inline-flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4" /> {b.landmark}
               </p>
@@ -150,7 +153,11 @@ function BillboardDetailPage() {
             </div>
             <div className="relative">
               <div className="overflow-hidden rounded-3xl bg-card-premium p-1 shadow-elegant ring-hairline">
-                <img src={b.image} alt={b.area} className="aspect-[4/3] w-full rounded-[1.35rem] object-cover" />
+                <img
+                  src={b.image}
+                  alt={b.area}
+                  className="aspect-[4/3] w-full rounded-[1.35rem] object-cover"
+                />
               </div>
             </div>
           </div>
@@ -162,7 +169,12 @@ function BillboardDetailPage() {
         <SectionHeader
           align="left"
           eyebrow="Key Details"
-          title={<>Everything you need to know about <span className="text-gradient-gold">this placement.</span></>}
+          title={
+            <>
+              Everything you need to know about{" "}
+              <span className="text-gradient-gold">this placement.</span>
+            </>
+          }
         />
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <DetailInfoCard icon={MapPin} label="City" value={b.city} />
@@ -170,8 +182,16 @@ function BillboardDetailPage() {
           <DetailInfoCard icon={Landmark} label="Landmark" value={b.landmark} />
           <DetailInfoCard icon={Megaphone} label="Billboard Type" value={b.billboardType} />
           <DetailInfoCard icon={Ruler} label="Size" value={b.size} />
-          <DetailInfoCard icon={Eye} label="Daily Impressions" value={b.estimatedDailyImpressions} />
-          <DetailInfoCard icon={CheckCircle2} label="Availability" value={availability ?? b.availability} />
+          <DetailInfoCard
+            icon={Eye}
+            label="Daily Impressions"
+            value={b.estimatedDailyImpressions}
+          />
+          <DetailInfoCard
+            icon={CheckCircle2}
+            label="Availability"
+            value={availability ?? b.availability}
+          />
           <DetailInfoCard icon={Wallet} label="Price Range" value={b.priceRange} />
           <DetailInfoCard icon={Sun} label="Lighting" value={b.lighting} />
         </div>
@@ -183,12 +203,15 @@ function BillboardDetailPage() {
           <SectionHeader
             align="left"
             eyebrow="About this placement"
-            title={<>Why brands choose <span className="text-gradient-gold">{b.area}.</span></>}
+            title={
+              <>
+                Why brands choose <span className="text-gradient-gold">{b.area}.</span>
+              </>
+            }
           />
           <div className="rounded-3xl bg-card-premium p-8 shadow-elegant ring-hairline">
             <p className="text-base leading-relaxed text-muted-foreground">{b.description}</p>
             <TagList items={b.tags} className="mt-6" />
-
           </div>
         </div>
       </Section>
@@ -199,18 +222,15 @@ function BillboardDetailPage() {
           <SectionHeader
             align="left"
             eyebrow="Gallery"
-            title={<>See <span className="text-gradient-gold">{b.area}</span> up close.</>}
+            title={
+              <>
+                See <span className="text-gradient-gold">{b.area}</span> up close.
+              </>
+            }
           />
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {b.gallery.map((src, i) => (
-              <div key={src} className="overflow-hidden rounded-2xl bg-card-premium shadow-elegant ring-hairline">
-                <img
-                  src={src}
-                  alt={`${b.area} — photo ${i + 1}`}
-                  loading="lazy"
-                  className="aspect-[4/3] w-full object-cover"
-                />
-              </div>
+              <GalleryPhoto key={src} src={src} alt={`${b.area} — photo ${i + 1}`} />
             ))}
           </div>
         </Section>
@@ -225,12 +245,7 @@ function BillboardDetailPage() {
             items={b.recommendedIndustries}
             accent="gold"
           />
-          <TagPanel
-            title="Best For"
-            icon={Target}
-            items={b.bestFor}
-            accent="electric"
-          />
+          <TagPanel title="Best For" icon={Target} items={b.bestFor} accent="electric" />
           <TagPanel
             title="Nearby Environment"
             icon={Landmark}
@@ -242,14 +257,36 @@ function BillboardDetailPage() {
 
       {/* Why this works */}
       <Section tone="surface">
-        <SectionHeader eyebrow="Why it works" title={<>Why this location <span className="text-gradient-gold">delivers.</span></>} />
+        <SectionHeader
+          eyebrow="Why it works"
+          title={
+            <>
+              Why this location <span className="text-gradient-gold">delivers.</span>
+            </>
+          }
+        />
         <div className="mt-14 grid gap-5 lg:grid-cols-3">
           {[
-            { icon: Eye, title: "High Daily Visibility", body: "This placement is designed to reach commuters, shoppers, professionals, and local traffic." },
-            { icon: TrendingUp, title: "Strong Brand Recall", body: "Repeated exposure helps customers remember your brand over time." },
-            { icon: Target, title: "Strategic Positioning", body: "The area is suitable for businesses that want credibility, awareness, and market presence." },
+            {
+              icon: Eye,
+              title: "High Daily Visibility",
+              body: "This placement is designed to reach commuters, shoppers, professionals, and local traffic.",
+            },
+            {
+              icon: TrendingUp,
+              title: "Strong Brand Recall",
+              body: "Repeated exposure helps customers remember your brand over time.",
+            },
+            {
+              icon: Target,
+              title: "Strategic Positioning",
+              body: "The area is suitable for businesses that want credibility, awareness, and market presence.",
+            },
           ].map(({ icon: Icon, title, body }) => (
-            <div key={title} className="rounded-2xl bg-card-premium p-6 shadow-elegant ring-hairline">
+            <div
+              key={title}
+              className="rounded-2xl bg-card-premium p-6 shadow-elegant ring-hairline"
+            >
               <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gold text-primary-foreground">
                 <Icon className="h-5 w-5" />
               </div>
@@ -284,7 +321,10 @@ function BillboardDetailPage() {
               "Avoid too much text or detail",
               "Design for quick readability from a distance",
             ].map((tip) => (
-              <li key={tip} className="flex items-start gap-3 rounded-2xl bg-card-premium p-4 shadow-elegant ring-hairline">
+              <li
+                key={tip}
+                className="flex items-start gap-3 rounded-2xl bg-card-premium p-4 shadow-elegant ring-hairline"
+              >
                 <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
                 <span className="text-sm">{tip}</span>
               </li>
@@ -294,12 +334,23 @@ function BillboardDetailPage() {
       </Section>
 
       {/* Related */}
-      <Section tone="surface">
-        <SectionHeader eyebrow="More Locations" title={<>You may also <span className="text-gradient-electric">consider these.</span></>} />
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {related.map((r) => <BillboardCard key={r.id} b={r} compact />)}
-        </div>
-      </Section>
+      {related.length > 0 && (
+        <Section tone="surface">
+          <SectionHeader
+            eyebrow="More Locations"
+            title={
+              <>
+                You may also <span className="text-gradient-electric">consider these.</span>
+              </>
+            }
+          />
+          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {related.map((r) => (
+              <BillboardCard key={r.id} b={r} compact />
+            ))}
+          </div>
+        </Section>
+      )}
 
       {/* Final CTA */}
       <Section>
@@ -312,7 +363,8 @@ function BillboardDetailPage() {
               Interested in <span className="text-gradient-gold">this billboard location?</span>
             </h2>
             <p className="mt-5 text-base text-muted-foreground sm:text-lg">
-              Send us your campaign details and the Keikol team will help you confirm availability, pricing, and next steps.
+              Send us your campaign details and the Keikol team will help you confirm availability,
+              pricing, and next steps.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link
@@ -343,6 +395,23 @@ function BillboardDetailPage() {
   );
 }
 
+function GalleryPhoto({ src, alt }: { src: string; alt: string }) {
+  const { loaded, onLoad, imgRef } = useImageLoaded();
+  return (
+    <div className="relative overflow-hidden rounded-2xl bg-card-premium shadow-elegant ring-hairline">
+      {!loaded && <Skeleton className="absolute inset-0 rounded-none" />}
+      <img
+        ref={imgRef}
+        src={src}
+        alt={alt}
+        loading="lazy"
+        onLoad={onLoad}
+        className={`aspect-[4/3] w-full object-cover ${loaded ? "opacity-100" : "opacity-0"}`}
+      />
+    </div>
+  );
+}
+
 function DetailInfoCard({
   icon: Icon,
   label,
@@ -358,7 +427,9 @@ function DetailInfoCard({
         <Icon className="h-5 w-5" />
       </span>
       <div className="min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{label}</p>
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+          {label}
+        </p>
         <p className="mt-1 text-sm font-semibold">{value}</p>
       </div>
     </div>
@@ -376,7 +447,8 @@ function TagPanel({
   items: string[];
   accent: "gold" | "electric";
 }) {
-  const accentClass = accent === "gold" ? "bg-gold text-primary-foreground" : "bg-electric text-accent-foreground";
+  const accentClass =
+    accent === "gold" ? "bg-gold text-primary-foreground" : "bg-electric text-accent-foreground";
   return (
     <div className="rounded-2xl bg-card-premium p-6 shadow-elegant ring-hairline">
       <div className="flex items-center gap-3">
@@ -386,7 +458,6 @@ function TagPanel({
         <h3 className="font-display text-base font-bold">{title}</h3>
       </div>
       <TagList items={items} className="mt-5" />
-
     </div>
   );
 }
@@ -401,13 +472,25 @@ function NotFoundState({ id }: { id: string }) {
         Billboard Location <span className="text-gradient-gold">Not Found</span>
       </h1>
       <p className="mt-4 text-base text-muted-foreground">
-        The billboard location you are looking for {id ? <>(<code className="text-foreground">{id}</code>)</> : null} may have been moved, renamed, or is no longer available.
+        The billboard location you are looking for{" "}
+        {id ? (
+          <>
+            (<code className="text-foreground">{id}</code>)
+          </>
+        ) : null}{" "}
+        may have been moved, renamed, or is no longer available.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
-        <Link to="/locations" className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-6 py-3 text-sm font-semibold hover:border-accent hover:text-accent">
+        <Link
+          to="/locations"
+          className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-6 py-3 text-sm font-semibold hover:border-accent hover:text-accent"
+        >
           <ArrowLeft className="h-4 w-4" /> Back to Locations
         </Link>
-        <Link to="/contact" className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-primary-foreground shadow-gold">
+        <Link
+          to="/contact"
+          className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-primary-foreground shadow-gold"
+        >
           Request a Quote <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
