@@ -50,7 +50,6 @@ export function Footer() {
             links={[
               { label: "Home", to: "/" },
               { label: "Locations", to: "/locations" },
-              { label: "Industries", to: "/industries" },
               { label: "Campaign Ideas", to: "/portfolio" },
               { label: "About", to: "/about" },
               { label: "Contact", to: "/contact" },

@@ -1,14 +1,34 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, LayoutDashboard, LogOut, Menu, Shield, X } from "lucide-react";
+import {
+  ArrowRight,
+  ChevronDown,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Shield,
+  X,
+} from "lucide-react";
 
 import keikolMark from "@/assets/Logo.png";
 import { useAuth } from "@/lib/auth-context";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+// Grouped under one "Services" nav item rather than each living at the top
+// level — keeps the nav from growing a new flat link every time a service is
+// added (billboards, photography today; more media lines later).
+const SERVICES = [
+  { label: "Billboards", to: "/locations" },
+  { label: "Photography & Videography", to: "/photographers" },
+] as const;
 
 const NAV_LINKS = [
   { label: "Home", to: "/" },
-  { label: "Locations", to: "/locations" },
-  { label: "Industries", to: "/industries" },
   { label: "About", to: "/about" },
   { label: "Contact", to: "/contact" },
 ] as const;
@@ -55,11 +75,35 @@ export function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
         <Logo />
         <nav className="hidden items-center gap-7 lg:flex">
-          {NAV_LINKS.map((l) => (
+          <Link
+            to="/"
+            activeOptions={{ exact: true }}
+            activeProps={{ className: "text-foreground" }}
+            inactiveProps={{ className: "text-muted-foreground hover:text-foreground" }}
+            className="text-sm font-medium transition-colors"
+          >
+            Home
+          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus:outline-none data-[state=open]:text-foreground">
+              Services <ChevronDown className="h-3.5 w-3.5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {SERVICES.map((s) => (
+                <DropdownMenuItem
+                  key={s.to}
+                  asChild
+                  className="cursor-pointer focus:bg-gold/10 focus:text-gold"
+                >
+                  <Link to={s.to}>{s.label}</Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {NAV_LINKS.slice(1).map((l) => (
             <Link
               key={l.to}
               to={l.to}
-              activeOptions={{ exact: l.to === "/" }}
               activeProps={{ className: "text-foreground" }}
               inactiveProps={{ className: "text-muted-foreground hover:text-foreground" }}
               className="text-sm font-medium transition-colors"
@@ -84,7 +128,7 @@ export function Header() {
                 className="group inline-flex items-center overflow-hidden rounded-full border border-border bg-surface/60 px-3 py-2.5 text-sm font-semibold transition-colors hover:border-gold hover:text-gold"
               >
                 <LayoutDashboard className="h-4 w-4 shrink-0" />
-                <span className="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-500 ease-out group-hover:ml-2 group-hover:max-w-xs">
+                <span className="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out group-hover:ml-2 group-hover:max-w-xs group-hover:duration-1000">
                   Dashboard
                 </span>
               </Link>
@@ -122,12 +166,40 @@ export function Header() {
       {open && (
         <div className="border-t border-border bg-background/95 backdrop-blur-xl lg:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-1 px-5 py-4">
-            {NAV_LINKS.map((l) => (
+            <Link
+              to="/"
+              onClick={() => setOpen(false)}
+              activeOptions={{ exact: true }}
+              activeProps={{ className: "bg-surface text-foreground" }}
+              inactiveProps={{
+                className: "text-muted-foreground hover:bg-surface hover:text-foreground",
+              }}
+              className="rounded-lg px-3 py-3 text-sm font-medium"
+            >
+              Home
+            </Link>
+            <p className="mt-2 px-3 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Services
+            </p>
+            {SERVICES.map((s) => (
+              <Link
+                key={s.to}
+                to={s.to}
+                onClick={() => setOpen(false)}
+                activeProps={{ className: "bg-surface text-foreground" }}
+                inactiveProps={{
+                  className: "text-muted-foreground hover:bg-surface hover:text-foreground",
+                }}
+                className="rounded-lg px-3 py-3 text-sm font-medium"
+              >
+                {s.label}
+              </Link>
+            ))}
+            {NAV_LINKS.slice(1).map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
                 onClick={() => setOpen(false)}
-                activeOptions={{ exact: l.to === "/" }}
                 activeProps={{ className: "bg-surface text-foreground" }}
                 inactiveProps={{
                   className: "text-muted-foreground hover:bg-surface hover:text-foreground",

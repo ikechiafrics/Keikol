@@ -292,6 +292,14 @@ function LocationsPage() {
             </div>
           ))}
         </div>
+        <div className="mt-10 text-center">
+          <Link
+            to="/industries"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-6 py-3 text-sm font-semibold transition-colors hover:border-gold hover:text-gold"
+          >
+            See Guidance by Industry <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
       </Section>
 
       <CTASection

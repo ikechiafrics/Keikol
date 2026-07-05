@@ -7,14 +7,14 @@ import { heroImg } from "@/data/billboards";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About Keikol — Modern Advertising & Media in Nigeria" },
+      { title: "About Keikol — A Modern Media Company" },
       {
         name: "description",
         content:
-          "Keikol Media Ltd is building a modern, transparent, and technology-driven outdoor advertising company in Nigeria.",
+          "Keikol Media Ltd is building a modern, transparent, technology-driven media company — spanning billboard advertising, photography, and videography.",
       },
       { property: "og:title", content: "About Keikol" },
-      { property: "og:description", content: "Building the future of outdoor advertising in Nigeria." },
+      { property: "og:description", content: "Building the future of modern media." },
       { property: "og:url", content: "/about" },
       { property: "og:image", content: heroImg },
     ],
@@ -56,8 +56,8 @@ function AboutPage() {
     <>
       <PageHero
         eyebrow="About Keikol"
-        title={<>Building the future of outdoor advertising in <span className="text-gradient-gold">Nigeria.</span></>}
-        subtitle="Keikol is a modern advertising and media brand created to make billboard advertising more accessible, transparent, and technology-driven."
+        title={<>Building the future of <span className="text-gradient-gold">modern media.</span></>}
+        subtitle="Keikol is a modern media brand created to help ambitious brands get seen — through premium advertising and creative services that are more accessible, transparent, and technology-driven."
       />
 
       <Section>
@@ -71,13 +71,13 @@ function AboutPage() {
             <div className="mt-6 space-y-5 text-base leading-relaxed text-muted-foreground">
               <p>
                 Keikol is the public-facing brand of <strong className="text-foreground">Keikol Media Ltd</strong>,
-                a modern advertising and media company focused on outdoor advertising, billboard placements,
-                digital media solutions, and future technology-driven campaign management.
+                a modern media company helping ambitious brands get seen — connecting them with the
+                right service for their campaign, and the right partner behind it.
               </p>
               <p>
-                The company is starting with billboard advertising and gradually building toward a smarter media
-                infrastructure platform that combines premium outdoor visibility with digital experiences,
-                analytics, automation, and AI-powered advertising tools.
+                The company is gradually building toward a smarter media infrastructure platform that
+                combines premium creative services with digital experiences, analytics, automation,
+                and AI-powered tools.
               </p>
             </div>
           </div>
@@ -114,7 +114,7 @@ function AboutPage() {
         />
         <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { icon: Eye, title: "Premium Media Placement", body: "We focus on high-visibility billboard locations that help brands get noticed." },
+            { icon: Eye, title: "Premium Media Placement", body: "We focus on high-visibility placements and creative work that help brands get noticed." },
             { icon: Users, title: "Better Customer Experience", body: "A smoother, clearer, and more professional advertising journey." },
             { icon: Sparkles, title: "Transparent Communication", body: "We want businesses to understand their options, campaign value, and next steps." },
             { icon: TrendingUp, title: "Future Technology Integration", body: "Our long-term roadmap includes digital booking, analytics, AI, automation, and smart infrastructure." },
