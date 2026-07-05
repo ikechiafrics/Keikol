@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   ArrowRight,
-  ChevronDown,
+  ChevronRight,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -12,12 +12,6 @@ import {
 
 import keikolMark from "@/assets/Logo.png";
 import { useAuth } from "@/lib/auth-context";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 // Grouped under one "Services" nav item rather than each living at the top
 // level — keeps the nav from growing a new flat link every time a service is
@@ -49,6 +43,7 @@ function Logo() {
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [servicesExpanded, setServicesExpanded] = useState(false);
   const { user, isAdmin, signOutUser } = useAuth();
   const navigate = useNavigate();
 
@@ -84,22 +79,31 @@ export function Header() {
           >
             Home
           </Link>
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus:outline-none data-[state=open]:text-foreground">
-              Services <ChevronDown className="h-3.5 w-3.5" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              {SERVICES.map((s) => (
-                <DropdownMenuItem
-                  key={s.to}
-                  asChild
-                  className="cursor-pointer focus:bg-gold/10 focus:text-gold"
-                >
-                  <Link to={s.to}>{s.label}</Link>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Pure CSS hover dropdown — no JS open/close state, so there's
+              nothing to race or flicker. The invisible padding bridge
+              (pt-2 on the panel wrapper) keeps the gap between trigger and
+              panel inside the same hoverable box, so moving the cursor
+              straight down from "Services" into the panel never exits the
+              group and re-triggers a hover-out. */}
+          <div className="group relative">
+            <button className="flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus:outline-none">
+              Services{" "}
+              <ChevronRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:rotate-90" />
+            </button>
+            <div className="invisible absolute left-0 top-full pt-2 opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+              <div className="min-w-[220px] rounded-xl border border-border bg-card-premium p-1.5 shadow-elegant ring-hairline">
+                {SERVICES.map((s) => (
+                  <Link
+                    key={s.to}
+                    to={s.to}
+                    className="block rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-gold/10 hover:text-gold"
+                  >
+                    {s.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
           {NAV_LINKS.slice(1).map((l) => (
             <Link
               key={l.to}
@@ -178,23 +182,33 @@ export function Header() {
             >
               Home
             </Link>
-            <p className="mt-2 px-3 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+            <button
+              onClick={() => setServicesExpanded((v) => !v)}
+              className="flex items-center justify-between rounded-lg px-3 py-3 text-sm font-medium text-muted-foreground hover:bg-surface hover:text-foreground"
+            >
               Services
-            </p>
-            {SERVICES.map((s) => (
-              <Link
-                key={s.to}
-                to={s.to}
-                onClick={() => setOpen(false)}
-                activeProps={{ className: "bg-surface text-foreground" }}
-                inactiveProps={{
-                  className: "text-muted-foreground hover:bg-surface hover:text-foreground",
-                }}
-                className="rounded-lg px-3 py-3 text-sm font-medium"
-              >
-                {s.label}
-              </Link>
-            ))}
+              <ChevronRight
+                className={`h-4 w-4 transition-transform duration-300 ${servicesExpanded ? "rotate-90" : ""}`}
+              />
+            </button>
+            {servicesExpanded && (
+              <div className="ml-2 flex flex-col gap-1 border-l border-border pl-3">
+                {SERVICES.map((s) => (
+                  <Link
+                    key={s.to}
+                    to={s.to}
+                    onClick={() => setOpen(false)}
+                    activeProps={{ className: "bg-surface text-foreground" }}
+                    inactiveProps={{
+                      className: "text-muted-foreground hover:bg-surface hover:text-foreground",
+                    }}
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium"
+                  >
+                    {s.label}
+                  </Link>
+                ))}
+              </div>
+            )}
             {NAV_LINKS.slice(1).map((l) => (
               <Link
                 key={l.to}
