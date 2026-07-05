@@ -13,6 +13,7 @@ const ADMIN_NAV_LINKS = [
   { label: "Overview", to: "/admin" },
   { label: "Bookings", to: "/admin/bookings" },
   { label: "Billboards", to: "/admin/billboards" },
+  { label: "Photographers", to: "/admin/photographers" },
   { label: "Quotes", to: "/admin/quotes" },
   { label: "Audit Log", to: "/admin/audit-log" },
 ] as const;

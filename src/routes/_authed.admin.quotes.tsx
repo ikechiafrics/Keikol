@@ -113,8 +113,9 @@ function AdminQuotesPage() {
             <thead>
               <tr className="border-b border-border text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 <th className="px-5 py-4">Submitted</th>
+                <th className="px-5 py-4">Service</th>
                 <th className="px-5 py-4">Contact</th>
-                <th className="px-5 py-4">Interested Billboard</th>
+                <th className="px-5 py-4">Interested In</th>
                 <th className="px-5 py-4">Campaign</th>
                 <th className="px-5 py-4">Message</th>
                 <th className="px-5 py-4">Status</th>
@@ -124,10 +125,22 @@ function AdminQuotesPage() {
             <tbody>
               {quotes.map((qte) => {
                 const classes = QUOTE_STATUS_CLASSES[qte.status];
+                const isPhotography = qte.serviceType === "photography_videography";
                 return (
                   <tr key={qte.id} className="border-b border-border align-top last:border-0">
                     <td className="whitespace-nowrap px-5 py-4 text-muted-foreground">
                       {qte.createdAt ? qte.createdAt.toDate().toLocaleDateString() : "—"}
+                    </td>
+                    <td className="px-5 py-4">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${
+                          isPhotography
+                            ? "bg-electric/15 text-electric-soft"
+                            : "bg-gold/20 text-gold"
+                        }`}
+                      >
+                        {isPhotography ? "Photography & Videography" : "Billboard"}
+                      </span>
                     </td>
                     <td className="px-5 py-4">
                       <p className="font-semibold">{qte.name}</p>
@@ -138,13 +151,19 @@ function AdminQuotesPage() {
                       <p className="text-xs text-muted-foreground">{qte.phone}</p>
                     </td>
                     <td className="px-5 py-4 text-muted-foreground">
-                      <p>{qte.interestedBillboard}</p>
+                      <p>{isPhotography ? qte.interestedPhotographer : qte.interestedBillboard}</p>
                       {qte.city && <p className="text-xs">{qte.city}</p>}
                     </td>
                     <td className="px-5 py-4 text-muted-foreground">
-                      <p>{qte.budget}</p>
-                      <p className="text-xs">{qte.duration}</p>
-                      <p className="text-xs">{qte.goal}</p>
+                      {isPhotography ? (
+                        <p className="text-xs">—</p>
+                      ) : (
+                        <>
+                          <p>{qte.budget}</p>
+                          <p className="text-xs">{qte.duration}</p>
+                          <p className="text-xs">{qte.goal}</p>
+                        </>
+                      )}
                     </td>
                     <td className="max-w-xs px-5 py-4">
                       <p className="line-clamp-3 text-muted-foreground" title={qte.message}>

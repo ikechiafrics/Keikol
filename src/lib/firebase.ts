@@ -97,3 +97,10 @@ export function artworkStoragePath(uid: string, bookingId: string, filename: str
 export function billboardStoragePath(billboardId: string, filename: string): string {
   return `billboards/${billboardId}/${filename}`;
 }
+
+// Storage path convention for photographer/videographer profile + portfolio
+// images. Must stay in sync with the
+// `photographers/{photographerId}/{allPaths=**}` match in storage.rules.
+export function photographerStoragePath(photographerId: string, filename: string): string {
+  return `photographers/${photographerId}/${filename}`;
+}

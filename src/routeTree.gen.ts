@@ -19,7 +19,9 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PhotographersIndexRouteImport } from './routes/photographers.index'
 import { Route as LocationsIndexRouteImport } from './routes/locations.index'
+import { Route as PhotographersIdRouteImport } from './routes/photographers.$id'
 import { Route as LocationsIdRouteImport } from './routes/locations.$id'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed.dashboard'
 import { Route as AuthedAdminRouteImport } from './routes/_authed.admin'
@@ -28,11 +30,15 @@ import { Route as AuthedInvoicesBookingIdRouteImport } from './routes/_authed.in
 import { Route as AuthedInvoiceIdRouteImport } from './routes/_authed.invoice.$id'
 import { Route as AuthedBookIdRouteImport } from './routes/_authed.book.$id'
 import { Route as AuthedAdminQuotesRouteImport } from './routes/_authed.admin.quotes'
+import { Route as AuthedAdminPhotographersRouteImport } from './routes/_authed.admin.photographers'
 import { Route as AuthedAdminBookingsRouteImport } from './routes/_authed.admin.bookings'
 import { Route as AuthedAdminBillboardsRouteImport } from './routes/_authed.admin.billboards'
 import { Route as AuthedAdminAuditLogRouteImport } from './routes/_authed.admin.audit-log'
+import { Route as AuthedAdminPhotographersIndexRouteImport } from './routes/_authed.admin.photographers.index'
 import { Route as AuthedAdminBookingsIndexRouteImport } from './routes/_authed.admin.bookings.index'
 import { Route as AuthedAdminBillboardsIndexRouteImport } from './routes/_authed.admin.billboards.index'
+import { Route as AuthedAdminPhotographersNewRouteImport } from './routes/_authed.admin.photographers.new'
+import { Route as AuthedAdminPhotographersIdRouteImport } from './routes/_authed.admin.photographers.$id'
 import { Route as AuthedAdminBookingsNewRouteImport } from './routes/_authed.admin.bookings.new'
 import { Route as AuthedAdminBookingsIdRouteImport } from './routes/_authed.admin.bookings.$id'
 import { Route as AuthedAdminBillboardsNewRouteImport } from './routes/_authed.admin.billboards.new'
@@ -87,9 +93,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PhotographersIndexRoute = PhotographersIndexRouteImport.update({
+  id: '/photographers/',
+  path: '/photographers/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LocationsIndexRoute = LocationsIndexRouteImport.update({
   id: '/locations/',
   path: '/locations/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PhotographersIdRoute = PhotographersIdRouteImport.update({
+  id: '/photographers/$id',
+  path: '/photographers/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LocationsIdRoute = LocationsIdRouteImport.update({
@@ -132,6 +148,12 @@ const AuthedAdminQuotesRoute = AuthedAdminQuotesRouteImport.update({
   path: '/quotes',
   getParentRoute: () => AuthedAdminRoute,
 } as any)
+const AuthedAdminPhotographersRoute =
+  AuthedAdminPhotographersRouteImport.update({
+    id: '/photographers',
+    path: '/photographers',
+    getParentRoute: () => AuthedAdminRoute,
+  } as any)
 const AuthedAdminBookingsRoute = AuthedAdminBookingsRouteImport.update({
   id: '/bookings',
   path: '/bookings',
@@ -147,6 +169,12 @@ const AuthedAdminAuditLogRoute = AuthedAdminAuditLogRouteImport.update({
   path: '/audit-log',
   getParentRoute: () => AuthedAdminRoute,
 } as any)
+const AuthedAdminPhotographersIndexRoute =
+  AuthedAdminPhotographersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthedAdminPhotographersRoute,
+  } as any)
 const AuthedAdminBookingsIndexRoute =
   AuthedAdminBookingsIndexRouteImport.update({
     id: '/',
@@ -158,6 +186,18 @@ const AuthedAdminBillboardsIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => AuthedAdminBillboardsRoute,
+  } as any)
+const AuthedAdminPhotographersNewRoute =
+  AuthedAdminPhotographersNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthedAdminPhotographersRoute,
+  } as any)
+const AuthedAdminPhotographersIdRoute =
+  AuthedAdminPhotographersIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthedAdminPhotographersRoute,
   } as any)
 const AuthedAdminBookingsNewRoute = AuthedAdminBookingsNewRouteImport.update({
   id: '/new',
@@ -194,10 +234,13 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthedAdminRouteWithChildren
   '/dashboard': typeof AuthedDashboardRoute
   '/locations/$id': typeof LocationsIdRoute
+  '/photographers/$id': typeof PhotographersIdRoute
   '/locations/': typeof LocationsIndexRoute
+  '/photographers/': typeof PhotographersIndexRoute
   '/admin/audit-log': typeof AuthedAdminAuditLogRoute
   '/admin/billboards': typeof AuthedAdminBillboardsRouteWithChildren
   '/admin/bookings': typeof AuthedAdminBookingsRouteWithChildren
+  '/admin/photographers': typeof AuthedAdminPhotographersRouteWithChildren
   '/admin/quotes': typeof AuthedAdminQuotesRoute
   '/book/$id': typeof AuthedBookIdRoute
   '/invoice/$id': typeof AuthedInvoiceIdRoute
@@ -207,8 +250,11 @@ export interface FileRoutesByFullPath {
   '/admin/billboards/new': typeof AuthedAdminBillboardsNewRoute
   '/admin/bookings/$id': typeof AuthedAdminBookingsIdRoute
   '/admin/bookings/new': typeof AuthedAdminBookingsNewRoute
+  '/admin/photographers/$id': typeof AuthedAdminPhotographersIdRoute
+  '/admin/photographers/new': typeof AuthedAdminPhotographersNewRoute
   '/admin/billboards/': typeof AuthedAdminBillboardsIndexRoute
   '/admin/bookings/': typeof AuthedAdminBookingsIndexRoute
+  '/admin/photographers/': typeof AuthedAdminPhotographersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -222,7 +268,9 @@ export interface FileRoutesByTo {
   '/terms-of-use': typeof TermsOfUseRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/locations/$id': typeof LocationsIdRoute
+  '/photographers/$id': typeof PhotographersIdRoute
   '/locations': typeof LocationsIndexRoute
+  '/photographers': typeof PhotographersIndexRoute
   '/admin/audit-log': typeof AuthedAdminAuditLogRoute
   '/admin/quotes': typeof AuthedAdminQuotesRoute
   '/book/$id': typeof AuthedBookIdRoute
@@ -233,8 +281,11 @@ export interface FileRoutesByTo {
   '/admin/billboards/new': typeof AuthedAdminBillboardsNewRoute
   '/admin/bookings/$id': typeof AuthedAdminBookingsIdRoute
   '/admin/bookings/new': typeof AuthedAdminBookingsNewRoute
+  '/admin/photographers/$id': typeof AuthedAdminPhotographersIdRoute
+  '/admin/photographers/new': typeof AuthedAdminPhotographersNewRoute
   '/admin/billboards': typeof AuthedAdminBillboardsIndexRoute
   '/admin/bookings': typeof AuthedAdminBookingsIndexRoute
+  '/admin/photographers': typeof AuthedAdminPhotographersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -251,10 +302,13 @@ export interface FileRoutesById {
   '/_authed/admin': typeof AuthedAdminRouteWithChildren
   '/_authed/dashboard': typeof AuthedDashboardRoute
   '/locations/$id': typeof LocationsIdRoute
+  '/photographers/$id': typeof PhotographersIdRoute
   '/locations/': typeof LocationsIndexRoute
+  '/photographers/': typeof PhotographersIndexRoute
   '/_authed/admin/audit-log': typeof AuthedAdminAuditLogRoute
   '/_authed/admin/billboards': typeof AuthedAdminBillboardsRouteWithChildren
   '/_authed/admin/bookings': typeof AuthedAdminBookingsRouteWithChildren
+  '/_authed/admin/photographers': typeof AuthedAdminPhotographersRouteWithChildren
   '/_authed/admin/quotes': typeof AuthedAdminQuotesRoute
   '/_authed/book/$id': typeof AuthedBookIdRoute
   '/_authed/invoice/$id': typeof AuthedInvoiceIdRoute
@@ -264,8 +318,11 @@ export interface FileRoutesById {
   '/_authed/admin/billboards/new': typeof AuthedAdminBillboardsNewRoute
   '/_authed/admin/bookings/$id': typeof AuthedAdminBookingsIdRoute
   '/_authed/admin/bookings/new': typeof AuthedAdminBookingsNewRoute
+  '/_authed/admin/photographers/$id': typeof AuthedAdminPhotographersIdRoute
+  '/_authed/admin/photographers/new': typeof AuthedAdminPhotographersNewRoute
   '/_authed/admin/billboards/': typeof AuthedAdminBillboardsIndexRoute
   '/_authed/admin/bookings/': typeof AuthedAdminBookingsIndexRoute
+  '/_authed/admin/photographers/': typeof AuthedAdminPhotographersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -282,10 +339,13 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/locations/$id'
+    | '/photographers/$id'
     | '/locations/'
+    | '/photographers/'
     | '/admin/audit-log'
     | '/admin/billboards'
     | '/admin/bookings'
+    | '/admin/photographers'
     | '/admin/quotes'
     | '/book/$id'
     | '/invoice/$id'
@@ -295,8 +355,11 @@ export interface FileRouteTypes {
     | '/admin/billboards/new'
     | '/admin/bookings/$id'
     | '/admin/bookings/new'
+    | '/admin/photographers/$id'
+    | '/admin/photographers/new'
     | '/admin/billboards/'
     | '/admin/bookings/'
+    | '/admin/photographers/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -310,7 +373,9 @@ export interface FileRouteTypes {
     | '/terms-of-use'
     | '/dashboard'
     | '/locations/$id'
+    | '/photographers/$id'
     | '/locations'
+    | '/photographers'
     | '/admin/audit-log'
     | '/admin/quotes'
     | '/book/$id'
@@ -321,8 +386,11 @@ export interface FileRouteTypes {
     | '/admin/billboards/new'
     | '/admin/bookings/$id'
     | '/admin/bookings/new'
+    | '/admin/photographers/$id'
+    | '/admin/photographers/new'
     | '/admin/billboards'
     | '/admin/bookings'
+    | '/admin/photographers'
   id:
     | '__root__'
     | '/'
@@ -338,10 +406,13 @@ export interface FileRouteTypes {
     | '/_authed/admin'
     | '/_authed/dashboard'
     | '/locations/$id'
+    | '/photographers/$id'
     | '/locations/'
+    | '/photographers/'
     | '/_authed/admin/audit-log'
     | '/_authed/admin/billboards'
     | '/_authed/admin/bookings'
+    | '/_authed/admin/photographers'
     | '/_authed/admin/quotes'
     | '/_authed/book/$id'
     | '/_authed/invoice/$id'
@@ -351,8 +422,11 @@ export interface FileRouteTypes {
     | '/_authed/admin/billboards/new'
     | '/_authed/admin/bookings/$id'
     | '/_authed/admin/bookings/new'
+    | '/_authed/admin/photographers/$id'
+    | '/_authed/admin/photographers/new'
     | '/_authed/admin/billboards/'
     | '/_authed/admin/bookings/'
+    | '/_authed/admin/photographers/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -367,7 +441,9 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsOfUseRoute: typeof TermsOfUseRoute
   LocationsIdRoute: typeof LocationsIdRoute
+  PhotographersIdRoute: typeof PhotographersIdRoute
   LocationsIndexRoute: typeof LocationsIndexRoute
+  PhotographersIndexRoute: typeof PhotographersIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -442,11 +518,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/photographers/': {
+      id: '/photographers/'
+      path: '/photographers'
+      fullPath: '/photographers/'
+      preLoaderRoute: typeof PhotographersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/locations/': {
       id: '/locations/'
       path: '/locations'
       fullPath: '/locations/'
       preLoaderRoute: typeof LocationsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/photographers/$id': {
+      id: '/photographers/$id'
+      path: '/photographers/$id'
+      fullPath: '/photographers/$id'
+      preLoaderRoute: typeof PhotographersIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/locations/$id': {
@@ -505,6 +595,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedAdminQuotesRouteImport
       parentRoute: typeof AuthedAdminRoute
     }
+    '/_authed/admin/photographers': {
+      id: '/_authed/admin/photographers'
+      path: '/photographers'
+      fullPath: '/admin/photographers'
+      preLoaderRoute: typeof AuthedAdminPhotographersRouteImport
+      parentRoute: typeof AuthedAdminRoute
+    }
     '/_authed/admin/bookings': {
       id: '/_authed/admin/bookings'
       path: '/bookings'
@@ -526,6 +623,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedAdminAuditLogRouteImport
       parentRoute: typeof AuthedAdminRoute
     }
+    '/_authed/admin/photographers/': {
+      id: '/_authed/admin/photographers/'
+      path: '/'
+      fullPath: '/admin/photographers/'
+      preLoaderRoute: typeof AuthedAdminPhotographersIndexRouteImport
+      parentRoute: typeof AuthedAdminPhotographersRoute
+    }
     '/_authed/admin/bookings/': {
       id: '/_authed/admin/bookings/'
       path: '/'
@@ -539,6 +643,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/billboards/'
       preLoaderRoute: typeof AuthedAdminBillboardsIndexRouteImport
       parentRoute: typeof AuthedAdminBillboardsRoute
+    }
+    '/_authed/admin/photographers/new': {
+      id: '/_authed/admin/photographers/new'
+      path: '/new'
+      fullPath: '/admin/photographers/new'
+      preLoaderRoute: typeof AuthedAdminPhotographersNewRouteImport
+      parentRoute: typeof AuthedAdminPhotographersRoute
+    }
+    '/_authed/admin/photographers/$id': {
+      id: '/_authed/admin/photographers/$id'
+      path: '/$id'
+      fullPath: '/admin/photographers/$id'
+      preLoaderRoute: typeof AuthedAdminPhotographersIdRouteImport
+      parentRoute: typeof AuthedAdminPhotographersRoute
     }
     '/_authed/admin/bookings/new': {
       id: '/_authed/admin/bookings/new'
@@ -603,10 +721,29 @@ const AuthedAdminBookingsRouteChildren: AuthedAdminBookingsRouteChildren = {
 const AuthedAdminBookingsRouteWithChildren =
   AuthedAdminBookingsRoute._addFileChildren(AuthedAdminBookingsRouteChildren)
 
+interface AuthedAdminPhotographersRouteChildren {
+  AuthedAdminPhotographersIdRoute: typeof AuthedAdminPhotographersIdRoute
+  AuthedAdminPhotographersNewRoute: typeof AuthedAdminPhotographersNewRoute
+  AuthedAdminPhotographersIndexRoute: typeof AuthedAdminPhotographersIndexRoute
+}
+
+const AuthedAdminPhotographersRouteChildren: AuthedAdminPhotographersRouteChildren =
+  {
+    AuthedAdminPhotographersIdRoute: AuthedAdminPhotographersIdRoute,
+    AuthedAdminPhotographersNewRoute: AuthedAdminPhotographersNewRoute,
+    AuthedAdminPhotographersIndexRoute: AuthedAdminPhotographersIndexRoute,
+  }
+
+const AuthedAdminPhotographersRouteWithChildren =
+  AuthedAdminPhotographersRoute._addFileChildren(
+    AuthedAdminPhotographersRouteChildren,
+  )
+
 interface AuthedAdminRouteChildren {
   AuthedAdminAuditLogRoute: typeof AuthedAdminAuditLogRoute
   AuthedAdminBillboardsRoute: typeof AuthedAdminBillboardsRouteWithChildren
   AuthedAdminBookingsRoute: typeof AuthedAdminBookingsRouteWithChildren
+  AuthedAdminPhotographersRoute: typeof AuthedAdminPhotographersRouteWithChildren
   AuthedAdminQuotesRoute: typeof AuthedAdminQuotesRoute
   AuthedAdminIndexRoute: typeof AuthedAdminIndexRoute
 }
@@ -615,6 +752,7 @@ const AuthedAdminRouteChildren: AuthedAdminRouteChildren = {
   AuthedAdminAuditLogRoute: AuthedAdminAuditLogRoute,
   AuthedAdminBillboardsRoute: AuthedAdminBillboardsRouteWithChildren,
   AuthedAdminBookingsRoute: AuthedAdminBookingsRouteWithChildren,
+  AuthedAdminPhotographersRoute: AuthedAdminPhotographersRouteWithChildren,
   AuthedAdminQuotesRoute: AuthedAdminQuotesRoute,
   AuthedAdminIndexRoute: AuthedAdminIndexRoute,
 }
@@ -654,7 +792,9 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsOfUseRoute: TermsOfUseRoute,
   LocationsIdRoute: LocationsIdRoute,
+  PhotographersIdRoute: PhotographersIdRoute,
   LocationsIndexRoute: LocationsIndexRoute,
+  PhotographersIndexRoute: PhotographersIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

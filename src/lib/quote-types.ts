@@ -2,23 +2,33 @@ import type { Timestamp } from "firebase/firestore";
 import type { QuoteStatus } from "@/lib/quote-status";
 import type { StatusBadgeClasses } from "@/lib/status-badge";
 
+export type QuoteService = "billboard" | "photography_videography";
+
 export interface QuoteRequest {
   id: string;
   name: string;
-  company: string;
   email: string;
   phone: string;
-  city: string;
-  billboardType: string;
-  budget: string;
-  duration: string;
-  goal: string;
   message: string;
-  billboardId: string;
-  interestedBillboard: string;
   status: QuoteStatus;
   createdAt: Timestamp | null;
   updatedAt: Timestamp | null;
+  // Billboard-shaped fields (present on billboard-quote submissions).
+  company?: string;
+  city?: string;
+  billboardType?: string;
+  budget?: string;
+  duration?: string;
+  goal?: string;
+  billboardId?: string;
+  interestedBillboard?: string;
+  // Photography/videography-shaped fields (present on those submissions).
+  // Named serviceType, not service — "service" is a reserved keyword in the
+  // Firestore Rules grammar (it's what declares `service cloud.firestore {}`),
+  // and using it as a field name there fails to parse.
+  serviceType?: QuoteService;
+  photographerId?: string;
+  interestedPhotographer?: string;
 }
 
 export const QUOTE_STATUS_CLASSES: Record<QuoteStatus, StatusBadgeClasses> = {

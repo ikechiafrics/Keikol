@@ -87,6 +87,12 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    match /photographers/{photographerId} {
+      allow read: if true;
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
     // Invoices are manually created/managed by admins only (no payment
     // gateway — amounts and paid/unpaid status are recorded by hand). Every
     // invoice for a given bookingId shares that booking's userId, so a
@@ -106,7 +112,11 @@ service cloud.firestore {
     match /quoteRequests/{quoteId} {
       allow read: if isAdmin();
 
-      allow create: if request.resource.data.keys().hasOnly([
+      // Two independent shapes are accepted: the original billboard-quote
+      // shape (unchanged) and a photography/videography inquiry shape. Each
+      // branch fully validates its own field list — this is purely additive,
+      // so the billboard branch below is byte-for-byte what it was before.
+      allow create: if (request.resource.data.keys().hasOnly([
                         "name", "company", "email", "phone", "city",
                         "billboardType", "budget", "duration", "goal", "message",
                         "billboardId", "interestedBillboard", "status", "createdAt", "updatedAt"
@@ -135,7 +145,30 @@ service cloud.firestore {
                     && request.resource.data.interestedBillboard.size() <= 200
                     && request.resource.data.status == "new"
                     && request.resource.data.createdAt == request.time
-                    && request.resource.data.updatedAt == request.time;
+                    && request.resource.data.updatedAt == request.time)
+                    || (request.resource.data.keys().hasOnly([
+                        "name", "email", "phone", "message", "serviceType",
+                        "photographerId", "interestedPhotographer", "status", "createdAt", "updatedAt"
+                      ])
+                    && request.resource.data.keys().hasAll([
+                        "name", "email", "phone", "message", "serviceType",
+                        "photographerId", "interestedPhotographer", "status", "createdAt", "updatedAt"
+                      ])
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 200
+                    && request.resource.data.email is string
+                    && request.resource.data.email.size() > 0 && request.resource.data.email.size() <= 320
+                    && request.resource.data.phone is string && request.resource.data.phone.size() <= 40
+                    && request.resource.data.message is string
+                    && request.resource.data.message.size() > 0 && request.resource.data.message.size() <= 5000
+                    && request.resource.data.serviceType == "photography_videography"
+                    && request.resource.data.photographerId is string && request.resource.data.photographerId.size() <= 200
+                    && request.resource.data.interestedPhotographer is string
+                    && request.resource.data.interestedPhotographer.size() > 0
+                    && request.resource.data.interestedPhotographer.size() <= 200
+                    && request.resource.data.status == "new"
+                    && request.resource.data.createdAt == request.time
+                    && request.resource.data.updatedAt == request.time);
 
       allow update: if isAdmin()
                     && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "updatedAt"])
