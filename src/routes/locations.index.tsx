@@ -25,7 +25,7 @@ import { BillboardCard } from "@/components/BillboardCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AVAILABILITIES, INDUSTRY_FILTERS, heroImg, type Billboard } from "@/data/billboards";
 import { useConfirmedWindows, getEffectiveAvailability } from "@/lib/billboard-availability";
-import { getPriceTierLabel } from "@/lib/billboard-rates";
+import { computePriceTiers, PRICE_TIER_LABELS, type PriceTierLevel } from "@/lib/billboard-rates";
 import { useBillboards } from "@/lib/billboards-data";
 import { useImageLoaded } from "@/lib/use-image-loaded";
 
@@ -71,6 +71,10 @@ function LocationsPage() {
 
   const { data: windows } = useConfirmedWindows();
   const { data: billboards, isLoading: billboardsLoading } = useBillboards();
+
+  // Relative price tier per billboard, ranked against current inventory —
+  // no exact rates published on this public page.
+  const priceTiers = useMemo(() => computePriceTiers(billboards ?? []), [billboards]);
 
   // Derived live from actual inventory, not a hardcoded guess — only ever
   // offers filter options that have at least one real billboard right now.
@@ -218,6 +222,7 @@ function LocationsPage() {
                     <ResultCard
                       key={b.id}
                       b={b}
+                      tier={priceTiers[b.id] ?? null}
                       active={selectedId === b.id}
                       onClick={() => setSelectedId(b.id)}
                     />
@@ -312,7 +317,11 @@ function LocationsPage() {
       />
 
       {/* Slide-in details sidebar */}
-      <DetailsSidebar billboard={selected} onClose={() => setSelectedId(null)} />
+      <DetailsSidebar
+        billboard={selected}
+        priceTiers={priceTiers}
+        onClose={() => setSelectedId(null)}
+      />
     </>
   );
 }
@@ -381,10 +390,12 @@ function EmptyState({ onClear }: { onClear: () => void }) {
 
 function ResultCard({
   b,
+  tier,
   active,
   onClick,
 }: {
   b: Billboard;
+  tier: PriceTierLevel | null;
   active: boolean;
   onClick: () => void;
 }) {
@@ -417,7 +428,9 @@ function ResultCard({
             <Eye className="h-3 w-3 text-accent" />
             {b.estimatedDailyImpressions}
           </span>
-          <span className="font-bold text-gold">{getPriceTierLabel(b.rates)}</span>
+          <span className="font-bold text-gold">
+            {tier ? PRICE_TIER_LABELS[tier] : "Contact for pricing"}
+          </span>
         </div>
       </div>
     </button>
@@ -499,9 +512,11 @@ function Select({
 
 function DetailsSidebar({
   billboard,
+  priceTiers,
   onClose,
 }: {
   billboard: Billboard | null;
+  priceTiers: Record<string, PriceTierLevel | null>;
   onClose: () => void;
 }) {
   // Keep the last-shown billboard rendered during the close animation so
@@ -532,6 +547,7 @@ function DetailsSidebar({
   const b = displayed;
   const { data: windows } = useConfirmedWindows();
   const availability = b ? getEffectiveAvailability(b, windows ?? []) : null;
+  const tier = b ? (priceTiers[b.id] ?? null) : null;
 
   return (
     <>
@@ -626,7 +642,7 @@ function DetailsSidebar({
                   <Stat icon={Ruler} label="Size" value={b.size} />
                   <Stat
                     label="Price tier"
-                    value={getPriceTierLabel(b.rates)}
+                    value={tier ? PRICE_TIER_LABELS[tier] : "Contact for pricing"}
                     valueClass="text-gold"
                   />
                 </div>

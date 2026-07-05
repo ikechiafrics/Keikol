@@ -30,7 +30,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Billboard } from "@/data/billboards";
 import { useConfirmedWindows, getEffectiveAvailability } from "@/lib/billboard-availability";
-import { getRatesSummary } from "@/lib/billboard-rates";
+import { computePriceTiers, PRICE_TIER_LABELS } from "@/lib/billboard-rates";
 import { fetchBillboardById, useBillboards } from "@/lib/billboards-data";
 import { useImageLoaded } from "@/lib/use-image-loaded";
 
@@ -91,6 +91,7 @@ function BillboardDetailPage() {
 
   const related = (allBillboards ?? []).filter((x) => x.id !== b.id).slice(0, 3);
   const quoteHref = `/contact?billboard=${b.id}`;
+  const tier = computePriceTiers(allBillboards ?? [])[b.id] ?? null;
 
   return (
     <>
@@ -193,7 +194,11 @@ function BillboardDetailPage() {
             label="Availability"
             value={availability ?? b.availability}
           />
-          <DetailInfoCard icon={Wallet} label="Price Range" value={getRatesSummary(b.rates)} />
+          <DetailInfoCard
+            icon={Wallet}
+            label="Price Tier"
+            value={tier ? PRICE_TIER_LABELS[tier] : "Contact for pricing"}
+          />
           <DetailInfoCard icon={Sun} label="Lighting" value={b.lighting} />
         </div>
       </Section>
