@@ -130,35 +130,6 @@ function AboutPage() {
         </div>
       </Section>
 
-      {/* Timeline */}
-      <Section>
-        <SectionHeader
-          eyebrow="Roadmap"
-          title={<>Our long-term <span className="text-gradient-electric">vision timeline.</span></>}
-          subtitle="The roadmap below outlines Keikol's future direction. These are forward-looking phases, not completed features."
-        />
-        <div className="relative mt-14">
-          <div className="absolute left-4 top-0 bottom-0 hidden w-px bg-border lg:left-1/2 lg:block" />
-          <div className="space-y-8">
-            {PHASES.map((p, i) => (
-              <div key={p.label} className={`relative lg:grid lg:grid-cols-2 lg:gap-12 ${i % 2 === 1 ? "lg:[&>*:first-child]:col-start-2" : ""}`}>
-                <div className="rounded-3xl bg-card-premium p-7 shadow-elegant ring-hairline">
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold">{p.label}</span>
-                  <h3 className="mt-2 font-display text-xl font-bold">{p.title}</h3>
-                  <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
-                    {p.items.map((it) => (
-                      <li key={it} className="flex items-start gap-2">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-accent" /> {it}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Section>
-
       {/* Values */}
       <Section tone="surface">
         <SectionHeader eyebrow="Values" title={<>What we <span className="text-gradient-gold">stand for.</span></>} />
@@ -186,6 +157,37 @@ function AboutPage() {
           >
             Partner with Keikol <ArrowRight className="h-4 w-4" />
           </Link>
+        </div>
+      </Section>
+
+      {/* Timeline — long-term vision, placed after current services/values so
+          commercial visitors see what Keikol does today before what it might
+          become. */}
+      <Section>
+        <SectionHeader
+          eyebrow="Roadmap"
+          title={<>Our long-term <span className="text-gradient-electric">vision timeline.</span></>}
+          subtitle="The roadmap below outlines Keikol's future direction. These are forward-looking phases, not completed features."
+        />
+        <div className="relative mt-14">
+          <div className="absolute left-4 top-0 bottom-0 hidden w-px bg-border lg:left-1/2 lg:block" />
+          <div className="space-y-8">
+            {PHASES.map((p, i) => (
+              <div key={p.label} className={`relative lg:grid lg:grid-cols-2 lg:gap-12 ${i % 2 === 1 ? "lg:[&>*:first-child]:col-start-2" : ""}`}>
+                <div className="rounded-3xl bg-card-premium p-7 shadow-elegant ring-hairline">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold">{p.label}</span>
+                  <h3 className="mt-2 font-display text-xl font-bold">{p.title}</h3>
+                  <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
+                    {p.items.map((it) => (
+                      <li key={it} className="flex items-start gap-2">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-accent" /> {it}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </Section>
 

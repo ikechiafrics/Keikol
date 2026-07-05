@@ -13,6 +13,7 @@ import { Section, SectionHeader, CTASection } from "@/components";
 import { BillboardCard } from "@/components/BillboardCard";
 import { PORTFOLIO_SAMPLES, heroImg } from "@/data/billboards";
 import { useBillboards } from "@/lib/billboards-data";
+import { usePhotographers } from "@/lib/photographers-data";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -113,7 +114,7 @@ type Service = {
   description: string;
   href: string;
   icon: typeof MapPin;
-  status: "Live" | "Onboarding" | "Coming Soon";
+  unit: string; // singular noun for the live-count line, e.g. "location", "creative partner"
   highlights: string[];
 };
 
@@ -125,7 +126,7 @@ const SERVICES: Service[] = [
       "Premium billboard placements across Nigeria's highest-traffic corridors — booked with transparent pricing and full campaign support.",
     href: "/locations",
     icon: MapPin,
-    status: "Live",
+    unit: "location",
     highlights: ["Premium locations", "Transparent pricing", "Campaign support"],
   },
   {
@@ -135,13 +136,24 @@ const SERVICES: Service[] = [
       "A curated directory of vetted photographers and videographers — matched to your brand, budget, and shoot type.",
     href: "/photographers",
     icon: Camera,
-    status: "Onboarding",
+    unit: "creative partner",
     highlights: ["Vetted creators", "Brand-matched", "Nationwide"],
   },
   // Add a new service here — the layout scales automatically.
 ];
 
+// Status/counts are computed from real data rather than hardcoded, so a
+// service correctly flips from "Onboarding" to "Live" the moment real
+// inventory/partners exist, instead of a stale guess going stale.
 function Services() {
+  const { data: billboards } = useBillboards();
+  const { data: photographers } = usePhotographers();
+
+  const counts: Record<string, number> = {
+    "/locations": billboards?.length ?? 0,
+    "/photographers": (photographers ?? []).filter((p) => p.active).length,
+  };
+
   return (
     <Section id="services">
       <SectionHeader
@@ -165,16 +177,16 @@ function Services() {
         }`}
       >
         {SERVICES.map((s) => (
-          <ServiceCard key={s.title} service={s} />
+          <ServiceCard key={s.title} service={s} count={counts[s.href] ?? 0} />
         ))}
       </div>
     </Section>
   );
 }
 
-function ServiceCard({ service }: { service: Service }) {
+function ServiceCard({ service, count }: { service: Service; count: number }) {
   const Icon = service.icon;
-  const isLive = service.status === "Live";
+  const isLive = count > 0;
   return (
     <Link
       to={service.href}
@@ -196,7 +208,7 @@ function ServiceCard({ service }: { service: Service }) {
             {isLive && (
               <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-glow" />
             )}
-            {service.status}
+            {isLive ? "Live" : "Onboarding"}
           </span>
         </div>
 
@@ -209,6 +221,12 @@ function ServiceCard({ service }: { service: Service }) {
         <p className="mt-4 text-base leading-relaxed text-muted-foreground">
           {service.description}
         </p>
+
+        {isLive && (
+          <p className="mt-4 text-sm font-semibold text-accent">
+            {count} {count === 1 ? service.unit : `${service.unit}s`} available now
+          </p>
+        )}
 
         <ul className="mt-6 flex flex-wrap gap-2">
           {service.highlights.map((h) => (
@@ -248,6 +266,13 @@ function FeaturedLocations() {
         }
         subtitle="Discover premium advertising locations across Nigeria's most strategic urban corridors."
       />
+      <div className="mt-6 flex justify-center">
+        <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-4 py-2 text-xs font-semibold text-accent">
+          <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-glow" />
+          {billboards?.length ?? 0} live location{(billboards?.length ?? 0) === 1 ? "" : "s"}{" "}
+          available now
+        </span>
+      </div>
       <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {featured.map((b) => (
           <BillboardCard key={b.id} b={b} compact />
