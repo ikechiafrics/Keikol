@@ -96,6 +96,7 @@ export function Header() {
                   <Link
                     key={s.to}
                     to={s.to}
+                    onClick={(e) => e.currentTarget.blur()}
                     className="block rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-gold/10 hover:text-gold"
                   >
                     {s.label}
