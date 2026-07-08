@@ -30,6 +30,7 @@ import { Route as AuthedInvoicesBookingIdRouteImport } from './routes/_authed.in
 import { Route as AuthedInvoiceIdRouteImport } from './routes/_authed.invoice.$id'
 import { Route as AuthedBookIdRouteImport } from './routes/_authed.book.$id'
 import { Route as AuthedAdminQuotesRouteImport } from './routes/_authed.admin.quotes'
+import { Route as AuthedAdminPhotographyBookingsRouteImport } from './routes/_authed.admin.photography-bookings'
 import { Route as AuthedAdminPhotographersRouteImport } from './routes/_authed.admin.photographers'
 import { Route as AuthedAdminBookingsRouteImport } from './routes/_authed.admin.bookings'
 import { Route as AuthedAdminBillboardsRouteImport } from './routes/_authed.admin.billboards'
@@ -148,6 +149,12 @@ const AuthedAdminQuotesRoute = AuthedAdminQuotesRouteImport.update({
   path: '/quotes',
   getParentRoute: () => AuthedAdminRoute,
 } as any)
+const AuthedAdminPhotographyBookingsRoute =
+  AuthedAdminPhotographyBookingsRouteImport.update({
+    id: '/photography-bookings',
+    path: '/photography-bookings',
+    getParentRoute: () => AuthedAdminRoute,
+  } as any)
 const AuthedAdminPhotographersRoute =
   AuthedAdminPhotographersRouteImport.update({
     id: '/photographers',
@@ -241,6 +248,7 @@ export interface FileRoutesByFullPath {
   '/admin/billboards': typeof AuthedAdminBillboardsRouteWithChildren
   '/admin/bookings': typeof AuthedAdminBookingsRouteWithChildren
   '/admin/photographers': typeof AuthedAdminPhotographersRouteWithChildren
+  '/admin/photography-bookings': typeof AuthedAdminPhotographyBookingsRoute
   '/admin/quotes': typeof AuthedAdminQuotesRoute
   '/book/$id': typeof AuthedBookIdRoute
   '/invoice/$id': typeof AuthedInvoiceIdRoute
@@ -272,6 +280,7 @@ export interface FileRoutesByTo {
   '/locations': typeof LocationsIndexRoute
   '/photographers': typeof PhotographersIndexRoute
   '/admin/audit-log': typeof AuthedAdminAuditLogRoute
+  '/admin/photography-bookings': typeof AuthedAdminPhotographyBookingsRoute
   '/admin/quotes': typeof AuthedAdminQuotesRoute
   '/book/$id': typeof AuthedBookIdRoute
   '/invoice/$id': typeof AuthedInvoiceIdRoute
@@ -309,6 +318,7 @@ export interface FileRoutesById {
   '/_authed/admin/billboards': typeof AuthedAdminBillboardsRouteWithChildren
   '/_authed/admin/bookings': typeof AuthedAdminBookingsRouteWithChildren
   '/_authed/admin/photographers': typeof AuthedAdminPhotographersRouteWithChildren
+  '/_authed/admin/photography-bookings': typeof AuthedAdminPhotographyBookingsRoute
   '/_authed/admin/quotes': typeof AuthedAdminQuotesRoute
   '/_authed/book/$id': typeof AuthedBookIdRoute
   '/_authed/invoice/$id': typeof AuthedInvoiceIdRoute
@@ -346,6 +356,7 @@ export interface FileRouteTypes {
     | '/admin/billboards'
     | '/admin/bookings'
     | '/admin/photographers'
+    | '/admin/photography-bookings'
     | '/admin/quotes'
     | '/book/$id'
     | '/invoice/$id'
@@ -377,6 +388,7 @@ export interface FileRouteTypes {
     | '/locations'
     | '/photographers'
     | '/admin/audit-log'
+    | '/admin/photography-bookings'
     | '/admin/quotes'
     | '/book/$id'
     | '/invoice/$id'
@@ -413,6 +425,7 @@ export interface FileRouteTypes {
     | '/_authed/admin/billboards'
     | '/_authed/admin/bookings'
     | '/_authed/admin/photographers'
+    | '/_authed/admin/photography-bookings'
     | '/_authed/admin/quotes'
     | '/_authed/book/$id'
     | '/_authed/invoice/$id'
@@ -595,6 +608,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedAdminQuotesRouteImport
       parentRoute: typeof AuthedAdminRoute
     }
+    '/_authed/admin/photography-bookings': {
+      id: '/_authed/admin/photography-bookings'
+      path: '/photography-bookings'
+      fullPath: '/admin/photography-bookings'
+      preLoaderRoute: typeof AuthedAdminPhotographyBookingsRouteImport
+      parentRoute: typeof AuthedAdminRoute
+    }
     '/_authed/admin/photographers': {
       id: '/_authed/admin/photographers'
       path: '/photographers'
@@ -744,6 +764,7 @@ interface AuthedAdminRouteChildren {
   AuthedAdminBillboardsRoute: typeof AuthedAdminBillboardsRouteWithChildren
   AuthedAdminBookingsRoute: typeof AuthedAdminBookingsRouteWithChildren
   AuthedAdminPhotographersRoute: typeof AuthedAdminPhotographersRouteWithChildren
+  AuthedAdminPhotographyBookingsRoute: typeof AuthedAdminPhotographyBookingsRoute
   AuthedAdminQuotesRoute: typeof AuthedAdminQuotesRoute
   AuthedAdminIndexRoute: typeof AuthedAdminIndexRoute
 }
@@ -753,6 +774,7 @@ const AuthedAdminRouteChildren: AuthedAdminRouteChildren = {
   AuthedAdminBillboardsRoute: AuthedAdminBillboardsRouteWithChildren,
   AuthedAdminBookingsRoute: AuthedAdminBookingsRouteWithChildren,
   AuthedAdminPhotographersRoute: AuthedAdminPhotographersRouteWithChildren,
+  AuthedAdminPhotographyBookingsRoute: AuthedAdminPhotographyBookingsRoute,
   AuthedAdminQuotesRoute: AuthedAdminQuotesRoute,
   AuthedAdminIndexRoute: AuthedAdminIndexRoute,
 }

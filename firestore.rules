@@ -93,6 +93,13 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Confirmed photography/videography engagements — fully admin-managed,
+    // no customer-facing read/write path (there's no signed-in "owner"
+    // concept here, unlike billboard bookings).
+    match /photographyBookings/{bookingId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
     // Invoices are manually created/managed by admins only (no payment
     // gateway — amounts and paid/unpaid status are recorded by hand). Every
     // invoice for a given bookingId shares that booking's userId, so a
@@ -147,25 +154,26 @@ service cloud.firestore {
                     && request.resource.data.createdAt == request.time
                     && request.resource.data.updatedAt == request.time)
                     || (request.resource.data.keys().hasOnly([
-                        "name", "email", "phone", "message", "serviceType",
-                        "photographerId", "interestedPhotographer", "status", "createdAt", "updatedAt"
+                        "name", "email", "phone", "message", "serviceType", "photographerId",
+                        "interestedPhotographer", "occasion", "preferredDate", "status", "createdAt", "updatedAt"
                       ])
                     && request.resource.data.keys().hasAll([
-                        "name", "email", "phone", "message", "serviceType",
-                        "photographerId", "interestedPhotographer", "status", "createdAt", "updatedAt"
+                        "name", "email", "phone", "message", "serviceType", "photographerId",
+                        "interestedPhotographer", "occasion", "preferredDate", "status", "createdAt", "updatedAt"
                       ])
                     && request.resource.data.name is string
                     && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 200
                     && request.resource.data.email is string
                     && request.resource.data.email.size() > 0 && request.resource.data.email.size() <= 320
                     && request.resource.data.phone is string && request.resource.data.phone.size() <= 40
-                    && request.resource.data.message is string
-                    && request.resource.data.message.size() > 0 && request.resource.data.message.size() <= 5000
+                    && request.resource.data.message is string && request.resource.data.message.size() <= 5000
                     && request.resource.data.serviceType == "photography_videography"
                     && request.resource.data.photographerId is string && request.resource.data.photographerId.size() <= 200
                     && request.resource.data.interestedPhotographer is string
                     && request.resource.data.interestedPhotographer.size() > 0
                     && request.resource.data.interestedPhotographer.size() <= 200
+                    && request.resource.data.occasion is string && request.resource.data.occasion.size() <= 100
+                    && request.resource.data.preferredDate is string && request.resource.data.preferredDate.size() <= 50
                     && request.resource.data.status == "new"
                     && request.resource.data.createdAt == request.time
                     && request.resource.data.updatedAt == request.time);

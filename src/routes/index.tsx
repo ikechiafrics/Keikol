@@ -114,7 +114,10 @@ type Service = {
   description: string;
   href: string;
   icon: typeof MapPin;
-  unit: string; // singular noun for the live-count line, e.g. "location", "creative partner"
+  // Singular noun for the live-count line, e.g. "location" — omitted for
+  // services with no public browsable inventory to count (e.g. photography,
+  // which doesn't list individual creatives publicly).
+  unit?: string;
   highlights: string[];
 };
 
@@ -133,11 +136,10 @@ const SERVICES: Service[] = [
     eyebrow: "Visual Production",
     title: "Photography & Videography",
     description:
-      "A curated directory of vetted photographers and videographers — matched to your brand, budget, and shoot type.",
+      "Corporate shoots, real estate coverage, weddings, and life's other big moments — request a quote and we'll match you with the right creative.",
     href: "/photographers",
     icon: Camera,
-    unit: "creative partner",
-    highlights: ["Vetted creators", "Brand-matched", "Nationwide"],
+    highlights: ["Corporate shoots", "Real estate coverage", "Weddings & events"],
   },
   // Add a new service here — the layout scales automatically.
 ];
@@ -222,7 +224,7 @@ function ServiceCard({ service, count }: { service: Service; count: number }) {
           {service.description}
         </p>
 
-        {isLive && (
+        {isLive && service.unit && (
           <p className="mt-4 text-sm font-semibold text-accent">
             {count} {count === 1 ? service.unit : `${service.unit}s`} available now
           </p>

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { doc, serverTimestamp, writeBatch } from "firebase/firestore";
-import { Trash2 } from "lucide-react";
+import { CalendarPlus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -13,6 +13,7 @@ import { useQuoteRequests } from "@/lib/quotes-data";
 import { logAudit, type AuditActor } from "@/lib/audit-log";
 import { QUOTE_STATUS_CLASSES, type QuoteRequest } from "@/lib/quote-types";
 import type { QuoteStatus } from "@/lib/quote-status";
+import { PhotographyBookingDialog } from "@/components/PhotographyBookingDialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -61,6 +62,7 @@ function AdminQuotesPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [pendingDelete, setPendingDelete] = useState<QuoteRequest | null>(null);
+  const [converting, setConverting] = useState<QuoteRequest | null>(null);
 
   const { data: quotes, isLoading } = useQuoteRequests();
 
@@ -156,7 +158,10 @@ function AdminQuotesPage() {
                     </td>
                     <td className="px-5 py-4 text-muted-foreground">
                       {isPhotography ? (
-                        <p className="text-xs">—</p>
+                        <>
+                          <p className="text-xs">{qte.occasion || "—"}</p>
+                          {qte.preferredDate && <p className="text-xs">{qte.preferredDate}</p>}
+                        </>
                       ) : (
                         <>
                           <p>{qte.budget}</p>
@@ -196,12 +201,22 @@ function AdminQuotesPage() {
                       </div>
                     </td>
                     <td className="px-5 py-4">
-                      <button
-                        onClick={() => setPendingDelete(qte)}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-destructive hover:underline"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" /> Delete
-                      </button>
+                      <div className="flex flex-col items-start gap-2">
+                        {isPhotography && (
+                          <button
+                            onClick={() => setConverting(qte)}
+                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold hover:underline"
+                          >
+                            <CalendarPlus className="h-3.5 w-3.5" /> Convert to Booking
+                          </button>
+                        )}
+                        <button
+                          onClick={() => setPendingDelete(qte)}
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-destructive hover:underline"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" /> Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -234,6 +249,23 @@ function AdminQuotesPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <PhotographyBookingDialog
+        open={converting !== null}
+        onOpenChange={(open) => !open && setConverting(null)}
+        mode="create"
+        prefill={
+          converting
+            ? {
+                quoteRequestId: converting.id,
+                clientName: converting.name,
+                clientEmail: converting.email,
+                clientPhone: converting.phone,
+                occasion: converting.occasion ?? "",
+              }
+            : null
+        }
+      />
     </Section>
   );
 }

@@ -29,6 +29,8 @@ export interface QuoteRequest {
   serviceType?: QuoteService;
   photographerId?: string;
   interestedPhotographer?: string;
+  occasion?: string;
+  preferredDate?: string;
 }
 
 export const QUOTE_STATUS_CLASSES: Record<QuoteStatus, StatusBadgeClasses> = {

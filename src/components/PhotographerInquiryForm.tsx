@@ -35,6 +35,8 @@ export function PhotographerInquiryForm({ photographer }: { photographer: Photog
         serviceType: "photography_videography",
         photographerId: photographer.id,
         interestedPhotographer: photographer.name,
+        occasion: "",
+        preferredDate: "",
         status: "new",
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
