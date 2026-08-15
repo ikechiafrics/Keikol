@@ -29,7 +29,7 @@ const PLATFORM_DETAILS: Record<string, { icon: typeof Users; blurb: string }> = 
   Google: { icon: Search, blurb: "Search and display ads that show up when it matters." },
   Snapchat: { icon: Ghost, blurb: "Reach younger, high-engagement audiences natively." },
   TikTok: { icon: Music2, blurb: "Short-form creative that performs where attention lives." },
-  "AI Search (ChatGPT)": {
+  "AI Search": {
     icon: Bot,
     blurb: "Visibility in AI-powered answers, not just search results.",
   },
