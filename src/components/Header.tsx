@@ -19,6 +19,7 @@ import { useAuth } from "@/lib/auth-context";
 const SERVICES = [
   { label: "Billboards", to: "/locations" },
   { label: "Photography & Videography", to: "/photographers" },
+  { label: "Digital Marketing", to: "/digital-marketing" },
 ] as const;
 
 const NAV_LINKS = [

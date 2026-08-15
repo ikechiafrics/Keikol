@@ -9,75 +9,50 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TermsOfUseRouteImport } from './routes/terms-of-use'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SignInRouteImport } from './routes/sign-in'
-import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
-import { Route as PortfolioRouteImport } from './routes/portfolio'
-import { Route as IndustriesRouteImport } from './routes/industries'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PhotographersIndexRouteImport } from './routes/photographers.index'
-import { Route as LocationsIndexRouteImport } from './routes/locations.index'
-import { Route as PhotographersIdRouteImport } from './routes/photographers.$id'
-import { Route as LocationsIdRouteImport } from './routes/locations.$id'
-import { Route as AuthedDashboardRouteImport } from './routes/_authed.dashboard'
+import { Route as AuthedRouteImport } from './routes/_authed'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DigitalMarketingRouteImport } from './routes/digital-marketing'
+import { Route as IndustriesRouteImport } from './routes/industries'
+import { Route as PortfolioRouteImport } from './routes/portfolio'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
+import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TermsOfUseRouteImport } from './routes/terms-of-use'
 import { Route as AuthedAdminRouteImport } from './routes/_authed.admin'
+import { Route as AuthedDashboardRouteImport } from './routes/_authed.dashboard'
+import { Route as LocationsIndexRouteImport } from './routes/locations.index'
+import { Route as LocationsIdRouteImport } from './routes/locations.$id'
+import { Route as PhotographersIndexRouteImport } from './routes/photographers.index'
+import { Route as PhotographersIdRouteImport } from './routes/photographers.$id'
 import { Route as AuthedAdminIndexRouteImport } from './routes/_authed.admin.index'
-import { Route as AuthedInvoicesBookingIdRouteImport } from './routes/_authed.invoices.$bookingId'
-import { Route as AuthedInvoiceIdRouteImport } from './routes/_authed.invoice.$id'
-import { Route as AuthedBookIdRouteImport } from './routes/_authed.book.$id'
-import { Route as AuthedAdminQuotesRouteImport } from './routes/_authed.admin.quotes'
-import { Route as AuthedAdminPhotographyBookingsRouteImport } from './routes/_authed.admin.photography-bookings'
-import { Route as AuthedAdminPhotographersRouteImport } from './routes/_authed.admin.photographers'
-import { Route as AuthedAdminBookingsRouteImport } from './routes/_authed.admin.bookings'
-import { Route as AuthedAdminBillboardsRouteImport } from './routes/_authed.admin.billboards'
 import { Route as AuthedAdminAuditLogRouteImport } from './routes/_authed.admin.audit-log'
-import { Route as AuthedAdminPhotographersIndexRouteImport } from './routes/_authed.admin.photographers.index'
-import { Route as AuthedAdminBookingsIndexRouteImport } from './routes/_authed.admin.bookings.index'
+import { Route as AuthedAdminBillboardsRouteImport } from './routes/_authed.admin.billboards'
+import { Route as AuthedAdminBookingsRouteImport } from './routes/_authed.admin.bookings'
+import { Route as AuthedAdminPhotographersRouteImport } from './routes/_authed.admin.photographers'
+import { Route as AuthedAdminPhotographyBookingsRouteImport } from './routes/_authed.admin.photography-bookings'
+import { Route as AuthedAdminQuotesRouteImport } from './routes/_authed.admin.quotes'
+import { Route as AuthedBookIdRouteImport } from './routes/_authed.book.$id'
+import { Route as AuthedInvoiceIdRouteImport } from './routes/_authed.invoice.$id'
+import { Route as AuthedInvoicesBookingIdRouteImport } from './routes/_authed.invoices.$bookingId'
 import { Route as AuthedAdminBillboardsIndexRouteImport } from './routes/_authed.admin.billboards.index'
-import { Route as AuthedAdminPhotographersNewRouteImport } from './routes/_authed.admin.photographers.new'
-import { Route as AuthedAdminPhotographersIdRouteImport } from './routes/_authed.admin.photographers.$id'
-import { Route as AuthedAdminBookingsNewRouteImport } from './routes/_authed.admin.bookings.new'
-import { Route as AuthedAdminBookingsIdRouteImport } from './routes/_authed.admin.bookings.$id'
-import { Route as AuthedAdminBillboardsNewRouteImport } from './routes/_authed.admin.billboards.new'
 import { Route as AuthedAdminBillboardsIdRouteImport } from './routes/_authed.admin.billboards.$id'
+import { Route as AuthedAdminBillboardsNewRouteImport } from './routes/_authed.admin.billboards.new'
+import { Route as AuthedAdminBookingsIndexRouteImport } from './routes/_authed.admin.bookings.index'
+import { Route as AuthedAdminBookingsIdRouteImport } from './routes/_authed.admin.bookings.$id'
+import { Route as AuthedAdminBookingsNewRouteImport } from './routes/_authed.admin.bookings.new'
+import { Route as AuthedAdminPhotographersIndexRouteImport } from './routes/_authed.admin.photographers.index'
+import { Route as AuthedAdminPhotographersIdRouteImport } from './routes/_authed.admin.photographers.$id'
+import { Route as AuthedAdminPhotographersNewRouteImport } from './routes/_authed.admin.photographers.new'
 
-const TermsOfUseRoute = TermsOfUseRouteImport.update({
-  id: '/terms-of-use',
-  path: '/terms-of-use',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignInRoute = SignInRouteImport.update({
-  id: '/sign-in',
-  path: '/sign-in',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
-  id: '/privacy-policy',
-  path: '/privacy-policy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PortfolioRoute = PortfolioRouteImport.update({
-  id: '/portfolio',
-  path: '/portfolio',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndustriesRoute = IndustriesRouteImport.update({
-  id: '/industries',
-  path: '/industries',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
+const AuthedRoute = AuthedRouteImport.update({
+  id: '/_authed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -85,28 +60,59 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthedRoute = AuthedRouteImport.update({
-  id: '/_authed',
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const DigitalMarketingRoute = DigitalMarketingRouteImport.update({
+  id: '/digital-marketing',
+  path: '/digital-marketing',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PhotographersIndexRoute = PhotographersIndexRouteImport.update({
-  id: '/photographers/',
-  path: '/photographers/',
+const IndustriesRoute = IndustriesRouteImport.update({
+  id: '/industries',
+  path: '/industries',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PortfolioRoute = PortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsOfUseRoute = TermsOfUseRouteImport.update({
+  id: '/terms-of-use',
+  path: '/terms-of-use',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedAdminRoute = AuthedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthedRoute,
 } as any)
 const LocationsIndexRoute = LocationsIndexRouteImport.update({
   id: '/locations/',
   path: '/locations/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PhotographersIdRoute = PhotographersIdRouteImport.update({
-  id: '/photographers/$id',
-  path: '/photographers/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LocationsIdRoute = LocationsIdRouteImport.update({
@@ -114,61 +120,19 @@ const LocationsIdRoute = LocationsIdRouteImport.update({
   path: '/locations/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthedRoute,
+const PhotographersIndexRoute = PhotographersIndexRouteImport.update({
+  id: '/photographers/',
+  path: '/photographers/',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthedAdminRoute = AuthedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AuthedRoute,
+const PhotographersIdRoute = PhotographersIdRouteImport.update({
+  id: '/photographers/$id',
+  path: '/photographers/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthedAdminIndexRoute = AuthedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AuthedAdminRoute,
-} as any)
-const AuthedInvoicesBookingIdRoute = AuthedInvoicesBookingIdRouteImport.update({
-  id: '/invoices/$bookingId',
-  path: '/invoices/$bookingId',
-  getParentRoute: () => AuthedRoute,
-} as any)
-const AuthedInvoiceIdRoute = AuthedInvoiceIdRouteImport.update({
-  id: '/invoice/$id',
-  path: '/invoice/$id',
-  getParentRoute: () => AuthedRoute,
-} as any)
-const AuthedBookIdRoute = AuthedBookIdRouteImport.update({
-  id: '/book/$id',
-  path: '/book/$id',
-  getParentRoute: () => AuthedRoute,
-} as any)
-const AuthedAdminQuotesRoute = AuthedAdminQuotesRouteImport.update({
-  id: '/quotes',
-  path: '/quotes',
-  getParentRoute: () => AuthedAdminRoute,
-} as any)
-const AuthedAdminPhotographyBookingsRoute =
-  AuthedAdminPhotographyBookingsRouteImport.update({
-    id: '/photography-bookings',
-    path: '/photography-bookings',
-    getParentRoute: () => AuthedAdminRoute,
-  } as any)
-const AuthedAdminPhotographersRoute =
-  AuthedAdminPhotographersRouteImport.update({
-    id: '/photographers',
-    path: '/photographers',
-    getParentRoute: () => AuthedAdminRoute,
-  } as any)
-const AuthedAdminBookingsRoute = AuthedAdminBookingsRouteImport.update({
-  id: '/bookings',
-  path: '/bookings',
-  getParentRoute: () => AuthedAdminRoute,
-} as any)
-const AuthedAdminBillboardsRoute = AuthedAdminBillboardsRouteImport.update({
-  id: '/billboards',
-  path: '/billboards',
   getParentRoute: () => AuthedAdminRoute,
 } as any)
 const AuthedAdminAuditLogRoute = AuthedAdminAuditLogRouteImport.update({
@@ -176,11 +140,64 @@ const AuthedAdminAuditLogRoute = AuthedAdminAuditLogRouteImport.update({
   path: '/audit-log',
   getParentRoute: () => AuthedAdminRoute,
 } as any)
-const AuthedAdminPhotographersIndexRoute =
-  AuthedAdminPhotographersIndexRouteImport.update({
+const AuthedAdminBillboardsRoute = AuthedAdminBillboardsRouteImport.update({
+  id: '/billboards',
+  path: '/billboards',
+  getParentRoute: () => AuthedAdminRoute,
+} as any)
+const AuthedAdminBookingsRoute = AuthedAdminBookingsRouteImport.update({
+  id: '/bookings',
+  path: '/bookings',
+  getParentRoute: () => AuthedAdminRoute,
+} as any)
+const AuthedAdminPhotographersRoute =
+  AuthedAdminPhotographersRouteImport.update({
+    id: '/photographers',
+    path: '/photographers',
+    getParentRoute: () => AuthedAdminRoute,
+  } as any)
+const AuthedAdminPhotographyBookingsRoute =
+  AuthedAdminPhotographyBookingsRouteImport.update({
+    id: '/photography-bookings',
+    path: '/photography-bookings',
+    getParentRoute: () => AuthedAdminRoute,
+  } as any)
+const AuthedAdminQuotesRoute = AuthedAdminQuotesRouteImport.update({
+  id: '/quotes',
+  path: '/quotes',
+  getParentRoute: () => AuthedAdminRoute,
+} as any)
+const AuthedBookIdRoute = AuthedBookIdRouteImport.update({
+  id: '/book/$id',
+  path: '/book/$id',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedInvoiceIdRoute = AuthedInvoiceIdRouteImport.update({
+  id: '/invoice/$id',
+  path: '/invoice/$id',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedInvoicesBookingIdRoute = AuthedInvoicesBookingIdRouteImport.update({
+  id: '/invoices/$bookingId',
+  path: '/invoices/$bookingId',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedAdminBillboardsIndexRoute =
+  AuthedAdminBillboardsIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => AuthedAdminPhotographersRoute,
+    getParentRoute: () => AuthedAdminBillboardsRoute,
+  } as any)
+const AuthedAdminBillboardsIdRoute = AuthedAdminBillboardsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthedAdminBillboardsRoute,
+} as any)
+const AuthedAdminBillboardsNewRoute =
+  AuthedAdminBillboardsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthedAdminBillboardsRoute,
   } as any)
 const AuthedAdminBookingsIndexRoute =
   AuthedAdminBookingsIndexRouteImport.update({
@@ -188,16 +205,20 @@ const AuthedAdminBookingsIndexRoute =
     path: '/',
     getParentRoute: () => AuthedAdminBookingsRoute,
   } as any)
-const AuthedAdminBillboardsIndexRoute =
-  AuthedAdminBillboardsIndexRouteImport.update({
+const AuthedAdminBookingsIdRoute = AuthedAdminBookingsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthedAdminBookingsRoute,
+} as any)
+const AuthedAdminBookingsNewRoute = AuthedAdminBookingsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AuthedAdminBookingsRoute,
+} as any)
+const AuthedAdminPhotographersIndexRoute =
+  AuthedAdminPhotographersIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => AuthedAdminBillboardsRoute,
-  } as any)
-const AuthedAdminPhotographersNewRoute =
-  AuthedAdminPhotographersNewRouteImport.update({
-    id: '/new',
-    path: '/new',
     getParentRoute: () => AuthedAdminPhotographersRoute,
   } as any)
 const AuthedAdminPhotographersIdRoute =
@@ -206,32 +227,18 @@ const AuthedAdminPhotographersIdRoute =
     path: '/$id',
     getParentRoute: () => AuthedAdminPhotographersRoute,
   } as any)
-const AuthedAdminBookingsNewRoute = AuthedAdminBookingsNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => AuthedAdminBookingsRoute,
-} as any)
-const AuthedAdminBookingsIdRoute = AuthedAdminBookingsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AuthedAdminBookingsRoute,
-} as any)
-const AuthedAdminBillboardsNewRoute =
-  AuthedAdminBillboardsNewRouteImport.update({
+const AuthedAdminPhotographersNewRoute =
+  AuthedAdminPhotographersNewRouteImport.update({
     id: '/new',
     path: '/new',
-    getParentRoute: () => AuthedAdminBillboardsRoute,
+    getParentRoute: () => AuthedAdminPhotographersRoute,
   } as any)
-const AuthedAdminBillboardsIdRoute = AuthedAdminBillboardsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AuthedAdminBillboardsRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/digital-marketing': typeof DigitalMarketingRoute
   '/industries': typeof IndustriesRoute
   '/portfolio': typeof PortfolioRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -268,6 +275,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/digital-marketing': typeof DigitalMarketingRoute
   '/industries': typeof IndustriesRoute
   '/portfolio': typeof PortfolioRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -302,6 +310,7 @@ export interface FileRoutesById {
   '/_authed': typeof AuthedRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/digital-marketing': typeof DigitalMarketingRoute
   '/industries': typeof IndustriesRoute
   '/portfolio': typeof PortfolioRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -340,6 +349,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
+    | '/digital-marketing'
     | '/industries'
     | '/portfolio'
     | '/privacy-policy'
@@ -376,6 +386,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
+    | '/digital-marketing'
     | '/industries'
     | '/portfolio'
     | '/privacy-policy'
@@ -409,6 +420,7 @@ export interface FileRouteTypes {
     | '/_authed'
     | '/about'
     | '/contact'
+    | '/digital-marketing'
     | '/industries'
     | '/portfolio'
     | '/privacy-policy'
@@ -447,6 +459,7 @@ export interface RootRouteChildren {
   AuthedRoute: typeof AuthedRouteWithChildren
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
+  DigitalMarketingRoute: typeof DigitalMarketingRoute
   IndustriesRoute: typeof IndustriesRoute
   PortfolioRoute: typeof PortfolioRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
@@ -461,60 +474,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/terms-of-use': {
-      id: '/terms-of-use'
-      path: '/terms-of-use'
-      fullPath: '/terms-of-use'
-      preLoaderRoute: typeof TermsOfUseRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sign-in': {
-      id: '/sign-in'
-      path: '/sign-in'
-      fullPath: '/sign-in'
-      preLoaderRoute: typeof SignInRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy-policy': {
-      id: '/privacy-policy'
-      path: '/privacy-policy'
-      fullPath: '/privacy-policy'
-      preLoaderRoute: typeof PrivacyPolicyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/portfolio': {
-      id: '/portfolio'
-      path: '/portfolio'
-      fullPath: '/portfolio'
-      preLoaderRoute: typeof PortfolioRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/industries': {
-      id: '/industries'
-      path: '/industries'
-      fullPath: '/industries'
-      preLoaderRoute: typeof IndustriesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authed': {
@@ -524,32 +488,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/photographers/': {
-      id: '/photographers/'
-      path: '/photographers'
-      fullPath: '/photographers/'
-      preLoaderRoute: typeof PhotographersIndexRouteImport
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/digital-marketing': {
+      id: '/digital-marketing'
+      path: '/digital-marketing'
+      fullPath: '/digital-marketing'
+      preLoaderRoute: typeof DigitalMarketingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/industries': {
+      id: '/industries'
+      path: '/industries'
+      fullPath: '/industries'
+      preLoaderRoute: typeof IndustriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portfolio': {
+      id: '/portfolio'
+      path: '/portfolio'
+      fullPath: '/portfolio'
+      preLoaderRoute: typeof PortfolioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms-of-use': {
+      id: '/terms-of-use'
+      path: '/terms-of-use'
+      fullPath: '/terms-of-use'
+      preLoaderRoute: typeof TermsOfUseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authed/admin': {
+      id: '/_authed/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthedAdminRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/dashboard': {
+      id: '/_authed/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthedDashboardRouteImport
+      parentRoute: typeof AuthedRoute
     }
     '/locations/': {
       id: '/locations/'
       path: '/locations'
       fullPath: '/locations/'
       preLoaderRoute: typeof LocationsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/photographers/$id': {
-      id: '/photographers/$id'
-      path: '/photographers/$id'
-      fullPath: '/photographers/$id'
-      preLoaderRoute: typeof PhotographersIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/locations/$id': {
@@ -559,81 +579,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocationsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authed/dashboard': {
-      id: '/_authed/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthedDashboardRouteImport
-      parentRoute: typeof AuthedRoute
+    '/photographers/': {
+      id: '/photographers/'
+      path: '/photographers'
+      fullPath: '/photographers/'
+      preLoaderRoute: typeof PhotographersIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authed/admin': {
-      id: '/_authed/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthedAdminRouteImport
-      parentRoute: typeof AuthedRoute
+    '/photographers/$id': {
+      id: '/photographers/$id'
+      path: '/photographers/$id'
+      fullPath: '/photographers/$id'
+      preLoaderRoute: typeof PhotographersIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authed/admin/': {
       id: '/_authed/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthedAdminIndexRouteImport
-      parentRoute: typeof AuthedAdminRoute
-    }
-    '/_authed/invoices/$bookingId': {
-      id: '/_authed/invoices/$bookingId'
-      path: '/invoices/$bookingId'
-      fullPath: '/invoices/$bookingId'
-      preLoaderRoute: typeof AuthedInvoicesBookingIdRouteImport
-      parentRoute: typeof AuthedRoute
-    }
-    '/_authed/invoice/$id': {
-      id: '/_authed/invoice/$id'
-      path: '/invoice/$id'
-      fullPath: '/invoice/$id'
-      preLoaderRoute: typeof AuthedInvoiceIdRouteImport
-      parentRoute: typeof AuthedRoute
-    }
-    '/_authed/book/$id': {
-      id: '/_authed/book/$id'
-      path: '/book/$id'
-      fullPath: '/book/$id'
-      preLoaderRoute: typeof AuthedBookIdRouteImport
-      parentRoute: typeof AuthedRoute
-    }
-    '/_authed/admin/quotes': {
-      id: '/_authed/admin/quotes'
-      path: '/quotes'
-      fullPath: '/admin/quotes'
-      preLoaderRoute: typeof AuthedAdminQuotesRouteImport
-      parentRoute: typeof AuthedAdminRoute
-    }
-    '/_authed/admin/photography-bookings': {
-      id: '/_authed/admin/photography-bookings'
-      path: '/photography-bookings'
-      fullPath: '/admin/photography-bookings'
-      preLoaderRoute: typeof AuthedAdminPhotographyBookingsRouteImport
-      parentRoute: typeof AuthedAdminRoute
-    }
-    '/_authed/admin/photographers': {
-      id: '/_authed/admin/photographers'
-      path: '/photographers'
-      fullPath: '/admin/photographers'
-      preLoaderRoute: typeof AuthedAdminPhotographersRouteImport
-      parentRoute: typeof AuthedAdminRoute
-    }
-    '/_authed/admin/bookings': {
-      id: '/_authed/admin/bookings'
-      path: '/bookings'
-      fullPath: '/admin/bookings'
-      preLoaderRoute: typeof AuthedAdminBookingsRouteImport
-      parentRoute: typeof AuthedAdminRoute
-    }
-    '/_authed/admin/billboards': {
-      id: '/_authed/admin/billboards'
-      path: '/billboards'
-      fullPath: '/admin/billboards'
-      preLoaderRoute: typeof AuthedAdminBillboardsRouteImport
       parentRoute: typeof AuthedAdminRoute
     }
     '/_authed/admin/audit-log': {
@@ -643,19 +607,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedAdminAuditLogRouteImport
       parentRoute: typeof AuthedAdminRoute
     }
-    '/_authed/admin/photographers/': {
-      id: '/_authed/admin/photographers/'
-      path: '/'
-      fullPath: '/admin/photographers/'
-      preLoaderRoute: typeof AuthedAdminPhotographersIndexRouteImport
-      parentRoute: typeof AuthedAdminPhotographersRoute
+    '/_authed/admin/billboards': {
+      id: '/_authed/admin/billboards'
+      path: '/billboards'
+      fullPath: '/admin/billboards'
+      preLoaderRoute: typeof AuthedAdminBillboardsRouteImport
+      parentRoute: typeof AuthedAdminRoute
     }
-    '/_authed/admin/bookings/': {
-      id: '/_authed/admin/bookings/'
-      path: '/'
-      fullPath: '/admin/bookings/'
-      preLoaderRoute: typeof AuthedAdminBookingsIndexRouteImport
-      parentRoute: typeof AuthedAdminBookingsRoute
+    '/_authed/admin/bookings': {
+      id: '/_authed/admin/bookings'
+      path: '/bookings'
+      fullPath: '/admin/bookings'
+      preLoaderRoute: typeof AuthedAdminBookingsRouteImport
+      parentRoute: typeof AuthedAdminRoute
+    }
+    '/_authed/admin/photographers': {
+      id: '/_authed/admin/photographers'
+      path: '/photographers'
+      fullPath: '/admin/photographers'
+      preLoaderRoute: typeof AuthedAdminPhotographersRouteImport
+      parentRoute: typeof AuthedAdminRoute
+    }
+    '/_authed/admin/photography-bookings': {
+      id: '/_authed/admin/photography-bookings'
+      path: '/photography-bookings'
+      fullPath: '/admin/photography-bookings'
+      preLoaderRoute: typeof AuthedAdminPhotographyBookingsRouteImport
+      parentRoute: typeof AuthedAdminRoute
+    }
+    '/_authed/admin/quotes': {
+      id: '/_authed/admin/quotes'
+      path: '/quotes'
+      fullPath: '/admin/quotes'
+      preLoaderRoute: typeof AuthedAdminQuotesRouteImport
+      parentRoute: typeof AuthedAdminRoute
+    }
+    '/_authed/book/$id': {
+      id: '/_authed/book/$id'
+      path: '/book/$id'
+      fullPath: '/book/$id'
+      preLoaderRoute: typeof AuthedBookIdRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/invoice/$id': {
+      id: '/_authed/invoice/$id'
+      path: '/invoice/$id'
+      fullPath: '/invoice/$id'
+      preLoaderRoute: typeof AuthedInvoiceIdRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/invoices/$bookingId': {
+      id: '/_authed/invoices/$bookingId'
+      path: '/invoices/$bookingId'
+      fullPath: '/invoices/$bookingId'
+      preLoaderRoute: typeof AuthedInvoicesBookingIdRouteImport
+      parentRoute: typeof AuthedRoute
     }
     '/_authed/admin/billboards/': {
       id: '/_authed/admin/billboards/'
@@ -664,25 +670,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedAdminBillboardsIndexRouteImport
       parentRoute: typeof AuthedAdminBillboardsRoute
     }
-    '/_authed/admin/photographers/new': {
-      id: '/_authed/admin/photographers/new'
-      path: '/new'
-      fullPath: '/admin/photographers/new'
-      preLoaderRoute: typeof AuthedAdminPhotographersNewRouteImport
-      parentRoute: typeof AuthedAdminPhotographersRoute
-    }
-    '/_authed/admin/photographers/$id': {
-      id: '/_authed/admin/photographers/$id'
+    '/_authed/admin/billboards/$id': {
+      id: '/_authed/admin/billboards/$id'
       path: '/$id'
-      fullPath: '/admin/photographers/$id'
-      preLoaderRoute: typeof AuthedAdminPhotographersIdRouteImport
-      parentRoute: typeof AuthedAdminPhotographersRoute
+      fullPath: '/admin/billboards/$id'
+      preLoaderRoute: typeof AuthedAdminBillboardsIdRouteImport
+      parentRoute: typeof AuthedAdminBillboardsRoute
     }
-    '/_authed/admin/bookings/new': {
-      id: '/_authed/admin/bookings/new'
+    '/_authed/admin/billboards/new': {
+      id: '/_authed/admin/billboards/new'
       path: '/new'
-      fullPath: '/admin/bookings/new'
-      preLoaderRoute: typeof AuthedAdminBookingsNewRouteImport
+      fullPath: '/admin/billboards/new'
+      preLoaderRoute: typeof AuthedAdminBillboardsNewRouteImport
+      parentRoute: typeof AuthedAdminBillboardsRoute
+    }
+    '/_authed/admin/bookings/': {
+      id: '/_authed/admin/bookings/'
+      path: '/'
+      fullPath: '/admin/bookings/'
+      preLoaderRoute: typeof AuthedAdminBookingsIndexRouteImport
       parentRoute: typeof AuthedAdminBookingsRoute
     }
     '/_authed/admin/bookings/$id': {
@@ -692,19 +698,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedAdminBookingsIdRouteImport
       parentRoute: typeof AuthedAdminBookingsRoute
     }
-    '/_authed/admin/billboards/new': {
-      id: '/_authed/admin/billboards/new'
+    '/_authed/admin/bookings/new': {
+      id: '/_authed/admin/bookings/new'
       path: '/new'
-      fullPath: '/admin/billboards/new'
-      preLoaderRoute: typeof AuthedAdminBillboardsNewRouteImport
-      parentRoute: typeof AuthedAdminBillboardsRoute
+      fullPath: '/admin/bookings/new'
+      preLoaderRoute: typeof AuthedAdminBookingsNewRouteImport
+      parentRoute: typeof AuthedAdminBookingsRoute
     }
-    '/_authed/admin/billboards/$id': {
-      id: '/_authed/admin/billboards/$id'
+    '/_authed/admin/photographers/': {
+      id: '/_authed/admin/photographers/'
+      path: '/'
+      fullPath: '/admin/photographers/'
+      preLoaderRoute: typeof AuthedAdminPhotographersIndexRouteImport
+      parentRoute: typeof AuthedAdminPhotographersRoute
+    }
+    '/_authed/admin/photographers/$id': {
+      id: '/_authed/admin/photographers/$id'
       path: '/$id'
-      fullPath: '/admin/billboards/$id'
-      preLoaderRoute: typeof AuthedAdminBillboardsIdRouteImport
-      parentRoute: typeof AuthedAdminBillboardsRoute
+      fullPath: '/admin/photographers/$id'
+      preLoaderRoute: typeof AuthedAdminPhotographersIdRouteImport
+      parentRoute: typeof AuthedAdminPhotographersRoute
+    }
+    '/_authed/admin/photographers/new': {
+      id: '/_authed/admin/photographers/new'
+      path: '/new'
+      fullPath: '/admin/photographers/new'
+      preLoaderRoute: typeof AuthedAdminPhotographersNewRouteImport
+      parentRoute: typeof AuthedAdminPhotographersRoute
     }
   }
 }
@@ -807,6 +827,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthedRoute: AuthedRouteWithChildren,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
+  DigitalMarketingRoute: DigitalMarketingRoute,
   IndustriesRoute: IndustriesRoute,
   PortfolioRoute: PortfolioRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,

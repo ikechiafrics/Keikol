@@ -34,6 +34,18 @@ export const Route = createFileRoute("/_authed/admin/quotes")({
 
 const STATUS_OPTIONS: QuoteStatus[] = ["new", "contacted", "closed"];
 
+// Missing/unset serviceType falls back to "Billboard" — older quotes
+// predate this field entirely.
+function serviceBadge(qte: QuoteRequest): { label: string; className: string } {
+  if (qte.serviceType === "photography_videography") {
+    return { label: "Photography & Videography", className: "bg-electric/15 text-electric-soft" };
+  }
+  if (qte.serviceType === "digital_marketing") {
+    return { label: "Digital Marketing", className: "bg-accent/20 text-accent" };
+  }
+  return { label: "Billboard", className: "bg-gold/20 text-gold" };
+}
+
 async function updateQuoteStatus(quote: QuoteRequest, status: QuoteStatus, actor: AuditActor) {
   const batch = writeBatch(db);
   batch.update(doc(db, "quoteRequests", quote.id), { status, updatedAt: serverTimestamp() });
@@ -128,6 +140,8 @@ function AdminQuotesPage() {
               {quotes.map((qte) => {
                 const classes = QUOTE_STATUS_CLASSES[qte.status];
                 const isPhotography = qte.serviceType === "photography_videography";
+                const isDigitalMarketing = qte.serviceType === "digital_marketing";
+                const badge = serviceBadge(qte);
                 return (
                   <tr key={qte.id} className="border-b border-border align-top last:border-0">
                     <td className="whitespace-nowrap px-5 py-4 text-muted-foreground">
@@ -135,13 +149,9 @@ function AdminQuotesPage() {
                     </td>
                     <td className="px-5 py-4">
                       <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${
-                          isPhotography
-                            ? "bg-electric/15 text-electric-soft"
-                            : "bg-gold/20 text-gold"
-                        }`}
+                        className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${badge.className}`}
                       >
-                        {isPhotography ? "Photography & Videography" : "Billboard"}
+                        {badge.label}
                       </span>
                     </td>
                     <td className="px-5 py-4">
@@ -153,11 +163,24 @@ function AdminQuotesPage() {
                       <p className="text-xs text-muted-foreground">{qte.phone}</p>
                     </td>
                     <td className="px-5 py-4 text-muted-foreground">
-                      <p>{isPhotography ? qte.interestedPhotographer : qte.interestedBillboard}</p>
-                      {qte.city && <p className="text-xs">{qte.city}</p>}
+                      {isDigitalMarketing ? (
+                        <>
+                          <p>{qte.businessName || "—"}</p>
+                          {qte.website && <p className="text-xs">{qte.website}</p>}
+                        </>
+                      ) : (
+                        <>
+                          <p>{isPhotography ? qte.interestedPhotographer : qte.interestedBillboard}</p>
+                          {qte.city && <p className="text-xs">{qte.city}</p>}
+                        </>
+                      )}
                     </td>
                     <td className="px-5 py-4 text-muted-foreground">
-                      {isPhotography ? (
+                      {isDigitalMarketing ? (
+                        <p className="text-xs">
+                          {qte.platforms && qte.platforms.length > 0 ? qte.platforms.join(", ") : "—"}
+                        </p>
+                      ) : isPhotography ? (
                         <>
                           <p className="text-xs">{qte.occasion || "—"}</p>
                           {qte.preferredDate && <p className="text-xs">{qte.preferredDate}</p>}

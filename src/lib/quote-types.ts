@@ -2,7 +2,7 @@ import type { Timestamp } from "firebase/firestore";
 import type { QuoteStatus } from "@/lib/quote-status";
 import type { StatusBadgeClasses } from "@/lib/status-badge";
 
-export type QuoteService = "billboard" | "photography_videography";
+export type QuoteService = "billboard" | "photography_videography" | "digital_marketing";
 
 export interface QuoteRequest {
   id: string;
@@ -31,6 +31,10 @@ export interface QuoteRequest {
   interestedPhotographer?: string;
   occasion?: string;
   preferredDate?: string;
+  // Digital marketing-shaped fields (present on those submissions).
+  businessName?: string;
+  website?: string;
+  platforms?: string[];
 }
 
 export const QUOTE_STATUS_CLASSES: Record<QuoteStatus, StatusBadgeClasses> = {

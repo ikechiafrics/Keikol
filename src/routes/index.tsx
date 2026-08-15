@@ -7,6 +7,7 @@ import {
   ChevronRight,
   MapPin,
   Sparkles,
+  Target,
 } from "lucide-react";
 
 import { Section, SectionHeader, CTASection } from "@/components";
@@ -140,6 +141,15 @@ const SERVICES: Service[] = [
     href: "/photographers",
     icon: Camera,
     highlights: ["Corporate shoots", "Real estate coverage", "Weddings & events"],
+  },
+  {
+    eyebrow: "Client Acquisition",
+    title: "Digital Marketing",
+    description:
+      "Paid campaigns across Meta, Google, Snapchat, TikTok, and AI search — built, run, and measured by Keikol.",
+    href: "/digital-marketing",
+    icon: Target,
+    highlights: ["Meta & Google Ads", "TikTok & Snapchat", "AI search visibility"],
   },
   // Add a new service here — the layout scales automatically.
 ];

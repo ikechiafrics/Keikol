@@ -176,6 +176,27 @@ service cloud.firestore {
                     && request.resource.data.preferredDate is string && request.resource.data.preferredDate.size() <= 50
                     && request.resource.data.status == "new"
                     && request.resource.data.createdAt == request.time
+                    && request.resource.data.updatedAt == request.time)
+                    || (request.resource.data.keys().hasOnly([
+                        "name", "email", "phone", "message", "serviceType",
+                        "businessName", "website", "platforms", "status", "createdAt", "updatedAt"
+                      ])
+                    && request.resource.data.keys().hasAll([
+                        "name", "email", "phone", "message", "serviceType",
+                        "businessName", "website", "platforms", "status", "createdAt", "updatedAt"
+                      ])
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 200
+                    && request.resource.data.email is string
+                    && request.resource.data.email.size() > 0 && request.resource.data.email.size() <= 320
+                    && request.resource.data.phone is string && request.resource.data.phone.size() <= 40
+                    && request.resource.data.message is string && request.resource.data.message.size() <= 5000
+                    && request.resource.data.serviceType == "digital_marketing"
+                    && request.resource.data.businessName is string && request.resource.data.businessName.size() <= 200
+                    && request.resource.data.website is string && request.resource.data.website.size() <= 300
+                    && request.resource.data.platforms is list && request.resource.data.platforms.size() <= 5
+                    && request.resource.data.status == "new"
+                    && request.resource.data.createdAt == request.time
                     && request.resource.data.updatedAt == request.time);
 
       allow update: if isAdmin()
